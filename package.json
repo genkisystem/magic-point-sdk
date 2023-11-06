@@ -21,15 +21,11 @@
     "url": "git+ssh://git@github.com/genkisystem/magic-point-sdk.git"
   },
   "keywords": [
-    "Magic",
-    "Dot",
-    "Magic",
-    "Point",
-    "UI",
+    "Magic-Dot",
+    "Magic-Point",
+    "UI-Testing",
     "Testing",
-    "Testing",
-    "Front-end",
-    "Testing"
+    "Front-end-Testing"
   ],
   "author": "Genki System Corp",
   "license": "ISC",
