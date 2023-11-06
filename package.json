@@ -1,0 +1,51 @@
+{
+  "name": "magic-point-sdk",
+  "version": "0.0.0",
+  "description": "Software Developer Kit of Magic Point project build on Javascript/NodeJS",
+  "main": "dist/index.cjs",
+  "module": "dist/index.m.js",
+  "unpkg": "dist/index.umd.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    "default": "./dist/index.esm.js",
+    "require": "./dist/index.cjs",
+    "types": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": " rm -rf dist && rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/genkisystem/magic-point-sdk.git"
+  },
+  "keywords": [
+    "Magic",
+    "Dot",
+    "Magic",
+    "Point",
+    "UI",
+    "Testing",
+    "Testing",
+    "Front-end",
+    "Testing"
+  ],
+  "author": "Genki System Corp",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/genkisystem/magic-point-sdk/issues"
+  },
+  "homepage": "https://github.com/genkisystem/magic-point-sdk#readme",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "rollup": "^4.1.6",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript2": "^0.36.0"
+  }
+}
