@@ -18,9 +18,15 @@
     "sourceMap": true,
     "strict": true,
     "target": "ES6",
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ]
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.css"
   ],
   "exclude": [
     "node_modules",

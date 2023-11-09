@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": " rm -rf dist && rollup -c"
+    "build": " rm -rf dist && rollup -c --watch"
   },
   "repository": {
     "type": "git",
@@ -40,8 +40,12 @@
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "rollup": "^4.1.6",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-typescript2": "^0.36.0"
+    "rollup-plugin-css": "^1.0.10",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "sass": "^1.69.5"
+  },
+  "dependencies": {
+    "uninstall": "^0.0.0"
   }
 }
