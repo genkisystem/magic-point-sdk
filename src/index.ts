@@ -8,38 +8,54 @@ class MagicPoint extends Base {
     constructor(config: ConfigurationOptions) {
         super(config)
         console.log('add magic dot listner')
+        this.initDotElement()
         this.createDotEventListenerHandler = this.createDotEventListenerHandler.bind(this); // Bind the context here
         this.addCreateDotEventListener()
+        this.moveCursor = this.moveCursor.bind(this); // Bind the context here
+        this.addCreateDotEventMove()
+        console.log(css)
     }
 
-    createDotEventListenerHandler(e: MouseEvent) {
-        this.insertDot(e)
-        this.insertForm(e)
-    }
+    // Event listener
     addCreateDotEventListener(): void {
         document.body.addEventListener("click", this.createDotEventListenerHandler)
     }
-
     removeCreateDotEventListener(): void {
-        console.log('remove event listener')
         document.body.removeEventListener("click", this.createDotEventListenerHandler)
     }
-
-    insertDot(e: MouseEvent): void {
-        this.removeCreateDotEventListener()
-        const dot: HTMLElement = document.createElement("div")
-
-        document.body.style.position = "relative"
-        dot.style.position = "absolute"
-        dot.style.left = (e.clientX - 10) + 'px'
-        dot.style.top = (e.clientY - 10) + 'px'
-        dot.style.height = '20px'
-        dot.style.width = '20px'
-        dot.style.backgroundColor = 'red'
-        dot.style.borderRadius = '50%'
-        document.body.appendChild(dot)
+    addCreateDotEventMove(): void {
+        document.body.addEventListener("mousemove", this.moveCursor)
+    }
+    removeCreateDotEventMove(){
+        document.body.removeEventListener("mousemove", this.moveCursor)
     }
 
+    createDotEventListenerHandler(e: MouseEvent) {
+        this.insertDotElementToClick(e)
+        this.removeCreateDotEventListener()
+        this.removeCreateDotEventMove()
+        this.insertForm(e)
+    }
+    moveCursor(e: MouseEvent): void {
+        const mouseY = e.clientY;
+        const mouseX = e.clientX;
+        const dotElement = document.getElementsByClassName(`${css['dot-element']}`)[0] as HTMLDivElement;
+        dotElement.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+       
+    }
+
+    initDotElement(): void {
+        console.log('insert')
+        const dot: HTMLElement = document.createElement("div")
+        dot.classList.add(css['dot-element'])
+        document.body.appendChild(dot)
+    }
+    insertDotElementToClick(e: MouseEvent){
+
+        const dotElement = document.getElementsByClassName(`${css['dot-element']}`)[0] as HTMLDivElement;
+        dotElement.style.top = e.clientY.toString();
+        dotElement.style.top = e.clientY.toString();
+    }
 
 
     insertForm(e: MouseEvent) {
