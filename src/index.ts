@@ -3,11 +3,13 @@ import { Posts } from "./posts"
 import { applyMixins } from "./utils";
 import { ConfigurationOptions } from "./base";
 import css from './index.scss';
+import Quill from 'quill'
 
 class MagicPoint extends Base {
     constructor(config: ConfigurationOptions) {
         super(config)
         console.log('add magic dot listner')
+        this.configTrix()
         this.initDotElement()
         this.createDotEventListenerHandler = this.createDotEventListenerHandler.bind(this); // Bind the context here
         this.addCreateDotEventListener()
@@ -29,12 +31,21 @@ class MagicPoint extends Base {
     removeCreateDotEventMove(){
         document.body.removeEventListener("mousemove", this.moveCursor)
     }
+    configTrix(){
+        document.addEventListener("trix-before-initialize", () => {
+        })
+    }
 
     createDotEventListenerHandler(e: MouseEvent) {
         this.insertDotElementToClick(e)
         this.removeCreateDotEventListener()
         this.removeCreateDotEventMove()
+        this.addCursorMouse()
         this.insertForm(e)
+    }
+    addCursorMouse(){
+        const bodyElement = document.body
+        bodyElement.style.cursor = 'default'
     }
     moveCursor(e: MouseEvent): void {
         const mouseY = e.clientY;
@@ -108,11 +119,12 @@ class MagicPoint extends Base {
                 <input type="text" id="title">
             </div>
 
-            <div class="${css.input_field}">
+            <div class="${css.input_field_editor}">
                 <label class="${css.label}" for="comment">Comment:</label>
-                <textarea type="text" id="comment" name="comment"></textarea>
+                <div class="${css.editor}">
+                    <div id="editor"></div>
+                </div>
             </div>
-            
             <div>
                 <input type="file" name="file" accept="image/*" onchange="document.getElementById('canvas').src = window.URL.createObjectURL(this.files[0])">
             </div>
@@ -126,7 +138,17 @@ class MagicPoint extends Base {
 
         document.body.appendChild(form)
 
+        // add link to header html
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdn.quilljs.com/1.3.6/quill.snow.css';
+        document.head.appendChild(link);
 
+        var quill = new Quill("#editor", {
+            debug: "info",
+            theme: "snow"
+          })
+        console.log(quill)
         function takeScreenshot() {
             // Use the MediaDevices API to capture the screen
             navigator.mediaDevices.getDisplayMedia({ video: { preferCurrentTab: true } as MediaTrackConstraints }).then((stream) => {
