@@ -1,13 +1,24 @@
+.hide {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
 .form {
     position: absolute;
     background-color: #fff;
     width: fit-content;
     height: fit-content;
+    margin: auto;
+    z-index: 10;
 
     .container {
         display: flex;
         flex-direction: column;
-        padding: 1rem 1rem;
+        padding-right: 1rem;
+        border: 1px solid #fff;
 
         .first_row {
             width: max-content;
@@ -17,17 +28,20 @@
             align-items: flex-start;
             justify-content: center;
 
-            .canvas {
-                width: 80vw;
-                height: 70vh;
-
-                background-position: center;
+            #canvas_holder {
+                width: 100%;
+                height: 100%;
+                max-width: 800px;
+                max-height: 80vh;
+                overflow: scroll;
 
                 border: 1px solid black;
                 color: #000;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+
+                .canvas {
+                    width: 100%;
+                    height: 100%;
+                }
             }
 
             .tool_bar_mockup {
@@ -44,6 +58,7 @@
 
                     &:hover {
                         background-color: purple;
+                        cursor: pointer;
                     }
                 }
             }
@@ -84,7 +99,7 @@
         .action {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
         }
 
         .title-label {

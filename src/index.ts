@@ -1,3 +1,5 @@
+import { toCanvas } from 'html-to-image'
+
 import { Base } from "./base";
 import { Posts } from "./posts"
 import { applyMixins } from "./utils";
@@ -11,10 +13,11 @@ class MagicPoint extends Base {
         this.createDotEventListenerHandler = this.createDotEventListenerHandler.bind(this); // Bind the context here
         this.addCreateDotEventListener()
     }
-
     createDotEventListenerHandler(e: MouseEvent) {
-        this.insertDot(e)
-        this.insertForm(e)
+        this.autoCaptureCurrentUserView(e).then((canvas) => {
+            this.insertForm(e, canvas)
+            this.insertDot(e)
+        })
     }
     addCreateDotEventListener(): void {
         document.body.addEventListener("click", this.createDotEventListenerHandler)
@@ -37,48 +40,19 @@ class MagicPoint extends Base {
         dot.style.width = '20px'
         dot.style.backgroundColor = 'red'
         dot.style.borderRadius = '50%'
+        dot.style.zIndex = '1'
         document.body.appendChild(dot)
     }
 
-
-
-    insertForm(e: MouseEvent) {
-        // const previewImage = (event: Event | undefined) => {
-        //     console.log('event: ', e)
-        //     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-        //     const target = event?.target as HTMLInputElement
-        //     if (!target.files) return;
-        //     const file = target.files[0];
-        //     const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d');
-        //     const reader = new FileReader();
-
-        //     reader.onload = function (event) {
-        //         const img = new Image();
-        //         img.onload = function () {
-        //             canvas.width = img.width;
-        //             canvas.height = img.height;
-        //             ctx?.drawImage(img, 0, 0);
-        //             // Perform your image editing operations here
-        //             // For example, you can draw shapes or add filters
-        //             ctx!.fillStyle = 'rgba(255, 0, 0, 0.5)';
-        //             ctx?.fillRect(10, 10, 50, 50); // Example rectangle
-
-        //             // You can add more editing operations here
-
-        //             // Example of saving the edited image
-        //             const editedImage = canvas.toDataURL('image/jpeg');
-        //             console.log('Edited image data:', editedImage);
-        //         }
-        //         img.src = event.target?.result as string;
-        //     }
-        //     reader.readAsDataURL(file);
-        // }
+    insertForm(e: MouseEvent, canvas: HTMLCanvasElement) {
+        console.log('insert form')
+        console.log(css)
         const form: HTMLFormElement = document.createElement('form')
-        form.classList.add(css.form)
+        form.classList.add(css.form, css.hide)
         form.innerHTML = `
         <div class="${css.container}">
             <div class="${css.first_row}">
-                <canvas class="${css.canvas}" id="canvas"></canvas>
+                <div id="${css.canvas_holder}"></div>
                 <div class="${css.tool_bar_mockup}">
                     <div class="${css.mockup_button}"></div>
                     <div class="${css.mockup_button}"></div>
@@ -86,7 +60,6 @@ class MagicPoint extends Base {
                     <div class="${css.mockup_button}"></div>
                 </div>
             </div>
-
             <div class="${css.input_field}">
                 <label class="${css.label}" for="title">Task title: </label>
                 <input type="text" id="title">
@@ -105,39 +78,82 @@ class MagicPoint extends Base {
             </div>
         </div>
         `
-        form.style.left = (e.clientX + 10) + 'px'
-        form.style.top = (e.clientY + 10) + 'px'
-
+        // form.style.left = (e.clientX + 10) + 'px'
+        // form.style.top = (e.clientY + 10) + 'px'
+        form.style.left = '5%'
+        form.style.top = '40px'
+        // form.style.margin = '0 auto'
         document.body.appendChild(form)
+        form.classList.add(`${css.show}`)
+        form.classList.remove(`${css.hide}`)
+
+        const canvasHolder = document.getElementById(`${css.canvas_holder}`)
+        canvas.classList.add('canvas')
+        canvasHolder?.appendChild(canvas)
+    }
 
 
-        function takeScreenshot() {
-            // Use the MediaDevices API to capture the screen
-            navigator.mediaDevices.getDisplayMedia({ video: { preferCurrentTab: true } as MediaTrackConstraints }).then((stream) => {
-                const track = stream.getVideoTracks()[0];
-                const imageCapture = new (window as any).ImageCapture(track);
-                imageCapture.grabFrame().then((imageBitmap: ImageBitmap) => {
-                    const canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
-                    canvas.width = imageBitmap.width!;
-                    canvas.height = imageBitmap.height!;
-                    const ctx = canvas.getContext('2d');
-                    if (ctx) {
-                        ctx.drawImage(imageBitmap, 0, 0);
-                        // Convert the canvas to an image and display it on the page or do something else with it
-                        // const img = new Image();
-                        // img.src = canvas.toDataURL();
-                        // document.body.appendChild(img);
-                    }
-                });
-            }).catch((error) => {
-                console.error('Error capturing screen:', error);
-            });
+    // Default capture screen flow
+    async autoCaptureCurrentUserView(e: MouseEvent): Promise<HTMLCanvasElement> {
+        console.log("event: ", e)
+        // we need to find outermost tag because that seem like the library not accepting body tag
+        const outermostTag = this.findOutermostTag(e.target as HTMLElement)
+        console.log('outermost tag: ', outermostTag)
+        const canvasFromLib = await toCanvas(outermostTag, { backgroundColor: 'pink' })
+        console.log('base64img: ', canvasFromLib)
+        const canvas = document.createElement('canvas')
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+        canvas.style.border = '1px solid #fff'
+        const ctx = canvas.getContext('2d')!
+        ctx.fillStyle = "grey";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.drawImage(canvasFromLib, 0, 0, window.innerWidth * 2, window.innerHeight * 2, 0, 0, window.innerWidth, window.innerHeight)
+        // ctx.drawImage(canvasFromLib, 0, 0)
+
+        // const image = new Image()
+        // image.src = img
+        // image.onload = () => {
+        //     console.log(`clientX: ${e.clientX} -- clientY: ${e.clientY} -- scrollX: ${window.scrollX} -- scrollY: ${window.scrollY}`)
+        //     console.log('canvas: ' + 'width: ' + canvas.width + 'height: ' + canvas.height)
+        //     // let sx, sy, sw, sh
+        //     // // , dImagePaddingX, dImagePaddingY
+        //     // // We want to make sure that the image is rectangular
+        //     // // So we need to detect the point where the image being taken
+        //     // sx = window.scrollX + e.clientX
+        //     // sy = window.scrollY + e.clientY
+        //     // sw = window.innerWidth
+        //     // sh = window.innerHeight
+        //     // console.log('source x: ' + sx + ' source y: ' + sy)
+
+        //     // ctx.drawImage(image, sx, sy, sw, sh, 0, 0, 800, window.innerHeight)
+        //     ctx.drawImage(image, 0, 0, window.innerWidth, window.innerHeight, 0, 0, window.innerWidth, window.innerHeight)
+        //     document.body.appendChild(canvas)
+        //     document.body.appendChild(base64img)
+        // }
+
+        return canvas
+    }
+
+    findOutermostTag(element: HTMLElement) {
+        console.log('passing element: ', element)
+        let currentElement = element;
+        // if (element.tagName.toLowerCase() === 'body' || element.tagName.toLowerCase() === 'html') {
+        //     currentElement = element.firstElementChild as HTMLElement;
+        // }
+
+        while (currentElement.parentElement) {
+            if (currentElement.parentElement.tagName.toLowerCase() === 'body') {
+                console.log("selected element: ", currentElement)
+                return currentElement
+            }
+            currentElement = currentElement.parentElement;
         }
-
-        takeScreenshot()
+        console.log("selected element: ", currentElement)
+        return currentElement
     }
 }
-
 
 interface MagicPoint extends Posts { }
 
