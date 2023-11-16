@@ -1,4 +1,4 @@
-import { toCanvas, toPng } from 'html-to-image'
+import { toPng } from 'html-to-image'
 
 import { Base } from "./base";
 import { Posts } from "./posts"
@@ -31,10 +31,10 @@ class MagicPoint extends Base {
     addCreateDotEventMove(): void {
         document.body.addEventListener("mousemove", this.moveCursor)
     }
-    removeCreateDotEventMove(){
+    removeCreateDotEventMove() {
         document.body.removeEventListener("mousemove", this.moveCursor)
     }
-    configTrix(){
+    configTrix() {
         document.addEventListener("trix-before-initialize", () => {
         })
     }
@@ -48,7 +48,7 @@ class MagicPoint extends Base {
         this.removeCreateDotEventMove()
         this.addCursorMouse()
     }
-    addCursorMouse(){
+    addCursorMouse() {
         const bodyElement = document.body
         bodyElement.style.cursor = 'default'
     }
@@ -57,7 +57,7 @@ class MagicPoint extends Base {
         const mouseX = e.clientX;
         const dotElement = document.getElementsByClassName(`${css['dot-element']}`)[0] as HTMLDivElement;
         dotElement.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
-       
+
     }
 
     initDotElement(): void {
@@ -66,7 +66,7 @@ class MagicPoint extends Base {
         dot.classList.add(css['dot-element'])
         document.body.appendChild(dot)
     }
-    insertDotElementToClick(e: MouseEvent){
+    insertDotElementToClick(e: MouseEvent) {
 
         const dotElement = document.getElementsByClassName(`${css['dot-element']}`)[0] as HTMLDivElement;
         dotElement.style.top = e.clientY.toString();
@@ -110,10 +110,14 @@ class MagicPoint extends Base {
         form.classList.add(`${css.show}`)
         form.classList.remove(`${css.hide}`)
 
+        const canvasHolder = document.getElementById(`${css.canvas_holder}`)
+        canvas.classList.add('canvas')
+        canvasHolder?.appendChild(canvas)
+
         // const canvasHolder = document.getElementById(`${css.canvas_holder}`)
         // canvas.classList.add('canvas')
         // canvasHolder?.appendChild(canvas)
-        
+
         // add link to header html
         const link = document.createElement('link');
         link.rel = 'stylesheet';
@@ -123,56 +127,86 @@ class MagicPoint extends Base {
         var quill = new Quill("#editor", {
             debug: "info",
             theme: "snow"
-            })
+        })
         console.log(quill)
 
         const imageEditorWrapper = new ImageEditorWrapper(`#${css.canvas_holder}`, canvas.toDataURL());
         console.log(imageEditorWrapper);
     }
     // Default capture screen flow
+    // async autoCaptureCurrentUserView(e: MouseEvent): Promise<HTMLCanvasElement> {
+    //     console.log("event: ", e)
+    //     // we need to find outermost tag because that seem like the library not accepting body tag
+    //     const outermostTag = this.findOutermostTag(e.target as HTMLElement)
+    //     console.log('outermost tag: ', outermostTag)
+    //     const canvasFromLib = await toCanvas(outermostTag, { backgroundColor: 'pink' })
+    //     const base64png = await toPng(outermostTag)
+    //     console.log(base64png)
+    //     console.log('base64img: ', canvasFromLib)
+    //     const canvas = document.createElement('canvas')
+    //     canvas.width = window.innerWidth
+    //     canvas.height = window.innerHeight
+    //     canvas.style.border = '1px solid #fff'
+    //     const ctx = canvas.getContext('2d')!
+    //     ctx.fillStyle = "grey";
+    //     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    //     // ctx.drawImage(canvasFromLib, 0, 0, window.innerWidth * 2, window.innerHeight * 2, 0, 0, window.innerWidth, window.innerHeight)
+    //     // ctx.drawImage(canvasFromLib, 0, 0)
+
+    //     const image = new Image()
+    //     image.src = base64png
+    //     image.onload = () => {
+    //         let sx, sy, sw, sh, dw, dh
+    //         sx = window.scrollX + e.clientX * this.getDevicePixelRatio()
+    //         sy = window.scrollY + e.clientY * this.getDevicePixelRatio()
+    //         console.log(`clientX: ${e.clientX} -- clientY: ${e.clientY}`)
+    //         console.log(` -- scrollX: ${window.scrollX} -- scrollY: ${window.scrollY}`)
+    //         console.log('source x: ' + sx + ' source y: ' + sy)
+    //         sw = window.innerWidth * this.getDevicePixelRatio()
+    //         sh = window.innerHeight * this.getDevicePixelRatio()
+    //         dw = window.innerWidth
+    //         dh = window.innerHeight
+
+    //         // ctx.drawImage(image, sx, sy, sw, sh, 0, 0, 800, window.innerHeight)
+    //         console.log('draw img')
+    //         ctx.drawImage(image, sx, sy, sw, sh, 0, 0, dw, dh)
+    //         // document.body.appendChild(canvas)
+    //         // document.body.appendChild(base64img)
+    //         return canvas
+    //     }
+    //     console.log('outer return')
+    //     return canvas
+    // }
     async autoCaptureCurrentUserView(e: MouseEvent): Promise<HTMLCanvasElement> {
-        console.log("event: ", e)
-        // we need to find outermost tag because that seem like the library not accepting body tag
-        const outermostTag = this.findOutermostTag(e.target as HTMLElement)
-        console.log('outermost tag: ', outermostTag)
-        const canvasFromLib = await toCanvas(outermostTag, { backgroundColor: 'pink' })
-        const base64png = await toPng(outermostTag)
-        console.log(base64png)
-        console.log('base64img: ', canvasFromLib)
-        const canvas = document.createElement('canvas')
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
-        canvas.style.border = '1px solid #fff'
-        const ctx = canvas.getContext('2d')!
-        ctx.fillStyle = "grey";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const outermostTag = this.findOutermostTag(e.target as HTMLElement);
+        const base64png = await toPng(outermostTag);
 
-        // ctx.drawImage(canvasFromLib, 0, 0, window.innerWidth * 2, window.innerHeight * 2, 0, 0, window.innerWidth, window.innerHeight)
-        // ctx.drawImage(canvasFromLib, 0, 0)
+        return new Promise<HTMLCanvasElement>((resolve) => {
+            const canvas = document.createElement('canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const ctx = canvas.getContext('2d')!;
+            ctx.fillStyle = 'grey';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        const image = new Image()
-        image.src = base64png
-        image.onload = () => {
-            let sx, sy, sw, sh, dw, dh
-            sx = window.scrollX + e.clientX * this.getDevicePixelRatio()
-            sy = window.scrollY + e.clientY * this.getDevicePixelRatio()
-            console.log(`clientX: ${e.clientX} -- clientY: ${e.clientY}`)
-            console.log(` -- scrollX: ${window.scrollX} -- scrollY: ${window.scrollY}`)
-            console.log('source x: ' + sx + ' source y: ' + sy)
-            sw = window.innerWidth * this.getDevicePixelRatio()
-            sh = window.innerHeight * this.getDevicePixelRatio()
-            dw = window.innerWidth
-            dh = window.innerHeight
+            const image = new Image();
+            image.src = base64png;
 
-            // ctx.drawImage(image, sx, sy, sw, sh, 0, 0, 800, window.innerHeight)
-            ctx.drawImage(image, sx, sy, sw, sh, 0, 0, dw, dh)
-            // document.body.appendChild(canvas)
-            // document.body.appendChild(base64img)
-            return canvas
-        }
+            image.onload = () => {
+                const sx = window.scrollX + e.clientX * this.getDevicePixelRatio();
+                const sy = window.scrollY + e.clientY * this.getDevicePixelRatio();
+                const sw = window.innerWidth * this.getDevicePixelRatio();
+                const sh = window.innerHeight * this.getDevicePixelRatio();
+                const dw = window.innerWidth;
+                const dh = window.innerHeight;
 
-        return canvas
+                ctx.drawImage(image, sx, sy, sw, sh, 0, 0, dw, dh);
+                resolve(canvas);
+            };
+        });
     }
+
 
     getDevicePixelRatio(): number {
         return window.devicePixelRatio || 1
