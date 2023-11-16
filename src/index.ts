@@ -6,6 +6,7 @@ import { applyMixins } from "./utils";
 import { ConfigurationOptions } from "./base";
 import css from './index.scss';
 import Quill from 'quill'
+import { ImageEditorWrapper } from './image-editor';
 
 class MagicPoint extends Base {
     constructor(config: ConfigurationOptions) {
@@ -80,12 +81,6 @@ class MagicPoint extends Base {
         <div class="${css.container}">
             <div class="${css.first_row}">
                 <div id="${css.canvas_holder}"></div>
-                <div class="${css.tool_bar_mockup}">
-                    <div class="${css.mockup_button}"></div>
-                    <div class="${css.mockup_button}"></div>
-                    <div class="${css.mockup_button}"></div>
-                    <div class="${css.mockup_button}"></div>
-                </div>
             </div>
             <div class="${css.input_field}">
                 <label class="${css.label}" for="title">Task title: </label>
@@ -115,9 +110,9 @@ class MagicPoint extends Base {
         form.classList.add(`${css.show}`)
         form.classList.remove(`${css.hide}`)
 
-        const canvasHolder = document.getElementById(`${css.canvas_holder}`)
-        canvas.classList.add('canvas')
-        canvasHolder?.appendChild(canvas)
+        // const canvasHolder = document.getElementById(`${css.canvas_holder}`)
+        // canvas.classList.add('canvas')
+        // canvasHolder?.appendChild(canvas)
         
         // add link to header html
         const link = document.createElement('link');
@@ -129,7 +124,10 @@ class MagicPoint extends Base {
             debug: "info",
             theme: "snow"
             })
-        console.log(quill)
+        console.log(quill);
+
+        const imageEditorWrapper = new ImageEditorWrapper(`#${css.canvas_holder}`, canvas.toDataURL());
+        console.log(imageEditorWrapper);
     }
     // Default capture screen flow
     async autoCaptureCurrentUserView(e: MouseEvent): Promise<HTMLCanvasElement> {
@@ -173,7 +171,7 @@ class MagicPoint extends Base {
             return canvas
         }
 
-        return canvas
+        return canvas;
     }
 
     getDevicePixelRatio(): number {
