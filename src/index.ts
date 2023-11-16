@@ -3,43 +3,70 @@ import { Posts } from "./posts"
 import { applyMixins } from "./utils";
 import { ConfigurationOptions } from "./base";
 import css from './index.scss';
+import Quill from 'quill'
 
 class MagicPoint extends Base {
     constructor(config: ConfigurationOptions) {
         super(config)
         console.log('add magic dot listner')
+        this.configTrix()
+        this.initDotElement()
         this.createDotEventListenerHandler = this.createDotEventListenerHandler.bind(this); // Bind the context here
         this.addCreateDotEventListener()
+        this.moveCursor = this.moveCursor.bind(this); // Bind the context here
+        this.addCreateDotEventMove()
+        console.log(css)
     }
 
-    createDotEventListenerHandler(e: MouseEvent) {
-        this.insertDot(e)
-        this.insertForm(e)
-    }
+    // Event listener
     addCreateDotEventListener(): void {
         document.body.addEventListener("click", this.createDotEventListenerHandler)
     }
-
     removeCreateDotEventListener(): void {
-        console.log('remove event listener')
         document.body.removeEventListener("click", this.createDotEventListenerHandler)
     }
-
-    insertDot(e: MouseEvent): void {
-        this.removeCreateDotEventListener()
-        const dot: HTMLElement = document.createElement("div")
-
-        document.body.style.position = "relative"
-        dot.style.position = "absolute"
-        dot.style.left = (e.clientX - 10) + 'px'
-        dot.style.top = (e.clientY - 10) + 'px'
-        dot.style.height = '20px'
-        dot.style.width = '20px'
-        dot.style.backgroundColor = 'red'
-        dot.style.borderRadius = '50%'
-        document.body.appendChild(dot)
+    addCreateDotEventMove(): void {
+        document.body.addEventListener("mousemove", this.moveCursor)
+    }
+    removeCreateDotEventMove(){
+        document.body.removeEventListener("mousemove", this.moveCursor)
+    }
+    configTrix(){
+        document.addEventListener("trix-before-initialize", () => {
+        })
     }
 
+    createDotEventListenerHandler(e: MouseEvent) {
+        this.insertDotElementToClick(e)
+        this.removeCreateDotEventListener()
+        this.removeCreateDotEventMove()
+        this.addCursorMouse()
+        this.insertForm(e)
+    }
+    addCursorMouse(){
+        const bodyElement = document.body
+        bodyElement.style.cursor = 'default'
+    }
+    moveCursor(e: MouseEvent): void {
+        const mouseY = e.clientY;
+        const mouseX = e.clientX;
+        const dotElement = document.getElementsByClassName(`${css['dot-element']}`)[0] as HTMLDivElement;
+        dotElement.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+       
+    }
+
+    initDotElement(): void {
+        console.log('insert')
+        const dot: HTMLElement = document.createElement("div")
+        dot.classList.add(css['dot-element'])
+        document.body.appendChild(dot)
+    }
+    insertDotElementToClick(e: MouseEvent){
+
+        const dotElement = document.getElementsByClassName(`${css['dot-element']}`)[0] as HTMLDivElement;
+        dotElement.style.top = e.clientY.toString();
+        dotElement.style.top = e.clientY.toString();
+    }
 
 
     insertForm(e: MouseEvent) {
@@ -92,11 +119,12 @@ class MagicPoint extends Base {
                 <input type="text" id="title">
             </div>
 
-            <div class="${css.input_field}">
+            <div class="${css.input_field_editor}">
                 <label class="${css.label}" for="comment">Comment:</label>
-                <textarea type="text" id="comment" name="comment"></textarea>
+                <div class="${css.editor}">
+                    <div id="editor"></div>
+                </div>
             </div>
-            
             <div>
                 <input type="file" name="file" accept="image/*" onchange="document.getElementById('canvas').src = window.URL.createObjectURL(this.files[0])">
             </div>
@@ -110,7 +138,17 @@ class MagicPoint extends Base {
 
         document.body.appendChild(form)
 
+        // add link to header html
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdn.quilljs.com/1.3.6/quill.snow.css';
+        document.head.appendChild(link);
 
+        var quill = new Quill("#editor", {
+            debug: "info",
+            theme: "snow"
+          })
+        console.log(quill)
         function takeScreenshot() {
             // Use the MediaDevices API to capture the screen
             navigator.mediaDevices.getDisplayMedia({ video: { preferCurrentTab: true } as MediaTrackConstraints }).then((stream) => {
