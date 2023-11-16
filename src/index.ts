@@ -124,7 +124,7 @@ class MagicPoint extends Base {
             debug: "info",
             theme: "snow"
             })
-        console.log(quill);
+        console.log(quill)
 
         const imageEditorWrapper = new ImageEditorWrapper(`#${css.canvas_holder}`, canvas.toDataURL());
         console.log(imageEditorWrapper);
@@ -171,7 +171,7 @@ class MagicPoint extends Base {
             return canvas
         }
 
-        return canvas;
+        return canvas
     }
 
     getDevicePixelRatio(): number {
