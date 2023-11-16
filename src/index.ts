@@ -1,4 +1,4 @@
-import { toCanvas } from 'html-to-image'
+import { toCanvas, toPng } from 'html-to-image'
 
 import { Base } from "./base";
 import { Posts } from "./posts"
@@ -100,6 +100,8 @@ class MagicPoint extends Base {
         const outermostTag = this.findOutermostTag(e.target as HTMLElement)
         console.log('outermost tag: ', outermostTag)
         const canvasFromLib = await toCanvas(outermostTag, { backgroundColor: 'pink' })
+        const base64png = await toPng(outermostTag)
+        console.log(base64png)
         console.log('base64img: ', canvasFromLib)
         const canvas = document.createElement('canvas')
         canvas.width = window.innerWidth
@@ -109,31 +111,35 @@ class MagicPoint extends Base {
         ctx.fillStyle = "grey";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.drawImage(canvasFromLib, 0, 0, window.innerWidth * 2, window.innerHeight * 2, 0, 0, window.innerWidth, window.innerHeight)
+        // ctx.drawImage(canvasFromLib, 0, 0, window.innerWidth * 2, window.innerHeight * 2, 0, 0, window.innerWidth, window.innerHeight)
         // ctx.drawImage(canvasFromLib, 0, 0)
 
-        // const image = new Image()
-        // image.src = img
-        // image.onload = () => {
-        //     console.log(`clientX: ${e.clientX} -- clientY: ${e.clientY} -- scrollX: ${window.scrollX} -- scrollY: ${window.scrollY}`)
-        //     console.log('canvas: ' + 'width: ' + canvas.width + 'height: ' + canvas.height)
-        //     // let sx, sy, sw, sh
-        //     // // , dImagePaddingX, dImagePaddingY
-        //     // // We want to make sure that the image is rectangular
-        //     // // So we need to detect the point where the image being taken
-        //     // sx = window.scrollX + e.clientX
-        //     // sy = window.scrollY + e.clientY
-        //     // sw = window.innerWidth
-        //     // sh = window.innerHeight
-        //     // console.log('source x: ' + sx + ' source y: ' + sy)
+        const image = new Image()
+        image.src = base64png
+        image.onload = () => {
+            let sx, sy, sw, sh, dw, dh
+            sx = window.scrollX + e.clientX * this.getDevicePixelRatio()
+            sy = window.scrollY + e.clientY * this.getDevicePixelRatio()
+            console.log(`clientX: ${e.clientX} -- clientY: ${e.clientY}`)
+            console.log(` -- scrollX: ${window.scrollX} -- scrollY: ${window.scrollY}`)
+            console.log('source x: ' + sx + ' source y: ' + sy)
+            sw = window.innerWidth * this.getDevicePixelRatio()
+            sh = window.innerHeight * this.getDevicePixelRatio()
+            dw = window.innerWidth
+            dh = window.innerHeight
 
-        //     // ctx.drawImage(image, sx, sy, sw, sh, 0, 0, 800, window.innerHeight)
-        //     ctx.drawImage(image, 0, 0, window.innerWidth, window.innerHeight, 0, 0, window.innerWidth, window.innerHeight)
-        //     document.body.appendChild(canvas)
-        //     document.body.appendChild(base64img)
-        // }
+            // ctx.drawImage(image, sx, sy, sw, sh, 0, 0, 800, window.innerHeight)
+            ctx.drawImage(image, sx, sy, sw, sh, 0, 0, dw, dh)
+            // document.body.appendChild(canvas)
+            // document.body.appendChild(base64img)
+            return canvas
+        }
 
         return canvas
+    }
+
+    getDevicePixelRatio(): number {
+        return window.devicePixelRatio || 1
     }
 
     findOutermostTag(element: HTMLElement) {
