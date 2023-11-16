@@ -11,11 +11,10 @@ export abstract class Base {
     constructor(config: ConfigurationOptions) {
         this.apiKey = config.apiKey
         this.baseUrl = config.baseUrl || "https://jsonplaceholder.typicode.com"
-
     }
 
 
-    protected invoke<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    protected async invoke<T>(endpoint: string, options?: RequestInit): Promise<T> {
         const url = `${this.baseUrl}${endpoint}`
 
         const headers = {
