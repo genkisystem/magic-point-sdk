@@ -1,33 +1,18 @@
-import ImageEditor from "tui-image-editor";
+import ImageEditor from 'tui-image-editor';
+
+import './tui-image-editor/tui-image-editor.css';
+import './tui-image-editor/tui-color-picker.css';
 
 export class ImageEditorWrapper {
   private imageEditor: ImageEditor | null;
-  private readonly tuiImageEditorStylesheet =
-    "https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.min.css";
-  private readonly tuiColorPickerStylesheet =
-    "https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.min.css";
-
+  
   constructor(editorId: string, initialImage: string) {
-    this.loadStylesheets();
     this.imageEditor = this.createImageEditor(editorId, initialImage);
     this.removeUnnecessaryElements();
   }
 
   public getImageDataUrl(): string | undefined {
     return this.imageEditor?.toDataURL();
-  }
-
-  private loadStylesheets() {
-    console.log("[Image editor] loadStylesheets started");
-    this.loadStylesheet(this.tuiImageEditorStylesheet);
-    this.loadStylesheet(this.tuiColorPickerStylesheet);
-  }
-
-  private loadStylesheet(href: string) {
-    const linkElement = document.createElement("link");
-    linkElement.rel = "stylesheet";
-    linkElement.href = href;
-    document.head.appendChild(linkElement);
   }
 
   private createImageEditor(
@@ -49,7 +34,6 @@ export class ImageEditorWrapper {
           menuBarPosition: "bottom",
           usageStatistics: false,
         },
-        cssMaxWidth: 500,
         cssMaxHeight: 500,
       };
 
