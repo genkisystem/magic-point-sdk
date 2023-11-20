@@ -21,6 +21,11 @@ class MagicPoint extends Base {
         console.log(css)
     }
 
+    // submit from create task
+    submitData() {
+        console.log("hehe")
+    }
+
     // Event listener
     addCreateDotEventListener(): void {
         document.body.addEventListener("click", this.createDotEventListenerHandler)
@@ -97,7 +102,7 @@ class MagicPoint extends Base {
                 <input type="file" name="file" accept="image/*" onchange="document.getElementById('canvas').src = window.URL.createObjectURL(this.files[0])">
             </div>
             <div class="${css.action}">
-                <input type="submit" value="Submit">
+                <input type="button" onClick="submitData()" value="Submit">
             </div>
         </div>
         `
