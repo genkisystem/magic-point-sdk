@@ -147,8 +147,8 @@ class MagicPoint extends Base {
             image.src = base64png;
 
             image.onload = () => {
-                const sx = window.scrollX
-                const sy = window.scrollY
+                const sx = window.scrollX * this.getDevicePixelRatio()
+                const sy = window.scrollY * this.getDevicePixelRatio()
                 const sw = window.innerWidth * this.getDevicePixelRatio();
                 const sh = window.innerHeight * this.getDevicePixelRatio();
                 const dw = window.innerWidth;
