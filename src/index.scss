@@ -11,13 +11,16 @@
     background-color: #fff;
     width: fit-content;
     height: fit-content;
-    margin: auto;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    bottom: 0;
+
     z-index: 10;
 
     .container {
         display: flex;
         flex-direction: column;
-        padding-right: 1rem;
         border: 1px solid #fff;
 
         .first_row {
@@ -90,6 +93,7 @@
 
 
         }
+
         .input_field_editor {
             width: 100%;
             height: 100px;
@@ -108,7 +112,8 @@
                 justify-content: flex-start;
                 color: #000;
             }
-            .editor{
+
+            .editor {
                 flex-grow: 1;
             }
         }
@@ -137,10 +142,12 @@
         }
     }
 }
-body{
-    cursor: none;
+
+body {
+    // cursor: ;
 }
-.dot-element{
+
+.dot-element {
     position: absolute;
     top: 20px;
     left: 20px;
