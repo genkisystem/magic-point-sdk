@@ -5,9 +5,10 @@ import { Posts } from "./posts"
 import { applyMixins } from "./utils";
 import { ConfigurationOptions } from "./base";
 import css from './index.scss';
-import Quill from 'quill'
+import Quill from 'quill';
 import { ImageEditorWrapper } from './image-editor';
-
+// import { requestAsync } from './request';
+var imageEditorWrapper: ImageEditorWrapper
 class MagicPoint extends Base {
     constructor(config: ConfigurationOptions) {
         super(config)
@@ -18,10 +19,63 @@ class MagicPoint extends Base {
         this.addCreateDotEventListener()
         this.moveCursor = this.moveCursor.bind(this); // Bind the context here
         this.addCreateDotEventMove()
-        // this.insertForm()
+        this.submitData = this.submitData.bind(this);
         console.log(css)
     }
 
+    // submit from create task
+    async submitData() {
+        const imageUrl = imageEditorWrapper.getImageDataUrl()?.replace('data:image/png;base64,', '')
+        console.log(document.getElementById("task-title"))
+        console.log(document.getElementById("editor"))
+        const titleElement = document.getElementById("task-title") as HTMLInputElement
+        const description = document.getElementById("editor")?.getElementsByClassName('ql-editor')[0]?.innerHTML
+        const formData = {
+            appData: {
+                name: 'Nguyen Tran Anh Hao',
+                title: titleElement.value,
+                description: description,
+                apiKey: '',
+                domain: '',
+                base64Images: [imageUrl]
+            }
+        }
+        let res: any = await this.post('task/nulab/add-issue', formData)
+        console.log(res.hasError)
+        if (res) {
+            // display notification
+            this.createNotification("success", res.appData)
+        }
+    }
+    createNotification(type: string, data: any) {
+        this.createNotificationElement(type, data)
+    }
+    createNotificationElement(type: string, data: any) {
+        const body = document.body
+        const notificationElement = document.createElement('div')
+        notificationElement.style['position'] = "fixed"
+        notificationElement.style['textAlign'] = "center"
+        notificationElement.style['color'] = "white"
+        notificationElement.style['top'] = "20px"
+        notificationElement.style['left'] = "28%"
+        notificationElement.style['fontSize'] = "20px"
+        notificationElement.style['padding'] = "15px"
+        notificationElement.style['borderRadius'] = "5px"
+        if (type === "success") {
+            const link = data?.url
+            notificationElement.innerHTML = `<span>Create task success!, Link task: </span><a href="${link}">${link}</a>`
+            notificationElement.style['backgroundColor'] = "green"
+        }
+        else {
+            notificationElement.textContent = "Create task fail! Please check your config!"
+            notificationElement.style['backgroundColor'] = "red"
+        }
+        // auto close after 5s
+        setTimeout(() => {
+            notificationElement.remove()
+        }, 5000);
+        body.appendChild(notificationElement)
+    }
     // Event listener
     addCreateDotEventListener(): void {
         document.body.addEventListener("click", this.createDotEventListenerHandler)
@@ -38,6 +92,13 @@ class MagicPoint extends Base {
     configTrix() {
         document.addEventListener("trix-before-initialize", () => {
         })
+    }
+    addEventSubmitData() {
+        let submitBtn = document.getElementById("submit-btn")!
+        console.log(submitBtn)
+        if (submitBtn) {
+            submitBtn.addEventListener("click", this.submitData)
+        }
     }
 
     createDotEventListenerHandler(e: MouseEvent) {
@@ -114,11 +175,15 @@ class MagicPoint extends Base {
 
         const canvasHolder = document.getElementById(`${css.canvas_holder}`)
         canvas.classList.add('canvas')
+        canvas.setAttribute("id", "canvas-img")
         canvasHolder?.appendChild(canvas)
+        console.log(canvas)
 
         // const canvasHolder = document.getElementById(`${css.canvas_holder}`)
         // canvas.classList.add('canvas')
         // canvasHolder?.appendChild(canvas)
+
+        this.addEventSubmitData()
 
         // add link to header html
         const link = document.createElement('link');
@@ -188,6 +253,7 @@ class MagicPoint extends Base {
         console.log("selected element: ", currentElement)
         return currentElement
     }
+
 }
 
 interface MagicPoint extends Posts { }
