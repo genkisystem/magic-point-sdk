@@ -76,16 +76,19 @@ class MagicPoint extends Base {
         this.removeCreateDotEventMove()
         this.addCursorMouse()
     }
+
     addCursorMouse() {
         const bodyElement = document.body
         bodyElement.style.cursor = 'default'
     }
+
     moveCursor(e: MouseEvent): void {
         const mouseY = e.clientY;
         const mouseX = e.clientX;
+        const scrollX = window.scrollX
+        const scrollY = window.scrollY
         const dotElement = document.getElementsByClassName(`${css['dot-element']}`)[0] as HTMLDivElement;
-        dotElement.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
-
+        dotElement.style.transform = `translate3d(${mouseX + scrollX}px, ${mouseY + scrollY}px, 0)`;
     }
 
     initDotElement(): void {
@@ -94,13 +97,12 @@ class MagicPoint extends Base {
         dot.classList.add(css['dot-element'])
         document.body.appendChild(dot)
     }
-    insertDotElementToClick(e: MouseEvent) {
 
+    insertDotElementToClick(e: MouseEvent) {
         const dotElement = document.getElementsByClassName(`${css['dot-element']}`)[0] as HTMLDivElement;
         dotElement.style.top = e.clientY.toString();
         dotElement.style.top = e.clientY.toString();
     }
-
 
     insertForm(e: MouseEvent, canvas: HTMLCanvasElement) {
         const form: HTMLFormElement = document.createElement('form')
@@ -129,11 +131,6 @@ class MagicPoint extends Base {
             </div>
         </div>
         `
-        // form.style.left = (e.clientX + 10) + 'px'
-        // form.style.top = (e.clientY + 10) + 'px'
-        form.style.left = '5%'
-        form.style.top = '40px'
-        // form.style.margin = '0 auto'
         document.body.appendChild(form)
         form.classList.add(`${css.show}`)
         form.classList.remove(`${css.hide}`)
@@ -181,8 +178,8 @@ class MagicPoint extends Base {
             image.src = base64png;
 
             image.onload = () => {
-                const sx = window.scrollX + e.clientX * this.getDevicePixelRatio();
-                const sy = window.scrollY + e.clientY * this.getDevicePixelRatio();
+                const sx = window.scrollX * this.getDevicePixelRatio()
+                const sy = window.scrollY * this.getDevicePixelRatio()
                 const sw = window.innerWidth * this.getDevicePixelRatio();
                 const sh = window.innerHeight * this.getDevicePixelRatio();
                 const dw = window.innerWidth;
@@ -194,7 +191,6 @@ class MagicPoint extends Base {
         });
     }
 
-
     getDevicePixelRatio(): number {
         return window.devicePixelRatio || 1
     }
@@ -202,10 +198,6 @@ class MagicPoint extends Base {
     findOutermostTag(element: HTMLElement) {
         console.log('passing element: ', element)
         let currentElement = element;
-        // if (element.tagName.toLowerCase() === 'body' || element.tagName.toLowerCase() === 'html') {
-        //     currentElement = element.firstElementChild as HTMLElement;
-        // }
-
         while (currentElement.parentElement) {
             if (currentElement.parentElement.tagName.toLowerCase() === 'body') {
                 console.log("selected element: ", currentElement)

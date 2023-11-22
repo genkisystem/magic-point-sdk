@@ -5,7 +5,7 @@ import './tui-image-editor/tui-color-picker.css';
 
 export class ImageEditorWrapper {
   private imageEditor: ImageEditor | null;
-  
+
   constructor(editorId: string, initialImage: string) {
     this.imageEditor = this.createImageEditor(editorId, initialImage);
     this.removeUnnecessaryElements();
@@ -28,13 +28,13 @@ export class ImageEditorWrapper {
           },
           theme: {},
           uiSize: {
-            width: "80vw",
-            height: "70vh",
+            width: "60vw",
+            height: "60vh",
           },
           menuBarPosition: "bottom",
           usageStatistics: false,
         },
-        cssMaxHeight: 500,
+        cssMaxHeight: window.innerHeight * 50 / 100,
       };
 
       const editorElement = document.querySelector(id);
