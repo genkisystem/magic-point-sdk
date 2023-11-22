@@ -61,9 +61,10 @@ class MagicPoint extends Base {
         notificationElement.style['fontSize'] = "20px"
         notificationElement.style['padding'] = "15px"
         notificationElement.style['borderRadius'] = "5px"
+        notificationElement.style['zIndex'] = "11"
         if (type === "success") {
             const link = data?.url
-            notificationElement.innerHTML = `<span>Create task success!, Link task: </span><a href="${link}">${link}</a>`
+            notificationElement.innerHTML = `<span>Create task success!, Link task: </span><a href="${link}" target="_blank">${link}</a>`
             notificationElement.style['backgroundColor'] = "green"
         }
         else {
