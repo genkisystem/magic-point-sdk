@@ -28,8 +28,8 @@ export class ImageEditorWrapper {
           },
           theme: {},
           uiSize: {
-            width: "60vw",
-            height: "60vh",
+            width: "70vw",
+            height: "70vh",
           },
           menuBarPosition: "bottom",
           usageStatistics: false,

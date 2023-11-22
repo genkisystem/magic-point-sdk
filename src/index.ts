@@ -126,7 +126,6 @@ class MagicPoint extends Base {
     }
 
     initDotElement(): void {
-        console.log('insert')
         const dot: HTMLElement = document.createElement("div")
         dot.classList.add(css['dot-element'])
         document.body.appendChild(dot)
@@ -142,32 +141,37 @@ class MagicPoint extends Base {
         const form: HTMLFormElement = document.createElement('form')
         form.classList.add(css.form, css.hide)
         form.innerHTML = `
-        <div class="${css.container}">
-            <div class="${css.first_row}">
-                <div id="${css.canvas_holder}"></div>
+        <div class="${css['inner-form-container']}">
+            <div class="${css['first-row']}">
+                <div id="${css['canvas-holder']}"></div>
             </div>
-            <div class="${css.input_field}">
-                <label class="${css.label}" for="title" id="label-title">Task title: </label>
-                <input type="text" id="task-title">
-            </div>
-
-            <div class="${css.input_field_editor}">
-                <label class="${css.label}" for="comment" id="label-description">Description:</label>
-                <div class="${css.editor}">
-                    <div id="editor"></div>
+            <div class="${css['second-row']}">
+                <div class="${css['input-field-editor']} ${css['first-col']}">
+                    <label class="${css['label']}" for="comment">Comment:</label>
+                    <div class="${css['editor']}">
+                        <div id="editor"></div>
+                    </div>
                 </div>
-            </div>
-            <div>
-                <input type="file" name="file" accept="image/*" onchange="document.getElementById('canvas').src = window.URL.createObjectURL(this.files[0])">
-            </div>
-            <div class="${css.action}">
-                <input id="submit-btn" type="button" value="Submit">
+
+                <div class="${css['second-col']}">
+                    <div class="${css['input-field']} ">
+                        <label class="${css['title-label']}" for="title">Task title: </label>
+                        <input type="text" id="title">
+                    </div>
+                    <div class="${css.action}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                        </svg>
+
+                        <input type="hidden" onchange="${this.closeModal}">
+                    </div>
+                </div>
             </div>
         </div>
         `
         document.body.appendChild(form)
-        form.classList.add(`${css.show}`)
-        form.classList.remove(`${css.hide}`)
+        document.body.classList.add(`${css['no-scroll']}`)
+        form.classList.remove(`${css['hide']}`)
 
         const canvasHolder = document.getElementById(`${css.canvas_holder}`)
         canvas.classList.add('canvas')
@@ -193,9 +197,16 @@ class MagicPoint extends Base {
         })
         console.log(quill)
 
-        imageEditorWrapper = new ImageEditorWrapper(`#${css.canvas_holder}`, canvas.toDataURL());
+        const imageEditorWrapper = new ImageEditorWrapper(`#${css['canvas-holder']}`, canvas.toDataURL());
         console.log(imageEditorWrapper);
     }
+
+    closeModal(): void {
+        const form: HTMLFormElement = document.getElementsByTagName("form")[0] as HTMLFormElement;
+        form.classList.remove(`${css['hide']}`)
+        document.body.classList.remove(`${css['no-scroll']}`)
+    }
+
     async autoCaptureCurrentUserView(e: MouseEvent): Promise<HTMLCanvasElement> {
         const outermostTag = this.findOutermostTag(e.target as HTMLElement);
         const base64png = await toPng(outermostTag);
