@@ -25,23 +25,57 @@ class MagicPoint extends Base {
 
     // submit from create task
     async submitData() {
-        const imageUrl = imageEditorWrapper.getImageDataUrl()
-        const title = document.getElementById("task-title")?.textContent
-        const description = document.getElementById("task-description")?.innerHTML
+        const imageUrl = imageEditorWrapper.getImageDataUrl()?.replace('data:image/png;base64,', '')
+        console.log(document.getElementById("task-title"))
+        console.log(document.getElementById("editor"))
+        const titleElement = document.getElementById("task-title") as HTMLInputElement
+        const description = document.getElementById("editor")?.getElementsByClassName('ql-editor')[0]?.innerHTML
         const formData = {
             appData: {
-                name: 'Name',
-                title: title,
+                name: 'Nguyen Tran Anh Hao',
+                title: titleElement.value,
                 description: description,
                 apiKey: '',
                 domain: '',
                 base64Images: [imageUrl]
             }
         }
-        let res = await this.post('task/nulab/add-issue', formData)
-        console.log(res)
+        let res: any = await this.post('task/nulab/add-issue', formData)
+        console.log(res.hasError)
+        if (res) {
+            // display notification
+            this.createNotification("success", res.appData)
+        }
     }
-
+    createNotification(type: string, data: any) {
+        this.createNotificationElement(type, data)
+    }
+    createNotificationElement(type: string, data: any) {
+        const body = document.body
+        const notificationElement = document.createElement('div')
+        notificationElement.style['position'] = "fixed"
+        notificationElement.style['textAlign'] = "center"
+        notificationElement.style['color'] = "white"
+        notificationElement.style['top'] = "20px"
+        notificationElement.style['left'] = "28%"
+        notificationElement.style['fontSize'] = "20px"
+        notificationElement.style['padding'] = "15px"
+        notificationElement.style['borderRadius'] = "5px"
+        if (type === "success") {
+            const link = 'https://gnksystem.backlog.com/view/' + data?.issueKey
+            notificationElement.innerHTML = `<span>Create task success!, Link task: </span><a href="${link}">${link}</a>`
+            notificationElement.style['backgroundColor'] = "green"
+        }
+        else {
+            notificationElement.textContent = "Create task fail! Please check your config!"
+            notificationElement.style['backgroundColor'] = "red"
+        }
+        // auto close after 5s
+        setTimeout(() => {
+            notificationElement.remove()
+        }, 5000);
+        body.appendChild(notificationElement)
+    }
     // Event listener
     addCreateDotEventListener(): void {
         document.body.addEventListener("click", this.createDotEventListenerHandler)
@@ -113,12 +147,12 @@ class MagicPoint extends Base {
                 <div id="${css.canvas_holder}"></div>
             </div>
             <div class="${css.input_field}">
-                <label class="${css.label}" for="title" id="task-title">Task title: </label>
-                <input type="text" id="title">
+                <label class="${css.label}" for="title" id="label-title">Task title: </label>
+                <input type="text" id="task-title">
             </div>
 
             <div class="${css.input_field_editor}">
-                <label class="${css.label}" for="comment" id="task-description">Description:</label>
+                <label class="${css.label}" for="comment" id="label-description">Description:</label>
                 <div class="${css.editor}">
                     <div id="editor"></div>
                 </div>
@@ -208,6 +242,7 @@ class MagicPoint extends Base {
         console.log("selected element: ", currentElement)
         return currentElement
     }
+
 }
 
 interface MagicPoint extends Posts { }
