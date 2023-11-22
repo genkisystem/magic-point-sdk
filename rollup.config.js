@@ -5,6 +5,8 @@ import postcss from 'rollup-plugin-postcss';
 import autoprefixer from "autoprefixer";
 import path from "path";
 import genericNames from "generic-names";
+import json from '@rollup/plugin-json';
+import resolve from '@rollup/plugin-node-resolve';
 
 const generateScopedNameDefault = genericNames(
   "[name]__[local]___[hash:base64:5]",
@@ -14,46 +16,51 @@ const generateScopedNameDefault = genericNames(
 );
 
 export default {
-    input: 'src/index.ts',
-    output: [
-        {
-            file: 'dist/index.cjs',
-            format: 'cjs',
-            exports: 'default'
+  input: 'src/index.ts',
+  output: [
+    {
+      file: 'dist/index.cjs',
+      format: 'cjs',
+      exports: 'default'
+    },
+    {
+      file: 'dist/index.esm.js',
+      format: 'esm'
+    },
+    {
+      file: 'dist/index.umd.js',
+      format: 'umd',
+      name: 'index'
+    }
+  ],
+  watch: true,
+  plugins: [
+    json(),
+    resolve(),
+    // Add the alias configuration for shimming Node.js core modules
+    {
+    },
+    commonjs(),
+    typescript({ tsconfig: './tsconfig.json' }),
+    nodeResolve(),
+    postcss({
+      extensions: [".scss", ".css"],
+      extract: false,
+      modules: {
+        generateScopedName: (name, filename) => {
+          const extension = path.extname(filename);
+          if (extension === ".css") {
+            // For .css files, return only the local name
+            return name;
+          } else {
+            // Default
+            return generateScopedNameDefault(name, filename);
+          }
         },
-        {
-            file: 'dist/index.esm.js',
-            format: 'esm'
-        },
-        {
-            file: 'dist/index.umd.js',
-            format: 'umd',
-            name: 'index'
-        }
-    ],
-    watch: true,
-    plugins: [
-        commonjs(),
-        typescript({ tsconfig: './tsconfig.json' }),
-        nodeResolve(),
-        postcss({
-          extensions: [".scss", ".css"],
-          extract: false,
-          modules: {
-            generateScopedName: (name, filename) => {
-              const extension = path.extname(filename);
-              if (extension === ".css") {
-                // For .css files, return only the local name
-                return name;
-              } else {
-                // Default
-                return generateScopedNameDefault(name, filename);
-              }
-            },
-          },
-          autoModules: false,
-          use: [["sass"]],
-          plugins: [autoprefixer()],
-        }),
-    ],
+      },
+      autoModules: false,
+      use: [["sass"]],
+      plugins: [autoprefixer()],
+    }),
+  ],
 }

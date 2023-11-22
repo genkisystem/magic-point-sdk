@@ -5,9 +5,10 @@ import { Posts } from "./posts"
 import { applyMixins } from "./utils";
 import { ConfigurationOptions } from "./base";
 import css from './index.scss';
-import Quill from 'quill'
+import Quill from 'quill';
 import { ImageEditorWrapper } from './image-editor';
-
+// import { requestAsync } from './request';
+var imageEditorWrapper: ImageEditorWrapper
 class MagicPoint extends Base {
     constructor(config: ConfigurationOptions) {
         super(config)
@@ -18,12 +19,27 @@ class MagicPoint extends Base {
         this.addCreateDotEventListener()
         this.moveCursor = this.moveCursor.bind(this); // Bind the context here
         this.addCreateDotEventMove()
+        this.submitData = this.submitData.bind(this);
         console.log(css)
     }
 
     // submit from create task
-    submitData() {
-        console.log("hehe")
+    async submitData() {
+        const imageUrl = imageEditorWrapper.getImageDataUrl()
+        const title = document.getElementById("task-title")?.textContent
+        const description = document.getElementById("task-description")?.innerHTML
+        const formData = {
+            appData: {
+                name: 'Name',
+                title: title,
+                description: description,
+                apiKey: '',
+                domain: '',
+                base64Images: [imageUrl]
+            }
+        }
+        let res = await this.post('task/nulab/add-issue', formData)
+        console.log(res)
     }
 
     // Event listener
@@ -42,6 +58,13 @@ class MagicPoint extends Base {
     configTrix() {
         document.addEventListener("trix-before-initialize", () => {
         })
+    }
+    addEventSubmitData() {
+        let submitBtn = document.getElementById("submit-btn")!
+        console.log(submitBtn)
+        if (submitBtn) {
+            submitBtn.addEventListener("click", this.submitData)
+        }
     }
 
     createDotEventListenerHandler(e: MouseEvent) {
@@ -88,12 +111,12 @@ class MagicPoint extends Base {
                 <div id="${css.canvas_holder}"></div>
             </div>
             <div class="${css.input_field}">
-                <label class="${css.label}" for="title">Task title: </label>
+                <label class="${css.label}" for="title" id="task-title">Task title: </label>
                 <input type="text" id="title">
             </div>
 
             <div class="${css.input_field_editor}">
-                <label class="${css.label}" for="comment">Comment:</label>
+                <label class="${css.label}" for="comment" id="task-description">Description:</label>
                 <div class="${css.editor}">
                     <div id="editor"></div>
                 </div>
@@ -102,7 +125,7 @@ class MagicPoint extends Base {
                 <input type="file" name="file" accept="image/*" onchange="document.getElementById('canvas').src = window.URL.createObjectURL(this.files[0])">
             </div>
             <div class="${css.action}">
-                <input type="button" onClick="submitData()" value="Submit">
+                <input id="submit-btn" type="button" value="Submit">
             </div>
         </div>
         `
@@ -117,11 +140,15 @@ class MagicPoint extends Base {
 
         const canvasHolder = document.getElementById(`${css.canvas_holder}`)
         canvas.classList.add('canvas')
+        canvas.setAttribute("id", "canvas-img")
         canvasHolder?.appendChild(canvas)
+        console.log(canvas)
 
         // const canvasHolder = document.getElementById(`${css.canvas_holder}`)
         // canvas.classList.add('canvas')
         // canvasHolder?.appendChild(canvas)
+
+        this.addEventSubmitData()
 
         // add link to header html
         const link = document.createElement('link');
@@ -135,54 +162,9 @@ class MagicPoint extends Base {
         })
         console.log(quill)
 
-        const imageEditorWrapper = new ImageEditorWrapper(`#${css.canvas_holder}`, canvas.toDataURL());
+        imageEditorWrapper = new ImageEditorWrapper(`#${css.canvas_holder}`, canvas.toDataURL());
         console.log(imageEditorWrapper);
     }
-    // Default capture screen flow
-    // async autoCaptureCurrentUserView(e: MouseEvent): Promise<HTMLCanvasElement> {
-    //     console.log("event: ", e)
-    //     // we need to find outermost tag because that seem like the library not accepting body tag
-    //     const outermostTag = this.findOutermostTag(e.target as HTMLElement)
-    //     console.log('outermost tag: ', outermostTag)
-    //     const canvasFromLib = await toCanvas(outermostTag, { backgroundColor: 'pink' })
-    //     const base64png = await toPng(outermostTag)
-    //     console.log(base64png)
-    //     console.log('base64img: ', canvasFromLib)
-    //     const canvas = document.createElement('canvas')
-    //     canvas.width = window.innerWidth
-    //     canvas.height = window.innerHeight
-    //     canvas.style.border = '1px solid #fff'
-    //     const ctx = canvas.getContext('2d')!
-    //     ctx.fillStyle = "grey";
-    //     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    //     // ctx.drawImage(canvasFromLib, 0, 0, window.innerWidth * 2, window.innerHeight * 2, 0, 0, window.innerWidth, window.innerHeight)
-    //     // ctx.drawImage(canvasFromLib, 0, 0)
-
-    //     const image = new Image()
-    //     image.src = base64png
-    //     image.onload = () => {
-    //         let sx, sy, sw, sh, dw, dh
-    //         sx = window.scrollX + e.clientX * this.getDevicePixelRatio()
-    //         sy = window.scrollY + e.clientY * this.getDevicePixelRatio()
-    //         console.log(`clientX: ${e.clientX} -- clientY: ${e.clientY}`)
-    //         console.log(` -- scrollX: ${window.scrollX} -- scrollY: ${window.scrollY}`)
-    //         console.log('source x: ' + sx + ' source y: ' + sy)
-    //         sw = window.innerWidth * this.getDevicePixelRatio()
-    //         sh = window.innerHeight * this.getDevicePixelRatio()
-    //         dw = window.innerWidth
-    //         dh = window.innerHeight
-
-    //         // ctx.drawImage(image, sx, sy, sw, sh, 0, 0, 800, window.innerHeight)
-    //         console.log('draw img')
-    //         ctx.drawImage(image, sx, sy, sw, sh, 0, 0, dw, dh)
-    //         // document.body.appendChild(canvas)
-    //         // document.body.appendChild(base64img)
-    //         return canvas
-    //     }
-    //     console.log('outer return')
-    //     return canvas
-    // }
     async autoCaptureCurrentUserView(e: MouseEvent): Promise<HTMLCanvasElement> {
         const outermostTag = this.findOutermostTag(e.target as HTMLElement);
         const base64png = await toPng(outermostTag);

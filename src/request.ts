@@ -18,7 +18,6 @@ const createRequest = function (apiUrl: string, timeout: number) {
       return
     }
     requestArray.push('post' + ':' + path + ':' + JSON.stringify(reqObj))
-    // eslint-disable-next-line no-return-await
     return await doRequest('post', path, reqObj)
   }
 
@@ -116,7 +115,7 @@ const createRequest = function (apiUrl: string, timeout: number) {
     del: del
   }
 }
-export const bookServiceAsync = createRequest(
+export const requestAsync = createRequest(
   'http://localhost:8080/api/',
   360000
 )
