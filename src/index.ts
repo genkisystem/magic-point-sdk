@@ -62,7 +62,7 @@ class MagicPoint extends Base {
         notificationElement.style['padding'] = "15px"
         notificationElement.style['borderRadius'] = "5px"
         if (type === "success") {
-            const link = 'https://gnksystem.backlog.com/view/' + data?.issueKey
+            const link = data?.url
             notificationElement.innerHTML = `<span>Create task success!, Link task: </span><a href="${link}">${link}</a>`
             notificationElement.style['backgroundColor'] = "green"
         }
