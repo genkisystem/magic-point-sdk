@@ -5,6 +5,7 @@
 .form {
     position: fixed;
     background-color: #fff;
+    border: 1px solid grey;
     width: fit-content;
     height: fit-content;
     left: 50%;
@@ -16,7 +17,7 @@
     .inner-form-container {
         display: flex;
         flex-direction: column;
-        border: 1px solid #fff;
+        // border: 1px solid #fff;
 
         .first-row {
             height: max-content;
@@ -73,6 +74,8 @@
                     display: flex;
                     align-items: center;
                     justify-content: flex-start;
+                    min-height: 2rem;
+                    cursor: pointer;
 
                     svg {
                         color: #000;
@@ -111,9 +114,9 @@
     }
 }
 
-// body {
-//     cursor: none;
-// }
+body {
+    cursor: none;
+}
 
 .no-scroll {
     overflow: hidden;
