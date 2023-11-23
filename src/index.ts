@@ -59,29 +59,53 @@ class MagicPoint extends Base {
         this.initDotElement()
         this.addCreateDotEventListener()
         this.addCreateDotEventMove()
+        this.hideCursor()
+        this.showDot(this.getLatestDot())
 
         loadingIcon.classList.add(`$${css['hide']}`)
         submitIcon.classList.remove(`$${css['hide']}`)
     }
+
+    hideCursor() {
+        document.body.style.cursor = 'none'
+    }
+
     createNotification(type: string, data: any) {
         this.createNotificationElement(type, data)
     }
     createNotificationElement(type: string, data: any) {
         const body = document.body
         const notificationElement = document.createElement('div')
+        notificationElement.addEventListener('click', (e: MouseEvent) => {
+            e.stopPropagation()
+        })
         notificationElement.style['position'] = "fixed"
         notificationElement.style['textAlign'] = "center"
         notificationElement.style['color'] = "white"
         notificationElement.style['top'] = "20px"
-        notificationElement.style['left'] = "28%"
-        notificationElement.style['fontSize'] = "20px"
+        notificationElement.style['left'] = "50%"
+        notificationElement.style['transform'] = "translateX(-50%)"
+        notificationElement.style['fontSize'] = "30px"
         notificationElement.style['padding'] = "15px"
         notificationElement.style['borderRadius'] = "5px"
         notificationElement.style['zIndex'] = "11"
+        notificationElement.style['height'] = '10vh'
+        notificationElement.style['width'] = 'max-content'
+        notificationElement.style['display'] = 'flex'
+        notificationElement.style['alignItems'] = 'center'
+        notificationElement.style['justifyContent'] = 'center'
         if (type === "success") {
             console.log(data)
             const link = data?.url
-            notificationElement.innerHTML = `<span>Create task success!, Link task: </span><a href="${link}" target="_blank">${link}</a>`
+            const anchor = document.createElement("a")
+            anchor.href = `${link}`
+            anchor.innerHTML = `${link}`
+            anchor.target = "_blank"
+            anchor.addEventListener("mouseover", () => {
+                anchor.style.cursor = 'none'
+            })
+            notificationElement.innerHTML = `<span>Create task success!, Link task: </span>`
+            notificationElement.appendChild(anchor)
             notificationElement.style['backgroundColor'] = "green"
         }
         else {
@@ -129,8 +153,7 @@ class MagicPoint extends Base {
     }
 
     addCursorMouse() {
-        const bodyElement = document.body
-        bodyElement.style.cursor = 'default'
+        document.body.style.cursor = 'default'
     }
 
     moveCursor(e: MouseEvent): void {
@@ -139,7 +162,16 @@ class MagicPoint extends Base {
         const scrollX = window.scrollX
         const scrollY = window.scrollY
         const dotElement = this.getLatestDot()
+        this.showDot(dotElement)
         dotElement.style.transform = `translate3d(${mouseX + scrollX}px, ${mouseY + scrollY}px, 0)`;
+    }
+
+    hideDot(dot: HTMLElement) {
+        dot.style.zIndex = '-1'
+    }
+
+    showDot(dot: HTMLElement) {
+        dot.style.zIndex = '999'
     }
 
     getLatestDot(): HTMLDivElement {
@@ -233,6 +265,7 @@ class MagicPoint extends Base {
     }
 
     async autoCaptureCurrentUserView(e: MouseEvent): Promise<HTMLCanvasElement> {
+        this.hideDot(this.getLatestDot())
         const outermostTag = this.findOutermostTag(e.target as HTMLElement);
         const base64png = await toPng(outermostTag);
 
