@@ -7,6 +7,7 @@ import path from "path";
 import genericNames from "generic-names";
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
+import svg from 'rollup-plugin-svg'
 
 const generateScopedNameDefault = genericNames(
   "[name]__[local]___[hash:base64:5]",
@@ -35,6 +36,9 @@ export default {
   ],
   watch: true,
   plugins: [
+    svg({
+
+    }),
     json(),
     resolve(),
     // Add the alias configuration for shimming Node.js core modules

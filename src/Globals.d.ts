@@ -4,5 +4,7 @@ declare module "*.scss" {
   export default classes;
 }
 
+declare module "*.svg";
+
 // For regular CSS
 declare module "*.css";

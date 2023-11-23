@@ -7,12 +7,14 @@ import { ConfigurationOptions } from "./base";
 import css from './index.scss';
 import Quill from 'quill';
 import { ImageEditorWrapper } from './image-editor';
-// import { requestAsync } from './request';
+import svg from './asset/Spinner-1s-200px.svg'
+
+
 var imageEditorWrapper: ImageEditorWrapper
 class MagicPoint extends Base {
     constructor(config: ConfigurationOptions) {
         super(config)
-        console.log('add magic dot listner')
+        console.log('add magic dot listener')
         this.configTrix()
         this.initDotElement()
         this.createDotEventListenerHandler = this.createDotEventListenerHandler.bind(this); // Bind the context here
@@ -25,6 +27,13 @@ class MagicPoint extends Base {
 
     // submit from create task
     async submitData() {
+        const loadingIcon = document.getElementById('loading') as HTMLDivElement
+        console.log(loadingIcon)
+        loadingIcon?.classList.remove(`${css['hide']}`)
+        const submitIcon = document.getElementById('submit-btn') as HTMLDivElement
+        console.log(submitIcon)
+        submitIcon?.classList.add(`${css['hide']}`)
+
         const imageUrl = imageEditorWrapper.getImageDataUrl()?.replace('data:image/png;base64,', '')
         console.log(document.getElementById("task-title"))
         console.log(document.getElementById("editor"))
@@ -33,7 +42,7 @@ class MagicPoint extends Base {
         const formData = {
             appData: {
                 name: 'Nguyen Tran Anh Hao',
-                title: titleElement.value,
+                title: titleElement.value || 'Default Task Title',
                 description: description,
                 apiKey: '',
                 domain: '',
@@ -46,6 +55,13 @@ class MagicPoint extends Base {
             // display notification
             this.createNotification("success", res.appData)
         }
+        this.closeModal()
+        this.initDotElement()
+        this.addCreateDotEventListener()
+        this.addCreateDotEventMove()
+
+        loadingIcon.classList.add(`$${css['hide']}`)
+        submitIcon.classList.remove(`$${css['hide']}`)
     }
     createNotification(type: string, data: any) {
         this.createNotificationElement(type, data)
@@ -63,6 +79,7 @@ class MagicPoint extends Base {
         notificationElement.style['borderRadius'] = "5px"
         notificationElement.style['zIndex'] = "11"
         if (type === "success") {
+            console.log(data)
             const link = data?.url
             notificationElement.innerHTML = `<span>Create task success!, Link task: </span><a href="${link}" target="_blank">${link}</a>`
             notificationElement.style['backgroundColor'] = "green"
@@ -96,7 +113,6 @@ class MagicPoint extends Base {
     }
     addEventSubmitData() {
         let submitBtn = document.getElementById("submit-btn")!
-        console.log(submitBtn)
         if (submitBtn) {
             submitBtn.addEventListener("click", this.submitData)
         }
@@ -122,8 +138,14 @@ class MagicPoint extends Base {
         const mouseX = e.clientX;
         const scrollX = window.scrollX
         const scrollY = window.scrollY
-        const dotElement = document.getElementsByClassName(`${css['dot-element']}`)[0] as HTMLDivElement;
+        const dotElement = this.getLatestDot()
         dotElement.style.transform = `translate3d(${mouseX + scrollX}px, ${mouseY + scrollY}px, 0)`;
+    }
+
+    getLatestDot(): HTMLDivElement {
+        const dotElementList = document.getElementsByClassName(`${css['dot-element']}`);
+        const dotElement = dotElementList[dotElementList.length - 1] as HTMLDivElement
+        return dotElement
     }
 
     initDotElement(): void {
@@ -133,7 +155,7 @@ class MagicPoint extends Base {
     }
 
     insertDotElementToClick(e: MouseEvent) {
-        const dotElement = document.getElementsByClassName(`${css['dot-element']}`)[0] as HTMLDivElement;
+        const dotElement = this.getLatestDot()
         dotElement.style.top = e.clientY.toString();
         dotElement.style.top = e.clientY.toString();
     }
@@ -160,11 +182,14 @@ class MagicPoint extends Base {
                         <input type="text" id="task-title">
                     </div>
                     <div class="${css['action']}" id="submit-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <svg id="submit-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                         </svg>
+                    </div>
+                    <div class="${css['loading']} ${css['hide']}" id="loading">
+                        ${svg}
+                    </div>
 
-                        <input type="hidden" onchange="${this.closeModal}">
                     </div>
                 </div>
             </div>
@@ -178,7 +203,6 @@ class MagicPoint extends Base {
         canvas.classList.add('canvas')
         canvas.setAttribute("id", "canvas-img")
         canvasHolder?.appendChild(canvas)
-        console.log(canvas)
 
         // const canvasHolder = document.getElementById(`${css.canvas_holder}`)
         // canvas.classList.add('canvas')
@@ -204,7 +228,7 @@ class MagicPoint extends Base {
 
     closeModal(): void {
         const form: HTMLFormElement = document.getElementsByTagName("form")[0] as HTMLFormElement;
-        form.classList.remove(`${css['hide']}`)
+        form?.remove()
         document.body.classList.remove(`${css['no-scroll']}`)
     }
 
