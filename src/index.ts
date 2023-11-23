@@ -162,7 +162,7 @@ class MagicPoint extends Base {
         const scrollX = window.scrollX
         const scrollY = window.scrollY
         const dotElement = this.getLatestDot()
-        dotElement.style.zIndex = '999'
+        this.showDot(dotElement)
         dotElement.style.transform = `translate3d(${mouseX + scrollX}px, ${mouseY + scrollY}px, 0)`;
     }
 
