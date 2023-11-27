@@ -36,10 +36,12 @@ class MagicPoint extends Base {
 
     private enableMagicPoint(): void {
         this.addCreateDotEventListener();
+        document.body.classList.add(css["red-dot-cursor"]);
     }
 
     private disableMagicPoint() {
         this.removeCreateDotEventListener();
+        document.body.classList.remove(css["red-dot-cursor"]);
     }
 
     private async createTask(data: any): Promise<void> {
@@ -156,27 +158,44 @@ class MagicPoint extends Base {
         magicButton: HTMLElement
     ): void {
         if (this.isFormOpen) {
-            this.modalManager.showModal(
-                "Are you sure you want to proceed?",
-                () => {
-                    this.formManager.closeForm();
-                    this.toggleButtonClass(normalButton, magicButton);
-                }
-            );
+            this.showConfirmationModal(normalButton, magicButton);
             return;
         }
+        this.updateUI(normalButton, magicButton);
+    }
+    
+    private showConfirmationModal(
+        normalButton: HTMLElement,
+        magicButton: HTMLElement
+    ): void {
+        const confirmationMessage = "Are you sure you want to proceed?";
+        this.modalManager.showModal(confirmationMessage, () => {
+            this.handleModalConfirmation(normalButton, magicButton);
+        });
+    }
+    
+    private handleModalConfirmation(
+        normalButton: HTMLElement,
+        magicButton: HTMLElement
+    ): void {
+        this.closeForm();
+        this.updateUI(normalButton, magicButton);
+    }
+    
+    private updateUI(
+        normalButton: HTMLElement,
+        magicButton: HTMLElement
+    ): void {
         this.toggleButtonClass(normalButton, magicButton);
         this.disableMagicPoint();
-        document.body.classList.remove(css["red-dot-cursor"]);
     }
-
+    
     private handleMagicButtonClick(
         magicButton: HTMLElement,
         normalButton: HTMLElement
     ): void {
         this.toggleButtonClass(magicButton, normalButton);
         this.enableMagicPoint();
-        document.body.classList.add(css["red-dot-cursor"]);
     }
 
     private createButton(
