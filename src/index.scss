@@ -133,10 +133,6 @@
     }
 }
 
-body {
-    cursor: none;
-}
-
 .no-scroll {
     overflow: hidden;
 }
@@ -154,4 +150,13 @@ body {
 
 a {
     color: white !important;
+}
+
+.active {
+    background-color: grey;
+    color: white;
+}
+
+.red-dot-cursor {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><circle cx="5" cy="5" r="5" fill="red" /></svg>'), auto;
 }
