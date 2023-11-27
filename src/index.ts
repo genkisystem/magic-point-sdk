@@ -45,12 +45,11 @@ class MagicPoint extends Base {
     }
 
     private async createTask(data: any): Promise<void> {
-        this.notificationManager.createNotification("success", {});
-        // let res: any = await this.post("task/nulab/add-issue", data);
-        // console.log(res.hasError);
-        // if (res) {
-        //     this.notificationManager.createNotification("success", res.appData);
-        // }
+        let res: any = await this.post("task/nulab/add-issue", data);
+        console.log(res.hasError);
+        if (res) {
+            this.notificationManager.createNotification("success", res.appData);
+        }
         this.closeForm();
     }
 
@@ -164,7 +163,7 @@ class MagicPoint extends Base {
         }
         this.updateUI(normalButton, magicButton);
     }
-    
+
     private showConfirmationModal(
         normalButton: HTMLElement,
         magicButton: HTMLElement
@@ -174,7 +173,7 @@ class MagicPoint extends Base {
             this.handleModalConfirmation(normalButton, magicButton);
         });
     }
-    
+
     private handleModalConfirmation(
         normalButton: HTMLElement,
         magicButton: HTMLElement
@@ -182,7 +181,7 @@ class MagicPoint extends Base {
         this.closeForm();
         this.updateUI(normalButton, magicButton);
     }
-    
+
     private updateUI(
         normalButton: HTMLElement,
         magicButton: HTMLElement
@@ -190,7 +189,7 @@ class MagicPoint extends Base {
         this.toggleButtonClass(normalButton, magicButton);
         this.disableMagicPoint();
     }
-    
+
     private handleMagicButtonClick(
         magicButton: HTMLElement,
         normalButton: HTMLElement
