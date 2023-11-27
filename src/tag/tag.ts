@@ -5,7 +5,12 @@ export class TagManager {
     private offsetX: number = 0;
     private offsetY: number = 0;
 
-    constructor() {}
+    constructor() {
+        this.onTagClick = this.onTagClick.bind(this);
+        this.startDrag = this.startDrag.bind(this);
+        this.drag = this.drag.bind(this);
+        this.endDrag = this.endDrag.bind(this);
+    }
 
     public createTag(x: number, y: number): void {
         this.divElement = document.createElement("div");
@@ -15,10 +20,15 @@ export class TagManager {
 
         document.body.appendChild(this.divElement);
 
+        this.divElement.addEventListener("click", this.onTagClick);
         this.divElement.addEventListener("mousedown", this.startDrag);
     }
 
-    private startDrag = (event: MouseEvent): void => {
+    private onTagClick(event: MouseEvent): void {
+        event.stopPropagation();
+    }
+
+    private startDrag(event: MouseEvent): void {
         if (!this.divElement) return;
 
         this.offsetX =
@@ -29,20 +39,29 @@ export class TagManager {
 
         document.addEventListener("mousemove", this.drag);
         document.addEventListener("mouseup", this.endDrag);
-    };
+    }
 
-    private drag = (event: MouseEvent): void => {
+    private drag(event: MouseEvent): void {
         if (!this.divElement) return;
 
         this.divElement.style.left = `${event.clientX - this.offsetX}px`;
         this.divElement.style.top = `${event.clientY - this.offsetY}px`;
-    };
+    }
 
-    private endDrag = (): void => {
+    private endDrag(): void {
         if (!this.divElement) return;
 
         this.divElement.style.cursor = "grab";
         document.removeEventListener("mousemove", this.drag);
         document.removeEventListener("mouseup", this.endDrag);
-    };
+    }
+
+    public destroy(): void {
+        if (this.divElement) {
+            this.divElement.removeEventListener("click", this.onTagClick);
+            this.divElement.removeEventListener("mousedown", this.startDrag);
+        }
+        document.removeEventListener("mousemove", this.drag);
+        document.removeEventListener("mouseup", this.endDrag);
+    }
 }
