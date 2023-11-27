@@ -45,11 +45,12 @@ class MagicPoint extends Base {
     }
 
     private async createTask(data: any): Promise<void> {
-        let res: any = await this.post("task/nulab/add-issue", data);
-        console.log(res.hasError);
-        if (res) {
-            this.notificationManager.createNotification("success", res.appData);
-        }
+        this.notificationManager.createNotification("success", {});
+        // let res: any = await this.post("task/nulab/add-issue", data);
+        // console.log(res.hasError);
+        // if (res) {
+        //     this.notificationManager.createNotification("success", res.appData);
+        // }
         this.closeForm();
     }
 

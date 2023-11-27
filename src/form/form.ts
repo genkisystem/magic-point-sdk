@@ -1,7 +1,7 @@
 import Quill from "quill";
+import svg from "../asset/Spinner-1s-200px.svg";
 import { ImageEditorWrapper } from "../image-editor";
 import css from "../index.scss";
-import svg from "../asset/Spinner-1s-200px.svg";
 
 export class FormManager {
     private form: HTMLFormElement | null = null;
@@ -9,13 +9,14 @@ export class FormManager {
     private textEditor!: Quill;
     private onSubmitCallback: (data: any) => void = () => {};
 
-    constructor() {}
+    constructor() {
+        this.loadEditorStyles();
+    }
 
     public createForm(canvasImage: HTMLCanvasElement): FormManager {
         this.form = document.createElement("form");
         this.configureForm();
         this.initializeTextEditor();
-        this.loadEditorStyles();
         this.initializeImageEditor(canvasImage.toDataURL());
         return this;
     }
@@ -81,9 +82,14 @@ export class FormManager {
     private collectFormData(): any {
         this.toggleLoading(true);
 
-        const imageUrl = this.imageEditorWrapper.getImageDataUrl()?.replace("data:image/png;base64,", "");
-        const title = document.getElementById("task-title") as HTMLInputElement | null;
-        const description = document.querySelector("#editor .ql-editor")?.innerHTML;
+        const imageUrl = this.imageEditorWrapper
+            .getImageDataUrl()
+            ?.replace("data:image/png;base64,", "");
+        const title = document.getElementById(
+            "task-title"
+        ) as HTMLInputElement | null;
+        const description =
+            document.querySelector("#editor .ql-editor")?.innerHTML;
 
         this.toggleLoading(false);
 
@@ -100,8 +106,12 @@ export class FormManager {
     }
 
     private toggleLoading(isLoading: boolean): void {
-        const loadingIcon = document.getElementById("loading") as HTMLDivElement;
-        const submitIcon = document.getElementById("submit-btn") as HTMLDivElement;
+        const loadingIcon = document.getElementById(
+            "loading"
+        ) as HTMLDivElement;
+        const submitIcon = document.getElementById(
+            "submit-btn"
+        ) as HTMLDivElement;
         if (isLoading) {
             loadingIcon.classList.remove(css["hide"]);
             submitIcon.classList.add(css["hide"]);
@@ -115,14 +125,8 @@ export class FormManager {
         const link = document.createElement("link");
         link.rel = "stylesheet";
         link.href = "https://cdn.quilljs.com/1.3.6/quill.snow.css";
+        link.crossOrigin = "anonymous";
         document.head.appendChild(link);
-
-        link.onload = () => {
-            console.log("Stylesheet loaded successfully");
-        };
-        link.onerror = () => {
-            console.error("Failed to load the stylesheet");
-        };
     }
 
     private getFormHTML(): string {
