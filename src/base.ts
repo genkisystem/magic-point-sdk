@@ -10,22 +10,32 @@ export abstract class Base {
     public baseUrl: string
     constructor(config: ConfigurationOptions) {
         this.apiKey = config.apiKey
-        this.baseUrl = config.baseUrl || "https://jsonplaceholder.typicode.com"
-
+        this.baseUrl = config.baseUrl || "http://localhost:3000/api/"
     }
 
 
-    protected invoke<T>(endpoint: string, options?: RequestInit): Promise<T> {
-        const url = `${this.baseUrl}${endpoint}`
+    public async post(path: string, reqObj: object) {
+        console.log(path)
+        console.log(reqObj)
+        return await this.invoke('POST', path, reqObj)
+        // return this.invoke('post', path, reqObj)
+    }
 
-        const headers = {
-            "Content-Type": "application/json",
-            "api-key": this.apiKey
-        }
+    protected async invoke<T>(method: string, path: string, data: object, options?: RequestInit): Promise<T> {
+        const url = `${this.baseUrl}${path}`
+
+        const headers = new Headers({
+            "content-type": "application/json",
+            "api-key": this.apiKey,
+            "Access-Control-Allow-Origin": ''
+        })
 
         const config = {
+            method: method,
+            // mode: 'no-cors' as RequestMode,
             ...options,
-            headers
+            headers: headers,
+            body: JSON.stringify(data)
         }
 
         return fetch(url, config).then(response => {
