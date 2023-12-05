@@ -77,7 +77,6 @@ class MagicPoint extends Base {
 
     createDotEventListenerHandler(e: MouseEvent) {
         this.formManager.setCurrentDomString(this.getPointDomTree(e))
-        console.log('form domstring: ', this.formManager.setCurrentDomString)
         this.autoCaptureCurrentUserView(e).then((canvas: HTMLCanvasElement) => {
             this.isFormOpen = true;
             this.formManager.createForm(canvas);
@@ -93,8 +92,6 @@ class MagicPoint extends Base {
         let pointDomTreeSelectorString = []
         for (const nodeInPath of composedPath as HTMLElement[]) {
             let singleNodeCSSSelector = ''
-            console.log("node ID: ", nodeInPath.id)
-            console.log("Parent Node: ", nodeInPath.parentNode)
 
             singleNodeCSSSelector += nodeInPath.tagName.toLowerCase()
 
@@ -155,7 +152,6 @@ class MagicPoint extends Base {
     }
 
     findOutermostTag(element: HTMLElement) {
-        console.log("passing element: ", element);
         let currentElement = element;
         while (currentElement.parentElement) {
             if (currentElement.parentElement.tagName.toLowerCase() === "body") {
