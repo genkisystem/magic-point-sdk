@@ -6,9 +6,8 @@ import { FormManager } from "./form";
 import css from "./index.scss";
 import { ModalManager } from "./modal";
 import { NotificationManager } from "./notification";
-import { Posts } from "./posts";
 import { TagManager } from "./tag";
-import { applyMixins } from "./utils";
+// import { applyMixins } from "./utils";
 
 class MagicPoint extends Base {
     private isFormOpen: boolean = false;
@@ -46,8 +45,7 @@ class MagicPoint extends Base {
 
     private async createTask(data: any): Promise<void> {
         let res: any = await this.post("task/nulab/add-issue", data);
-        console.log(res.hasError);
-        if (res) {
+        if (res?.hasError) {
             this.notificationManager.createNotification("success", res.appData);
         }
         this.closeForm();
@@ -74,10 +72,11 @@ class MagicPoint extends Base {
     }
 
     configTrix() {
-        document.addEventListener("trix-before-initialize", () => {});
+        document.addEventListener("trix-before-initialize", () => { });
     }
 
     createDotEventListenerHandler(e: MouseEvent) {
+        this.formManager.setCurrentDomString(this.getPointDomTree(e))
         this.autoCaptureCurrentUserView(e).then((canvas: HTMLCanvasElement) => {
             this.isFormOpen = true;
             this.formManager.createForm(canvas);
@@ -85,6 +84,27 @@ class MagicPoint extends Base {
         });
 
         this.disableMagicPoint();
+    }
+
+    private getPointDomTree(e: MouseEvent): string {
+        let composedPath = e.composedPath()
+        composedPath.splice(-3) // remove window, document, html tag
+        let pointDomTreeSelectorString = []
+        for (const nodeInPath of composedPath as HTMLElement[]) {
+            let singleNodeCSSSelector = ''
+
+            singleNodeCSSSelector += nodeInPath.tagName.toLowerCase()
+
+            if (nodeInPath.id) {
+                singleNodeCSSSelector += `#${nodeInPath.id}`
+            } else {
+                if (nodeInPath.parentNode!.childNodes.length > 0) { // nodeType = 3 is mean it is the text node, we dont care about this node
+                    singleNodeCSSSelector += `:nth-child(${Array.from(nodeInPath.parentNode!.childNodes).filter(node => node.nodeType !== 3).indexOf(nodeInPath) + 1})`
+                }
+            }
+            pointDomTreeSelectorString.push(singleNodeCSSSelector)
+        }
+        return pointDomTreeSelectorString.reverse().join(' ')
     }
 
     private setupFormSubmission(e: MouseEvent): void {
@@ -132,7 +152,6 @@ class MagicPoint extends Base {
     }
 
     findOutermostTag(element: HTMLElement) {
-        console.log("passing element: ", element);
         let currentElement = element;
         while (currentElement.parentElement) {
             if (currentElement.parentElement.tagName.toLowerCase() === "body") {
@@ -236,9 +255,5 @@ class MagicPoint extends Base {
         document.body.appendChild(div);
     }
 }
-
-interface MagicPoint extends Posts {}
-
-applyMixins(MagicPoint, [Posts]);
 
 export default MagicPoint;
