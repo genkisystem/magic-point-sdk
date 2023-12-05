@@ -7,10 +7,20 @@ export class FormManager {
     private form: HTMLFormElement | null = null;
     private imageEditorWrapper!: ImageEditorWrapper;
     private textEditor!: Quill;
-    private onSubmitCallback: (data: any) => void = () => {};
+    private onSubmitCallback: (data: any) => void = () => { };
+    private currentDomString: string;
 
     constructor() {
         this.loadEditorStyles();
+        this.currentDomString = ''
+    }
+
+    public setCurrentDomString(domString: string) {
+        this.currentDomString = domString;
+    }
+
+    public getCurrentDomString(): string {
+        return this.currentDomString
     }
 
     public createForm(canvasImage: HTMLCanvasElement): FormManager {
@@ -65,7 +75,7 @@ export class FormManager {
         if (submitBtn) {
             submitBtn.addEventListener("click", (e: MouseEvent) => {
                 e.stopPropagation();
-                return this.submitData();
+                this.submitData();
             });
         }
     }
@@ -101,6 +111,7 @@ export class FormManager {
                 apiKey: "",
                 domain: "",
                 base64Images: [imageUrl],
+                domString: this.currentDomString,
             },
         };
     }
