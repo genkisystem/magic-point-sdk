@@ -1,13 +1,17 @@
 import { toPng } from "html-to-image";
 import hand from "./asset/hand-slapped.svg";
 import penTool from "./asset/pen-tool.svg";
-import { Base, ConfigurationOptions } from "./base";
-import { FormManager } from "./form";
+import { Base, ConfigurationOptions, Request } from "./base";
+import { FormManager } from "./components/form";
 import css from "./index.scss";
-import { ModalManager } from "./modal";
-import { NotificationManager } from "./notification";
-import { TagManager } from "./tag";
+import { ModalManager } from "./components/modal";
+import { notification } from "./components/notification";
+import { TagManager } from "./components/tag";
+import { ListTaskManager } from "./components/list-task";
+import { Task } from "./components/list-task/types/Task";
 // import { applyMixins } from "./utils";
+import { NotificationManager } from './components/notification/notification';
+// import { EventBusInstance } from "./components/EventBus";
 
 class MagicPoint extends Base {
     private isFormOpen: boolean = false;
@@ -15,18 +19,24 @@ class MagicPoint extends Base {
     private notificationManager: NotificationManager;
     private formManager: FormManager;
     private modalManager: ModalManager;
+    private listTaskManager: ListTaskManager
 
     constructor(config: ConfigurationOptions) {
         super(config);
         console.log("add magic dot listener");
         this.tagManager = new TagManager();
-        this.notificationManager = new NotificationManager();
-        this.formManager = new FormManager();
+        this.notificationManager = notification;
+        console.log("notificationManager: ", this.notificationManager);
+        this.formManager = new FormManager(config);
         this.modalManager = new ModalManager();
+        this.listTaskManager = new ListTaskManager(config);
+        console.log('task manager: ', this.listTaskManager)
         this.configTrix();
         this.initializeBindings();
         this.insertMagicPointToggle();
     }
+
+
 
     private initializeBindings(): void {
         this.createDotEventListenerHandler =
@@ -43,12 +53,15 @@ class MagicPoint extends Base {
         document.body.classList.remove(css["red-dot-cursor"]);
     }
 
-    private async createTask(data: any): Promise<void> {
-        let res: any = await this.post("task/nulab/add-issue", data);
-        if (res?.hasError) {
-            this.notificationManager.createNotification("success", res.appData);
+    private async createTask(data: any): Promise<boolean> {
+        let res: any = await this.post("sdk/task", data);
+        if (!res?.hasError) {
+            this.notificationManager.createNotification("CREATE", "SUCCESS", res.appData);
+        } else {
+            this.notificationManager.createNotification("CREATE", "FAILED", res.appData);
         }
         this.closeForm();
+        return !res?.hasError
     }
 
     private closeForm() {
@@ -57,25 +70,25 @@ class MagicPoint extends Base {
     }
 
     // Event listener
-    addCreateDotEventListener(): void {
+    private addCreateDotEventListener(): void {
         document.body.addEventListener(
             "click",
             this.createDotEventListenerHandler
         );
     }
 
-    removeCreateDotEventListener(): void {
+    private removeCreateDotEventListener(): void {
         document.body.removeEventListener(
             "click",
             this.createDotEventListenerHandler
         );
     }
 
-    configTrix() {
+    private configTrix() {
         document.addEventListener("trix-before-initialize", () => { });
     }
 
-    createDotEventListenerHandler(e: MouseEvent) {
+    private createDotEventListenerHandler(e: MouseEvent) {
         this.formManager.setCurrentDomString(this.getPointDomTree(e))
         this.autoCaptureCurrentUserView(e).then((canvas: HTMLCanvasElement) => {
             this.isFormOpen = true;
@@ -104,19 +117,22 @@ class MagicPoint extends Base {
             }
             pointDomTreeSelectorString.push(singleNodeCSSSelector)
         }
+        console.log('pointDomTreeSelectorString', pointDomTreeSelectorString)
         return pointDomTreeSelectorString.reverse().join(' ')
     }
 
     private setupFormSubmission(e: MouseEvent): void {
-        this.formManager.onSubmit((formData: any) => {
-            console.log("Form Data:", formData);
-            this.createTask(formData);
-            this.tagManager.createTag(e.clientX, e.clientY);
-            this.enableMagicPoint();
+        this.formManager.onSubmit((formData: Request<Task>) => {
+            this.createTask(formData).then((isSuccess) => {
+                if (isSuccess) {
+                    this.tagManager.createTag(e.clientX, e.clientY);
+                    this.enableMagicPoint();
+                }
+            })
         });
     }
 
-    async autoCaptureCurrentUserView(
+    private async autoCaptureCurrentUserView(
         e: MouseEvent
     ): Promise<HTMLCanvasElement> {
         const outermostTag = this.findOutermostTag(e.target as HTMLElement);
@@ -147,11 +163,11 @@ class MagicPoint extends Base {
         });
     }
 
-    getDevicePixelRatio(): number {
+    private getDevicePixelRatio(): number {
         return window.devicePixelRatio || 1;
     }
 
-    findOutermostTag(element: HTMLElement) {
+    private findOutermostTag(element: HTMLElement) {
         let currentElement = element;
         while (currentElement.parentElement) {
             if (currentElement.parentElement.tagName.toLowerCase() === "body") {
@@ -232,7 +248,7 @@ class MagicPoint extends Base {
         return button;
     }
 
-    public insertMagicPointToggle(): void {
+    private insertMagicPointToggle(): void {
         const div = document.createElement("div");
         Object.assign(div.style, {
             position: "fixed",
@@ -254,6 +270,15 @@ class MagicPoint extends Base {
         div.append(normalButton, magicButton);
         document.body.appendChild(div);
     }
+
+    // private setupEventBuses(): void {
+    //     EventBusInstance.on('createTags', (tagData: any[]) => {
+    //         for (const tag of tagData) {
+    //             this.tagManager.createTag(5, 5)
+    //         }
+    //     })
+    // }
+
 }
 
 export default MagicPoint;

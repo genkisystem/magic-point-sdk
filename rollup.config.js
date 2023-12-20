@@ -36,9 +36,7 @@ export default {
   ],
   watch: true,
   plugins: [
-    svg({
-
-    }),
+    svg({}),
     json(),
     resolve(),
     // Add the alias configuration for shimming Node.js core modules

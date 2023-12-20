@@ -28,7 +28,7 @@ export class ImageEditorWrapper {
           },
           theme: {},
           uiSize: {
-            width: "70vw",
+            width: "100%",
             height: "70vh",
           },
           menuBarPosition: "bottom",
