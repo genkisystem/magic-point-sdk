@@ -5,6 +5,17 @@ export type ConfigurationOptions = {
     baseUrl?: string
 }
 
+export type Response<T> = {
+    appData: T,
+    errorCode: string,
+    hasError: boolean,
+    message: string,
+}
+
+export type Request<T> = {
+    appData: T
+}
+
 export abstract class Base {
     public apiKey: string
     public baseUrl: string
@@ -21,7 +32,11 @@ export abstract class Base {
         // return this.invoke('post', path, reqObj)
     }
 
-    protected async invoke<T>(method: string, path: string, data: object, options?: RequestInit): Promise<T> {
+    public async get(path: string): Promise<object | object[]> {
+        return await this.invoke('GET', path)
+    }
+
+    protected async invoke<T>(method: string, path: string, data?: object | null, options?: RequestInit): Promise<T> {
         const url = `${this.baseUrl}${path}`
 
         const headers = new Headers({
@@ -35,10 +50,13 @@ export abstract class Base {
             // mode: 'no-cors' as RequestMode,
             ...options,
             headers: headers,
-            body: JSON.stringify(data)
         }
 
-        return fetch(url, config).then(response => {
+        if (data && Object.keys(data).length > 0) {
+            config.body = JSON.stringify(data)
+        }
+
+        return await fetch(url, config).then(response => {
             if (response.ok) {
                 return response.json()
             } else {
