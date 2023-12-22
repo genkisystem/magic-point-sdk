@@ -12,5 +12,6 @@ export type Task = {
     taskStatus: IssueStatus
     assignee: Assignee | null
     issueType: IssueType,
-    endPoint: string
+    endPoint: string,
+    isRender?: boolean
 }

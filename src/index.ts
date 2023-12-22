@@ -11,7 +11,7 @@ import { ListTaskManager } from "./components/list-task";
 import { Task } from "./components/list-task/types/Task";
 // import { applyMixins } from "./utils";
 import { NotificationManager } from './components/notification/notification';
-// import { EventBusInstance } from "./components/EventBus";
+import { EventBusInstance } from "./components/EventBus";
 
 class MagicPoint extends Base {
     private isFormOpen: boolean = false;
@@ -20,6 +20,10 @@ class MagicPoint extends Base {
     private formManager: FormManager;
     private modalManager: ModalManager;
     private listTaskManager: ListTaskManager
+    private RENDER_TASK_OPERATOR = {
+        RENDER: true,
+        NOT_RENDER: false
+    }
 
     constructor(config: ConfigurationOptions) {
         super(config);
@@ -34,9 +38,8 @@ class MagicPoint extends Base {
         this.configTrix();
         this.initializeBindings();
         this.insertMagicPointToggle();
+        this.setupEventBuses()
     }
-
-
 
     private initializeBindings(): void {
         this.createDotEventListenerHandler =
@@ -57,6 +60,7 @@ class MagicPoint extends Base {
         let res: any = await this.post("sdk/task", data);
         if (!res?.hasError) {
             this.notificationManager.createNotification("CREATE", "SUCCESS", res.appData);
+            this.listTaskManager.fetchListTask(this.RENDER_TASK_OPERATOR.NOT_RENDER)
         } else {
             this.notificationManager.createNotification("CREATE", "FAILED", res.appData);
         }
@@ -271,13 +275,16 @@ class MagicPoint extends Base {
         document.body.appendChild(div);
     }
 
-    // private setupEventBuses(): void {
-    //     EventBusInstance.on('createTags', (tagData: any[]) => {
-    //         for (const tag of tagData) {
-    //             this.tagManager.createTag(5, 5)
-    //         }
-    //     })
-    // }
+    private setupEventBuses(): void {
+        EventBusInstance.on('create-tags', (x, y) => {
+            this.tagManager.createTag(x, y)
+        })
+
+        EventBusInstance.on('close-form', () => {
+            console.log('close form')
+            this.enableMagicPoint()
+        })
+    }
 
 }
 

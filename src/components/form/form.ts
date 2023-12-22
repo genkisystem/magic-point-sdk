@@ -29,7 +29,7 @@ export class FormManager extends Base {
     private currentSelectedAssignee: Assignee = {} as Assignee;
     private currentSelectedIssueType: IssueType = {} as IssueType;
     private currentSelectedIssueStatus: IssueStatus = {} as IssueStatus;
-    private currentTaskToUpdate: Task | null | undefined = null;
+    private currentTaskToUpdate: Task = {} as Task;
     public types: { [key in 'assignee' | 'issueType' | 'issueStatus']: string } = {
         assignee: 'assignee',
         issueType: 'issue-type',
@@ -80,7 +80,7 @@ export class FormManager extends Base {
     }
 
     public getCurrentDomString(): string {
-        return this.currentDomString
+        return this.currentDomString || this.currentTaskToUpdate.pointDom || ''
     }
 
     public createForm(canvasImage: HTMLCanvasElement, taskToUpdate?: Task): FormManager {
@@ -110,6 +110,7 @@ export class FormManager extends Base {
     public closeForm(): void {
         this.form?.remove();
         document.body.classList.remove(css["no-scroll"]);
+        EventBusInstance.emit('close-form');
     }
 
     private configureForm(): void {
@@ -374,7 +375,10 @@ export class FormManager extends Base {
             <div class="${formCss['row']}">
                 <div id="editor" class="${formCss['text-area']}"></div>
             </div>
-            <div class="${formCss['row']}">
+            <div class="${formCss['row']} ${formCss['row-actions']}">
+                <div class="${formCss['btn-wrap']}">
+                    <div id="${formCss['cancel-btn']}">Cancel</div>
+                </div>
                 <div class="${formCss['btn-wrap']}">
                     <div id="${formCss['submit-btn']}">${this.loadSubmitButtonContent()}</div>
                     <div class="${formCss['hide']}" id="${formCss['loading']}">
@@ -390,10 +394,21 @@ export class FormManager extends Base {
     private setupFormListeners() {
         this.addEventSubmitData()
         this.addEventSelectOnChange()
+        this.addEventCancelForm()
     }
 
-    public injectTaskDataToForm(task: Task) {
-        console.log('task on inject: ', task)
+    private addEventCancelForm() {
+        const cancelBtn = document.getElementById(`${formCss['cancel-btn']}`)
+        if (cancelBtn) {
+            cancelBtn.onclick = (e: MouseEvent) => {
+                e.stopPropagation()
+                this.closeForm()
+            }
+        }
+    }
+
+    private injectTaskDataToForm(task: Task) {
+        console.log('UPDATE: inject task data to form')
         const issueTypeSelectElement = document.getElementById(`${formCss['task-type']}`) as HTMLSelectElement
         const issueStatusSelectElement = document.getElementById(`status`) as HTMLSelectElement
         const assigneeSelectElement = document.getElementById(`assignee`) as HTMLSelectElement
