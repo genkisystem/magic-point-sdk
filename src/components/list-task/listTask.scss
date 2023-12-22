@@ -20,7 +20,7 @@
     .operator-wrap {
         display: flex;
         align-items: center;
-        justify-content: start;
+        justify-content: flex-start;
 
         .minimize-btn {
             flex: 0 0 auto;
@@ -102,7 +102,7 @@
         }
 
         .task-status {
-            flex: 1 1 20%;
+            flex: 1 0 22%;
             padding: 0.5rem 1rem;
             border-radius: 28px;
             color: #222;
@@ -110,6 +110,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 1.5;
+
+            @media screen and (max-width: 530px) {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.8rem;
+            }
         }
 
         .task-status-resolved {
@@ -122,6 +128,7 @@
 
         .task-status-in-progress {
             background-color: #2072AF;
+            color: #ffffff;
         }
 
         .task-status-disconnected {

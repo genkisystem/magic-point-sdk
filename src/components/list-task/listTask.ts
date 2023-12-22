@@ -7,9 +7,12 @@ import minimize from '../../asset/minimize.svg'
 import { Base, ConfigurationOptions, Response } from '../../base';
 import { Task } from './types/Task';
 import { FormManager } from '../form';
-import { EventBusInstance } from '../EventBus';
 import { ModalManager } from '../modal/modal';
 import { NotificationManager, notification } from '../notification';
+import { EventBusInstance } from '../EventBus/index';
+
+const FILTER_VALUE = ['ALL', 'SHOWN', 'HIDDEN'] as const
+type Filter = typeof FILTER_VALUE[number];
 export class ListTaskManager extends Base {
     // private isLoading: boolean = false;
     private listTask: Task[] = [];
@@ -17,6 +20,7 @@ export class ListTaskManager extends Base {
     private updateFormElement: FormManager;
     private modalManager: ModalManager;
     private notificationManager: NotificationManager;
+    private filter: string = FILTER_VALUE[0];
 
     constructor(config: ConfigurationOptions) {
         super(config);
@@ -31,11 +35,15 @@ export class ListTaskManager extends Base {
         this.listTask = listTask
     }
 
-    public async fetchListTask() {
+    public async fetchListTask(renderTaskAsDot: boolean = true) {
         this.listTask = await this.invoke<Response<Task[]>>('GET', `sdk/tasks?url-path=${window.location.pathname}`, null).then((res) => {
-            return res && !res.hasError ? res.appData : []
+            return res && !res.hasError && res.appData.length > 0 ? res.appData : []
         })
         this.setupListTask()
+
+        if (renderTaskAsDot) {
+            this.showTaskAsDot()
+        }
     }
 
     private setupDocumentEventHandler() {
@@ -48,15 +56,33 @@ export class ListTaskManager extends Base {
         if (this.HTMLElement) {
             this.HTMLElement.remove()
         }
-
         const listTaskElement = this.getListTaskHTML()
         if (listTaskElement) {
             document.body.appendChild(listTaskElement)
             this.addEditEventListener()
             this.addDeleteEventListener()
             this.addMinimizeEventListener()
+            this.addFilterEventListener()
             this.HTMLElement = listTaskElement
         }
+    }
+
+    private addFilterEventListener(): void {
+        const allCheckbox = document.getElementById('all')!
+        const shownCheckbox = document.getElementById('shown')!
+        const hiddenCheckbox = document.getElementById('hidden')!
+
+        allCheckbox.onclick = (e) => this.updateFilterData(e, "ALL")
+        shownCheckbox.onclick = (e) => this.updateFilterData(e, "SHOWN")
+        hiddenCheckbox.onclick = (e) => this.updateFilterData(e, "HIDDEN")
+    }
+
+    private updateFilterData(e: MouseEvent, filter: Filter) {
+        e.stopPropagation()
+        console.log(e.target)
+        this.filter = filter
+        this.setupListTask()
+        this.turnDotToTaskList()
     }
 
     private addMinimizeEventListener() {
@@ -130,7 +156,7 @@ export class ListTaskManager extends Base {
         return base64Image.appData[0]
     }
 
-    private turnDotToTaskList(e: Event): void {
+    private turnDotToTaskList(): void {
         if (this.HTMLElement?.classList.contains(`${css['dot-blink']}`) || this.HTMLElement?.classList.contains(`${css['dotted-list']}`)) {
             this.HTMLElement.classList.remove(`${css['dot-blink']}`, `${css['dotted-list']}`)
             this.HTMLElement.classList.add(`${css['dot-unblink']}`, `${css['slide-in']}`)
@@ -151,28 +177,41 @@ export class ListTaskManager extends Base {
         }
     }
 
-    public getListTaskHTML(): HTMLDivElement | null {
-        if (this.listTask.length > 0) {
-            const listTaskWrapper = document.createElement('div')
-            listTaskWrapper.id = `${css['list-task-wrapper']}`
-            listTaskWrapper.classList.add(`${css['slide-in']}`, `${css['dotted-list']}`, `${css['dot-blink']}`)
-            listTaskWrapper.innerHTML = `
+    private getListTaskHTML(): HTMLDivElement | null {
+        if (this.listTask?.length <= 0) return null
+
+        let localListTask = structuredClone(this.listTask)
+        switch (this.filter) {
+            case FILTER_VALUE[1]: {
+                localListTask = localListTask.filter(task => task.isRender === true)
+                break
+            }
+            case FILTER_VALUE[2]: {
+                localListTask = localListTask.filter(task => !task.isRender)
+            }
+            case FILTER_VALUE[0]:
+            default: break
+        }
+        const listTaskWrapper = document.createElement('div')
+        listTaskWrapper.id = `${css['list-task-wrapper']}`
+        listTaskWrapper.classList.add(`${css['slide-in']}`, `${css['dotted-list']}`, `${css['dot-blink']}`)
+        listTaskWrapper.innerHTML = `
         <div class="${css['operator-wrap']}">
             <div class="${css['minimize-btn']}">
                 ${minimize}
             </div>
             <div class="${css['filter']}">
                 <div class="${css['option-wrap']}">
-                    <input class="${css['filter-checkbox']}" type="checkbox" name="" id="">
-                    <p class="${css['type-text']}">All</p>
+                    <input class="${css['filter-checkbox']}" ${this.filter === FILTER_VALUE[0] ? "checked" : ''} type="checkbox" name="" id="all">
+                    <label class="${css['type-text']}" for="all">All</label>
                 </div>
                 <div class="${css['option-wrap']}">
-                    <input class="${css['filter-checkbox']}" type="checkbox" name="" id="">
-                    <p class="${css['type-text']}">Shown</p>
+                    <input class="${css['filter-checkbox']}" ${this.filter === FILTER_VALUE[1] ? "checked" : ''} type="checkbox" name="" id="shown">
+                    <label class="${css['type-text']}" for="shown">Shown</label>
                 </div>
                 <div class="${css['option-wrap']}">
-                    <input class="${css['filter-checkbox']}" type="checkbox" name="" id="">
-                    <p class="${css['type-text']}">Hidden</p>
+                    <input class="${css['filter-checkbox']}" ${this.filter === FILTER_VALUE[2] ? "checked" : ''} type="checkbox" name="" id="hidden">
+                    <label class="${css['type-text']}" for="hidden">Hidden</label>
                 </div>
             </div>
         </div>
@@ -180,14 +219,14 @@ export class ListTaskManager extends Base {
         <hr class="${css['hr']}">
 
         <!-- Task element -->
-        ${this.listTask.map((task, index) => {
-                return `
+        ${localListTask.map((task) => {
+            return `
                         <div class="${css['task']}">
                             <div class="${css['task-info']}">
                                 <h2 class="${css['task-title']}">${task.title}</>
                                     <p class="${css['task-assignee']}">Assignee: ${task.assignee?.name || 'Unassigned'}</p>
                                     <p class="${css['issue-type']}">Issue type: ${task.issueType.name}</p>
-                                    <p class="${css['time-created']}">Time Created: ${task.createdDate || ''}</p>
+                                    <p class="${css['time-created']}">Last updated: ${task.createdDate || task.updatedDate || ''}</p>
                             </div>
                             <div class="${css['task-status']} ${css[`task-status-${this.getTaskStatusCssPostfixClass(task.taskStatus.name)}`] || css['task-status-default']}">${task.taskStatus.name}</div>
                             <div class="${css['edit-wrap']}">
@@ -200,15 +239,13 @@ export class ListTaskManager extends Base {
                         <hr>
                         `}).join("")}
         `
-            // set up event handlers
-            listTaskWrapper.onclick = (e) => {
-                e.stopPropagation()
-                this.turnDotToTaskList(e)
-            }
-            return listTaskWrapper
+        // set up event handlers
+        listTaskWrapper.onclick = (e) => {
+            e.stopPropagation()
+            this.turnDotToTaskList()
         }
+        return listTaskWrapper
 
-        return null
     }
 
     private getTaskStatusCssPostfixClass(taskStatusName: string): string {
@@ -245,6 +282,34 @@ export class ListTaskManager extends Base {
                 console.error('Error loading the image');
             };
         })
+    }
+
+    private showTaskAsDot(): void {
+        if (!this.listTask) return
+        for (const task of this.listTask) {
+            if (task.isRender == null || task.isRender == undefined) {
+                if (!task.pointDom) continue
+                console.log('task: ', task)
+                const element = this.findElementByDomString(task.pointDom)
+                if (element) {
+                    console.log(element.getBoundingClientRect())
+                    const { left, top } = element.getBoundingClientRect()
+                    EventBusInstance.emit('create-tags', left, top)
+                    task.isRender = true
+                } else {
+                    task.isRender = false
+                }
+            }
+        }
+    }
+
+    private findElementByDomString(domString: string): HTMLElement | null {
+        const el = document.querySelector(domString) as HTMLElement;
+        if (el?.isConnected) {
+            return el
+        }
+
+        return null
     }
 
 }
