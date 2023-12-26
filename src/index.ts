@@ -1,29 +1,45 @@
 import { toPng } from "html-to-image";
+import figmaIcon from "./asset/figma.svg";
 import hand from "./asset/hand-slapped.svg";
 import penTool from "./asset/pen-tool.svg";
-import { Base, ConfigurationOptions, Request } from "./base";
+import { Base, ConfigurationOptions, GenericRequest } from "./base";
 import { FormManager } from "./components/form";
-import css from "./index.scss";
+import { ListTaskManager } from "./components/list-task";
+import { Task } from "./components/list-task/types/Task";
 import { ModalManager } from "./components/modal";
 import { notification } from "./components/notification";
 import { TagManager } from "./components/tag";
-import { ListTaskManager } from "./components/list-task";
-import { Task } from "./components/list-task/types/Task";
+import css from "./index.scss";
 // import { applyMixins } from "./utils";
-import { NotificationManager } from './components/notification/notification';
 import { EventBusInstance } from "./components/EventBus";
+import { FigmaComparerModal } from "./components/figma-modal/FigmaCompareModal";
+import { NotificationManager } from "./components/notification/notification";
+import { FigmaClient } from "./figma/figma";
+import { APP_ID } from "./utils/constants";
 
 class MagicPoint extends Base {
+    private isMagicPointEnabled: boolean = false;
     private isFormOpen: boolean = false;
     private tagManager: TagManager;
     private notificationManager: NotificationManager;
     private formManager: FormManager;
     private modalManager: ModalManager;
-    private listTaskManager: ListTaskManager
+    private listTaskManager: ListTaskManager;
     private RENDER_TASK_OPERATOR = {
         RENDER: true,
-        NOT_RENDER: false
-    }
+        NOT_RENDER: false,
+    };
+
+    private magicPointDiv: HTMLDivElement | null = null;
+    private figmaClient: FigmaClient = new FigmaClient(
+        "fQajLA73u5Megnj2UIfugu",
+        "http://localhost:8080/api/figma/oauth-callback"
+    );
+    private teamIds: string[] = [];
+    private figmaComparerModal: FigmaComparerModal = new FigmaComparerModal(
+        this.figmaClient,
+        this.createTasks.bind(this)
+    );
 
     constructor(config: ConfigurationOptions) {
         super(config);
@@ -34,16 +50,18 @@ class MagicPoint extends Base {
         this.formManager = new FormManager(config);
         this.modalManager = new ModalManager();
         this.listTaskManager = new ListTaskManager(config);
-        console.log('task manager: ', this.listTaskManager)
+        console.log("task manager: ", this.listTaskManager);
         this.configTrix();
         this.initializeBindings();
-        this.insertMagicPointToggle();
-        this.setupEventBuses()
+        this.setupEventBuses();
+        this.setupKeystrokeListener();
+        this.fetchInformation();
     }
 
     private initializeBindings(): void {
         this.createDotEventListenerHandler =
             this.createDotEventListenerHandler.bind(this);
+        this.magicPointListener = this.magicPointListener.bind(this);
     }
 
     private enableMagicPoint(): void {
@@ -56,16 +74,39 @@ class MagicPoint extends Base {
         document.body.classList.remove(css["red-dot-cursor"]);
     }
 
+    private async fetchInformation() {
+        const res: any = await this.get("sdk/figma-team");
+        if (res.appData && Array.isArray(res.appData)) {
+            this.teamIds = res.appData;
+        }
+        console.log(this.teamIds);
+    }
+
     private async createTask(data: any): Promise<boolean> {
         let res: any = await this.post("sdk/task", data);
         if (!res?.hasError) {
-            this.notificationManager.createNotification("CREATE", "SUCCESS", res.appData);
-            this.listTaskManager.fetchListTask(this.RENDER_TASK_OPERATOR.NOT_RENDER)
+            this.notificationManager.createNotification(
+                "CREATE",
+                "SUCCESS",
+                res.appData
+            );
+            this.listTaskManager.fetchListTask(
+                this.RENDER_TASK_OPERATOR.NOT_RENDER
+            );
         } else {
-            this.notificationManager.createNotification("CREATE", "FAILED", res.appData);
+            this.notificationManager.createNotification(
+                "CREATE",
+                "FAILED",
+                res.appData
+            );
         }
         this.closeForm();
-        return !res?.hasError
+        return !res?.hasError;
+    }
+
+    private async createTasks(tasks: any[]): Promise<void> {
+        console.log("duytk createTasks", tasks);
+        await Promise.all(tasks.map((data) => this.createTask(data)));
     }
 
     private closeForm() {
@@ -89,11 +130,12 @@ class MagicPoint extends Base {
     }
 
     private configTrix() {
-        document.addEventListener("trix-before-initialize", () => { });
+        document.addEventListener("trix-before-initialize", () => {});
     }
 
     private createDotEventListenerHandler(e: MouseEvent) {
-        this.formManager.setCurrentDomString(this.getPointDomTree(e))
+        this.formManager.setCurrentDomString(this.getPointDomTree(e));
+
         this.autoCaptureCurrentUserView(e).then((canvas: HTMLCanvasElement) => {
             this.isFormOpen = true;
             this.formManager.createForm(canvas);
@@ -104,35 +146,40 @@ class MagicPoint extends Base {
     }
 
     private getPointDomTree(e: MouseEvent): string {
-        let composedPath = e.composedPath()
-        composedPath.splice(-3) // remove window, document, html tag
-        let pointDomTreeSelectorString = []
+        let composedPath = e.composedPath();
+        composedPath.splice(-3); // remove window, document, html tag
+        let pointDomTreeSelectorString = [];
         for (const nodeInPath of composedPath as HTMLElement[]) {
-            let singleNodeCSSSelector = ''
+            let singleNodeCSSSelector = "";
 
-            singleNodeCSSSelector += nodeInPath.tagName.toLowerCase()
+            singleNodeCSSSelector += nodeInPath.tagName.toLowerCase();
 
             if (nodeInPath.id) {
-                singleNodeCSSSelector += `#${nodeInPath.id}`
+                singleNodeCSSSelector += `#${nodeInPath.id}`;
             } else {
-                if (nodeInPath.parentNode!.childNodes.length > 0) { // nodeType = 3 is mean it is the text node, we dont care about this node
-                    singleNodeCSSSelector += `:nth-child(${Array.from(nodeInPath.parentNode!.childNodes).filter(node => node.nodeType !== 3).indexOf(nodeInPath) + 1})`
+                if (nodeInPath.parentNode!.childNodes.length > 0) {
+                    // nodeType = 3 is mean it is the text node, we dont care about this node
+                    singleNodeCSSSelector += `:nth-child(${
+                        Array.from(nodeInPath.parentNode!.childNodes)
+                            .filter((node) => node.nodeType !== 3)
+                            .indexOf(nodeInPath) + 1
+                    })`;
                 }
             }
-            pointDomTreeSelectorString.push(singleNodeCSSSelector)
+            pointDomTreeSelectorString.push(singleNodeCSSSelector);
         }
-        console.log('pointDomTreeSelectorString', pointDomTreeSelectorString)
-        return pointDomTreeSelectorString.reverse().join(' ')
+        console.log("pointDomTreeSelectorString", pointDomTreeSelectorString);
+        return pointDomTreeSelectorString.reverse().join(" ");
     }
 
     private setupFormSubmission(e: MouseEvent): void {
-        this.formManager.onSubmit((formData: Request<Task>) => {
+        this.formManager.onSubmit((formData: GenericRequest<Task>) => {
             this.createTask(formData).then((isSuccess) => {
                 if (isSuccess) {
                     this.tagManager.createTag(e.clientX, e.clientY);
                     this.enableMagicPoint();
                 }
-            })
+            });
         });
     }
 
@@ -253,8 +300,9 @@ class MagicPoint extends Base {
     }
 
     private insertMagicPointToggle(): void {
-        const div = document.createElement("div");
-        Object.assign(div.style, {
+        this.magicPointDiv = document.createElement("div");
+        this.magicPointDiv.id = APP_ID;
+        Object.assign(this.magicPointDiv.style, {
             position: "fixed",
             top: "10px",
             right: "10px",
@@ -271,21 +319,50 @@ class MagicPoint extends Base {
             this.handleMagicButtonClick(magicButton, normalButton)
         );
 
-        div.append(normalButton, magicButton);
-        document.body.appendChild(div);
+        const figmaButton3 = this.createButton(figmaIcon, () => {
+            this.figmaComparerModal.showModal(this.teamIds);
+        });
+
+        this.magicPointDiv.append(normalButton, magicButton, figmaButton3);
+
+        document.body.appendChild(this.magicPointDiv);
     }
 
+    private removeMagicPointToggle() {
+        this.magicPointDiv?.remove();
+        this.disableMagicPoint();
+    }
+
+    private toggleMagicPointFeature() {
+        this.isMagicPointEnabled = !this.isMagicPointEnabled;
+        this.isMagicPointEnabled
+            ? this.insertMagicPointToggle()
+            : this.removeMagicPointToggle();
+    }
+
+    private setupKeystrokeListener() {
+        window.addEventListener("keydown", this.magicPointListener);
+    }
+
+    private magicPointListener(event: KeyboardEvent) {
+        if (event.ctrlKey && event.shiftKey && event.key === "M") {
+            this.toggleMagicPointFeature();
+        }
+    }
+
+    public removeKeystrokeListener() {
+        window.removeEventListener("keydown", this.magicPointListener);
+    }
     private setupEventBuses(): void {
-        EventBusInstance.on('create-tags', (x, y) => {
-            this.tagManager.createTag(x, y)
-        })
+        EventBusInstance.on("create-tags", (x, y) => {
+            this.tagManager.createTag(x, y);
+        });
 
-        EventBusInstance.on('close-form', () => {
-            console.log('close form')
-            this.enableMagicPoint()
-        })
+        EventBusInstance.on("close-form", () => {
+            console.log("close form");
+            this.enableMagicPoint();
+        });
     }
-
 }
 
 export default MagicPoint;

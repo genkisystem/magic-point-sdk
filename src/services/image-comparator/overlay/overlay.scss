@@ -1,0 +1,14 @@
+.overlay-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    // display: none;
+
+    .overlay-item {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
+}

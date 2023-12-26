@@ -12,7 +12,7 @@ export type Response<T> = {
     message: string,
 }
 
-export type Request<T> = {
+export type GenericRequest<T> = {
     appData: T
 }
 
@@ -21,7 +21,7 @@ export abstract class Base {
     public baseUrl: string
     constructor(config: ConfigurationOptions) {
         this.apiKey = config.apiKey
-        this.baseUrl = config.baseUrl || "http://localhost:3000/api/"
+        this.baseUrl = config.baseUrl || "http://localhost:8080/api/"
     }
 
 

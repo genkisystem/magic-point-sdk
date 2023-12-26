@@ -1,7 +1,7 @@
 import ImageEditor from 'tui-image-editor';
 
-import './tui-image-editor/tui-image-editor.css';
 import './tui-image-editor/tui-color-picker.css';
+import './tui-image-editor/tui-image-editor.css';
 
 export class ImageEditorWrapper {
   private imageEditor: ImageEditor | null;
@@ -29,7 +29,7 @@ export class ImageEditorWrapper {
           theme: {},
           uiSize: {
             width: "100%",
-            height: "70vh",
+            height: "100%",
           },
           menuBarPosition: "bottom",
           usageStatistics: false,
