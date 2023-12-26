@@ -4,6 +4,7 @@ import penTool from "./asset/pen-tool.svg";
 import { Base, ConfigurationOptions, Request } from "./base";
 import { FormManager } from "./components/form";
 import css from "./index.scss";
+import taskListCss from './components/list-task/listTask.scss'
 import { ModalManager } from "./components/modal";
 import { notification } from "./components/notification";
 import { TagManager } from "./components/tag";
@@ -105,6 +106,7 @@ class MagicPoint extends Base {
 
     private getPointDomTree(e: MouseEvent): string {
         let composedPath = e.composedPath()
+        console.log('composedPath', composedPath)
         composedPath.splice(-3) // remove window, document, html tag
         let pointDomTreeSelectorString = []
         for (const nodeInPath of composedPath as HTMLElement[]) {
@@ -115,13 +117,15 @@ class MagicPoint extends Base {
             if (nodeInPath.id) {
                 singleNodeCSSSelector += `#${nodeInPath.id}`
             } else {
-                if (nodeInPath.parentNode!.childNodes.length > 0) { // nodeType = 3 is mean it is the text node, we dont care about this node
+                if (nodeInPath.parentNode!.childNodes.length > 0) {
+                    console.log(nodeInPath.parentNode!.childNodes) // nodeType = 3 is mean it is the text node, we dont care about this node
                     singleNodeCSSSelector += `:nth-child(${Array.from(nodeInPath.parentNode!.childNodes).filter(node => node.nodeType !== 3).indexOf(nodeInPath) + 1})`
                 }
             }
             pointDomTreeSelectorString.push(singleNodeCSSSelector)
         }
         console.log('pointDomTreeSelectorString', pointDomTreeSelectorString)
+        console.log('selectorString', pointDomTreeSelectorString.reverse().join(' '))
         return pointDomTreeSelectorString.reverse().join(' ')
     }
 
@@ -136,10 +140,24 @@ class MagicPoint extends Base {
         });
     }
 
+    private hideSDKElements() {
+        const taskList: HTMLDivElement = document.querySelector(`#${taskListCss['list-task-wrapper']}`)!
+        taskList.style.display = 'none';
+
+        const magicPointToggleWrap: HTMLDivElement = document.querySelector(`.${css['active']}`)?.parentElement as HTMLDivElement
+        magicPointToggleWrap.style.display = 'none';
+
+        setTimeout(() => {
+            taskList.style.display = 'flex';
+            magicPointToggleWrap.style.display = 'block';
+        }, 1);
+    }
+
     private async autoCaptureCurrentUserView(
         e: MouseEvent
     ): Promise<HTMLCanvasElement> {
         const outermostTag = this.findOutermostTag(e.target as HTMLElement);
+        this.hideSDKElements()
         const base64png = await toPng(outermostTag);
 
         return new Promise<HTMLCanvasElement>((resolve) => {
@@ -172,16 +190,18 @@ class MagicPoint extends Base {
     }
 
     private findOutermostTag(element: HTMLElement) {
-        let currentElement = element;
-        while (currentElement.parentElement) {
-            if (currentElement.parentElement.tagName.toLowerCase() === "body") {
-                console.log("selected element: ", currentElement);
-                return currentElement;
-            }
-            currentElement = currentElement.parentElement;
-        }
-        console.log("selected element: ", currentElement);
-        return currentElement;
+        // console.log('passed element', element)
+        // let currentElement = element;
+        // while (currentElement.parentElement) {
+        //     if (currentElement.parentElement.tagName.toLowerCase() === "body") {
+        //         console.log("selected element: ", currentElement);
+        //         return currentElement;
+        //     }
+        //     currentElement = currentElement.parentElement;
+        // }
+        // console.log("selected element: ", currentElement);
+        // return currentElement;
+        return document.getElementsByTagName('html')[0];
     }
 
     private toggleButtonClass(
