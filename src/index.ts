@@ -140,7 +140,7 @@ class MagicPoint extends Base {
         });
     }
 
-    private hideSDKElements() {
+    private toggleSDKElementsInOneSec() {
         const taskList: HTMLDivElement = document.querySelector(`#${taskListCss['list-task-wrapper']}`)!
         taskList.style.display = 'none';
 
@@ -157,7 +157,7 @@ class MagicPoint extends Base {
         e: MouseEvent
     ): Promise<HTMLCanvasElement> {
         const outermostTag = this.findOutermostTag(e.target as HTMLElement);
-        this.hideSDKElements()
+        this.toggleSDKElementsInOneSec()
         const base64png = await toPng(outermostTag);
 
         return new Promise<HTMLCanvasElement>((resolve) => {
