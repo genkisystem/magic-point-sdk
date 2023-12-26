@@ -96,7 +96,7 @@ export class FormManager extends Base {
             this.initializeTextEditor();
             this.initializeImageEditor(canvasImage.toDataURL());
 
-            if (this.currentTaskToUpdate) {
+            if (this.currentTaskToUpdate && Object.keys(this.currentTaskToUpdate).length > 0) {
                 console.log('task update: ', taskToUpdate)
                 this.injectTaskDataToForm(this.currentTaskToUpdate)
             }

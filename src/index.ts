@@ -240,11 +240,16 @@ class MagicPoint extends Base {
     private createButton(
         icon: string,
         clickHandler: () => void
-    ): HTMLButtonElement {
-        const button = document.createElement("button");
+    ): HTMLDivElement {
+        const button = document.createElement("div");
         button.innerHTML = icon;
         button.style.width = "50px";
         button.style.height = "50px";
+        button.style.display = "flex"
+        button.style.alignItems = "center";
+        button.style.justifyContent = "center";
+        button.style.borderRadius = "8px"
+        button.style.cursor = "pointer"
         button.addEventListener("click", (e) => {
             clickHandler();
             e.stopPropagation();
