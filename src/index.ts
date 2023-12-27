@@ -5,7 +5,7 @@ import penTool from "./asset/pen-tool.svg";
 import { Base, ConfigurationOptions, GenericRequest } from "./base";
 import { FormManager } from "./components/form";
 import { ListTaskManager } from "./components/list-task";
-import taskListCss from './components/list-task/listTask.scss';
+import taskListCss from "./components/list-task/listTask.scss";
 import { Task } from "./components/list-task/types/Task";
 import { ModalManager } from "./components/modal";
 import { notification } from "./components/notification";
@@ -92,7 +92,7 @@ class MagicPoint extends Base {
                 res.appData
             );
             this.listTaskManager.fetchListTask(
-                this.RENDER_TASK_OPERATOR.NOT_RENDER
+                this.RENDER_TASK_OPERATOR.RENDER
             );
         } else {
             this.notificationManager.createNotification(
@@ -147,10 +147,10 @@ class MagicPoint extends Base {
     }
 
     private getPointDomTree(e: MouseEvent): string {
-        let composedPath = e.composedPath()
-        console.log('composedPath', composedPath)
-        composedPath.splice(-3) // remove window, document, html tag
-        let pointDomTreeSelectorString = []
+        let composedPath = e.composedPath();
+        console.log("composedPath", composedPath);
+        composedPath.splice(-3); // remove window, document, html tag
+        let pointDomTreeSelectorString = [];
         for (const nodeInPath of composedPath as HTMLElement[]) {
             let singleNodeCSSSelector = "";
 
@@ -160,15 +160,22 @@ class MagicPoint extends Base {
                 singleNodeCSSSelector += `#${nodeInPath.id}`;
             } else {
                 if (nodeInPath.parentNode!.childNodes.length > 0) {
-                    console.log(nodeInPath.parentNode!.childNodes) // nodeType = 3 is mean it is the text node, we dont care about this node
-                    singleNodeCSSSelector += `:nth-child(${Array.from(nodeInPath.parentNode!.childNodes).filter(node => node.nodeType !== 3).indexOf(nodeInPath) + 1})`
+                    console.log(nodeInPath.parentNode!.childNodes); // nodeType = 3 is mean it is the text node, we dont care about this node
+                    singleNodeCSSSelector += `:nth-child(${
+                        Array.from(nodeInPath.parentNode!.childNodes)
+                            .filter((node) => node.nodeType !== 3)
+                            .indexOf(nodeInPath) + 1
+                    })`;
                 }
             }
             pointDomTreeSelectorString.push(singleNodeCSSSelector);
         }
-        console.log('pointDomTreeSelectorString', pointDomTreeSelectorString)
-        console.log('selectorString', pointDomTreeSelectorString.reverse().join(' '))
-        return pointDomTreeSelectorString.reverse().join(' ')
+        console.log("pointDomTreeSelectorString", pointDomTreeSelectorString);
+        console.log(
+            "selectorString",
+            pointDomTreeSelectorString.reverse().join(" ")
+        );
+        return pointDomTreeSelectorString.reverse().join(" ");
     }
 
     private setupFormSubmission(e: MouseEvent): void {
@@ -183,15 +190,19 @@ class MagicPoint extends Base {
     }
 
     private toggleSDKElementsInOneSec() {
-        const taskList: HTMLDivElement = document.querySelector(`#${taskListCss['list-task-wrapper']}`)!
-        taskList.style.display = 'none';
+        const taskList: HTMLDivElement = document.querySelector(
+            `#${taskListCss["list-task-wrapper"]}`
+        )!;
+        taskList.style.display = "none";
 
-        const magicPointToggleWrap: HTMLDivElement = document.querySelector(`.${css['active']}`)?.parentElement as HTMLDivElement
-        magicPointToggleWrap.style.display = 'none';
+        const magicPointToggleWrap: HTMLDivElement = document.querySelector(
+            `.${css["active"]}`
+        )?.parentElement as HTMLDivElement;
+        magicPointToggleWrap.style.display = "none";
 
         setTimeout(() => {
-            taskList.style.display = 'flex';
-            magicPointToggleWrap.style.display = 'block';
+            taskList.style.display = "flex";
+            magicPointToggleWrap.style.display = "block";
         }, 1);
     }
 
@@ -199,7 +210,7 @@ class MagicPoint extends Base {
         e: MouseEvent
     ): Promise<HTMLCanvasElement> {
         const outermostTag = this.findOutermostTag(e.target as HTMLElement);
-        this.toggleSDKElementsInOneSec()
+        this.toggleSDKElementsInOneSec();
         const base64png = await toPng(outermostTag);
 
         return new Promise<HTMLCanvasElement>((resolve) => {
@@ -243,7 +254,7 @@ class MagicPoint extends Base {
         // }
         // console.log("selected element: ", currentElement);
         // return currentElement;
-        return document.getElementsByTagName('html')[0];
+        return document.getElementsByTagName("html")[0];
     }
 
     private toggleButtonClass(
@@ -307,11 +318,11 @@ class MagicPoint extends Base {
         button.innerHTML = icon;
         button.style.width = "50px";
         button.style.height = "50px";
-        button.style.display = "flex"
+        button.style.display = "flex";
         button.style.alignItems = "center";
         button.style.justifyContent = "center";
-        button.style.borderRadius = "8px"
-        button.style.cursor = "pointer"
+        button.style.borderRadius = "8px";
+        button.style.cursor = "pointer";
         button.addEventListener("click", (e) => {
             clickHandler();
             e.stopPropagation();

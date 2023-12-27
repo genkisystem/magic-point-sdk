@@ -14,7 +14,6 @@ import { ImageComparisonSlider } from "../../services/image-comparator/slide/Ima
 import { resizeCanvas } from "../../utils/canvas";
 import { getComposedPathForHTMLElement, getPointDom } from "../../utils/dom";
 import {
-    convertCoordinates,
     createButton,
     createDivElement,
     findElementAtPosition,
@@ -216,21 +215,23 @@ export class FigmaComparisonScreen implements Component {
             this.checkedTasks.includes(i)
         );
 
-        return selectedTask.map((t): GenericRequest<Task> => {
+        const originalWidth = document.body.style.width;
+        const originalHeight = document.body.style.height;
+        const originalMaxHeight = document.body.style.maxHeight;
+        const originalMinHeight = document.body.style.minHeight;
+
+        document.body.style.width = `${1920}px`;
+        document.body.style.height = `${1080}px`;
+        document.body.style.maxHeight = `${1080}px`;
+        document.body.style.minHeight = `${1080}px`;
+
+        const request = selectedTask.map((t): GenericRequest<Task> => {
             let pDom = "";
-            const { xActual, yActual } = convertCoordinates(
-                t.pageX,
-                t.pageY,
-                1920,
-                1080,
-                document.body.offsetWidth,
-                document.body.offsetHeight
-            );
 
             const element = findElementAtPosition(
                 document.body,
-                xActual,
-                yActual
+                t.pageX,
+                t.pageY
             );
             if (element) {
                 pDom = getPointDom(getComposedPathForHTMLElement(element));
@@ -258,6 +259,13 @@ export class FigmaComparisonScreen implements Component {
                 },
             };
         });
+
+        document.body.style.width = originalWidth;
+        document.body.style.height = originalHeight;
+        document.body.style.minHeight = originalMinHeight;
+        document.body.style.maxHeight = originalMaxHeight;
+
+        return request;
     }
 
     private getModeName(mode: CompareMode): string {

@@ -192,7 +192,7 @@ export class FigmaComparer implements Component {
         if (!this.tasks) return;
 
         this.onCreateTasks(this.tasks).then(() => {
-            // this.closeModal();
+            this.closeModal();
         });
     }
 

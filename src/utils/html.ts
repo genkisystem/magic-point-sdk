@@ -37,11 +37,10 @@ export const findElementAtPosition = (
     y: number
 ): HTMLElement | null => {
     let foundElement: HTMLElement | null = null;
+
     for (let child of Array.from(root.children)) {
         if (child instanceof HTMLElement) {
             let rect: DOMRect = child.getBoundingClientRect();
-            console.log("duytk child", child);
-            console.log("duytk rect", rect);
 
             // Check if the coordinates are within this element's bounds
             if (
@@ -74,4 +73,23 @@ export const convertCoordinates = (
     const xActual = (x / wOriginal) * wActual;
     const yActual = (y / hOriginal) * hActual;
     return { xActual, yActual };
+};
+
+export const getNewCoordinates = (
+    originalWidth: number,
+    originalHeight: number,
+    newWidth: number,
+    newHeight: number,
+    originalX: number,
+    originalY: number
+): { newX: number; newY: number } => {
+    // Calculate scaling factors
+    const scaleX = newWidth / originalWidth;
+    const scaleY = newHeight / originalHeight;
+
+    // Apply scaling factors to the original coordinates
+    const newX = originalX * scaleX;
+    const newY = originalY * scaleY;
+
+    return { newX, newY };
 };

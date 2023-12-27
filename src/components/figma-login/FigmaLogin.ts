@@ -134,7 +134,6 @@ export class FigmaLoginBody implements Component {
     }
 
     private updateScreen() {
-        console.log("duytk updateScreen");
         this.hideLoading();
         this.renderComponent();
     }

@@ -1,15 +1,15 @@
-import css from './listTask.scss'
+import css from './listTask.scss';
 
-import editIcon from '../../asset/edit.svg'
-import trash from '../../asset/trash.svg'
-import minimize from '../../asset/minimize.svg'
+import editIcon from '../../asset/edit.svg';
+import minimize from '../../asset/minimize.svg';
+import trash from '../../asset/trash.svg';
 
 import { Base, ConfigurationOptions, Response } from '../../base';
-import { Task } from './types/Task';
+import { EventBusInstance } from '../EventBus/index';
 import { FormManager } from '../form';
 import { ModalManager } from '../modal/modal';
 import { NotificationManager, notification } from '../notification';
-import { EventBusInstance } from '../EventBus/index';
+import { Task } from './types/Task';
 
 const FILTER_VALUE = ['ALL', 'SHOWN', 'HIDDEN'] as const
 type Filter = typeof FILTER_VALUE[number];
