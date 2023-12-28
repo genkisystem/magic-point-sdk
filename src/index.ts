@@ -3,40 +3,45 @@ import figmaIcon from "./asset/figma.svg";
 import hand from "./asset/hand-slapped.svg";
 import penTool from "./asset/pen-tool.svg";
 import { Base, ConfigurationOptions, GenericRequest } from "./base";
+import { EventBusInstance } from "./components/EventBus";
+import { FigmaComparerModal } from "./components/figma-modal/FigmaCompareModal";
 import { FormManager } from "./components/form";
 import { ListTaskManager } from "./components/list-task";
 import taskListCss from "./components/list-task/listTask.scss";
 import { Task } from "./components/list-task/types/Task";
 import { ModalManager } from "./components/modal";
 import { notification } from "./components/notification";
-import { TagManager } from "./components/tag";
-import css from "./index.scss";
-// import { applyMixins } from "./utils";
-import { EventBusInstance } from "./components/EventBus";
-import { FigmaComparerModal } from "./components/figma-modal/FigmaCompareModal";
 import { NotificationManager } from "./components/notification/notification";
+import { TagManager } from "./components/tag";
 import { FigmaClient } from "./figma/figma";
+import css from "./index.scss";
 import { APP_ID } from "./utils/constants";
+import { getPointDom } from "./utils/dom";
 
 class MagicPoint extends Base {
     private isMagicPointEnabled: boolean = false;
     private isFormOpen: boolean = false;
+
     private tagManager: TagManager;
     private notificationManager: NotificationManager;
     private formManager: FormManager;
     private modalManager: ModalManager;
     private listTaskManager: ListTaskManager;
-    private RENDER_TASK_OPERATOR = {
+
+    private readonly RENDER_TASK_OPERATOR = {
         RENDER: true,
         NOT_RENDER: false,
     };
 
     private magicPointDiv: HTMLDivElement | null = null;
+
     private figmaClient: FigmaClient = new FigmaClient(
         "fQajLA73u5Megnj2UIfugu",
         "http://localhost:8080/api/figma/oauth-callback"
     );
-    private teamIds: string[] = [];
+
+    private figmaTeamIds: string[] = [];
+
     private figmaComparerModal: FigmaComparerModal = new FigmaComparerModal(
         this.figmaClient,
         this.createTasks.bind(this)
@@ -47,11 +52,10 @@ class MagicPoint extends Base {
         console.log("add magic dot listener");
         this.tagManager = new TagManager();
         this.notificationManager = notification;
-        console.log("notificationManager: ", this.notificationManager);
         this.formManager = new FormManager(config);
         this.modalManager = new ModalManager();
         this.listTaskManager = new ListTaskManager(config);
-        console.log("task manager: ", this.listTaskManager);
+
         this.configTrix();
         this.initializeBindings();
         this.setupEventBuses();
@@ -78,9 +82,8 @@ class MagicPoint extends Base {
     private async fetchInformation() {
         const res: any = await this.get("sdk/figma-team");
         if (res.appData && Array.isArray(res.appData)) {
-            this.teamIds = res.appData;
+            this.figmaTeamIds = res.appData;
         }
-        console.log(this.teamIds);
     }
 
     private async createTask(data: any): Promise<boolean> {
@@ -135,7 +138,8 @@ class MagicPoint extends Base {
     }
 
     private createDotEventListenerHandler(e: MouseEvent) {
-        this.formManager.setCurrentDomString(this.getPointDomTree(e));
+        const path = e.composedPath();
+        this.formManager.setCurrentDomString(getPointDom(path));
 
         this.autoCaptureCurrentUserView(e).then((canvas: HTMLCanvasElement) => {
             this.isFormOpen = true;
@@ -144,38 +148,6 @@ class MagicPoint extends Base {
         });
 
         this.disableMagicPoint();
-    }
-
-    private getPointDomTree(e: MouseEvent): string {
-        let composedPath = e.composedPath();
-        console.log("composedPath", composedPath);
-        composedPath.splice(-3); // remove window, document, html tag
-        let pointDomTreeSelectorString = [];
-        for (const nodeInPath of composedPath as HTMLElement[]) {
-            let singleNodeCSSSelector = "";
-
-            singleNodeCSSSelector += nodeInPath.tagName.toLowerCase();
-
-            if (nodeInPath.id) {
-                singleNodeCSSSelector += `#${nodeInPath.id}`;
-            } else {
-                if (nodeInPath.parentNode!.childNodes.length > 0) {
-                    console.log(nodeInPath.parentNode!.childNodes); // nodeType = 3 is mean it is the text node, we dont care about this node
-                    singleNodeCSSSelector += `:nth-child(${
-                        Array.from(nodeInPath.parentNode!.childNodes)
-                            .filter((node) => node.nodeType !== 3)
-                            .indexOf(nodeInPath) + 1
-                    })`;
-                }
-            }
-            pointDomTreeSelectorString.push(singleNodeCSSSelector);
-        }
-        console.log("pointDomTreeSelectorString", pointDomTreeSelectorString);
-        console.log(
-            "selectorString",
-            pointDomTreeSelectorString.reverse().join(" ")
-        );
-        return pointDomTreeSelectorString.reverse().join(" ");
     }
 
     private setupFormSubmission(e: MouseEvent): void {
@@ -351,7 +323,7 @@ class MagicPoint extends Base {
         );
 
         const figmaButton3 = this.createButton(figmaIcon, () => {
-            this.figmaComparerModal.showModal(this.teamIds);
+            this.figmaComparerModal.showModal(this.figmaTeamIds);
         });
 
         this.magicPointDiv.append(normalButton, magicButton, figmaButton3);
@@ -384,6 +356,7 @@ class MagicPoint extends Base {
     public removeKeystrokeListener() {
         window.removeEventListener("keydown", this.magicPointListener);
     }
+
     private setupEventBuses(): void {
         EventBusInstance.on("create-tags", (x, y) => {
             this.tagManager.createTag(x, y);
