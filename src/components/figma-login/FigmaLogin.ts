@@ -1,5 +1,5 @@
-import { FigmaClient } from "../../figma/figma";
-import { FigmaTeamProjectResponse, FigmaUser } from "../../figma/type";
+import { FigmaClient } from "../../services/figma/figma";
+import { FigmaTeamProjectResponse, FigmaUser } from "../../services/figma/type";
 import { ButtonComponent, IButtonConfig } from "../Button/ButtonComponent";
 import { Component, SelectItem } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";

@@ -22,7 +22,7 @@ export class ListTaskManager extends Base {
     private notificationManager: NotificationManager;
     private filter: string = FILTER_VALUE[0];
 
-    constructor(config: ConfigurationOptions) {
+    constructor(config: ConfigurationOptions, private magicPointContainer: HTMLElement) {
         super(config);
         this.fetchListTask()
         this.updateFormElement = new FormManager(config)
@@ -58,7 +58,7 @@ export class ListTaskManager extends Base {
         }
         const listTaskElement = this.getListTaskHTML()
         if (listTaskElement) {
-            document.body.appendChild(listTaskElement)
+            this.magicPointContainer.appendChild(listTaskElement)
             this.addEditEventListener()
             this.addDeleteEventListener()
             this.addMinimizeEventListener()

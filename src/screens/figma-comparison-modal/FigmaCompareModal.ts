@@ -1,8 +1,8 @@
 import { GenericRequest } from "../../base";
-import { FigmaClient } from "../../figma/figma";
-import { BaseModal } from "../base-modal/BaseModal";
-import { FigmaComparer } from "../figma-comparer/FigmaComparer";
-import { Task } from "../list-task/types/Task";
+import { BaseModal } from "../../components/base-modal/BaseModal";
+import { FigmaComparer } from "../../components/figma-comparer/FigmaComparer";
+import { Task } from "../../components/list-task/types/Task";
+import { FigmaClient } from "../../services/figma/figma";
 
 export class FigmaComparerModal {
     private figmaComparer?: FigmaComparer;

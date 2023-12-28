@@ -1,6 +1,6 @@
 import { GenericRequest } from "../../base";
-import { FigmaClient } from "../../figma/figma";
-import { HtmlImageComparer } from "../../image-comparer/ImageComparer";
+import { FigmaClient } from "../../services/figma/figma";
+import { HtmlImageComparer } from "../../services/image-comparer/ImageComparer";
 import { IButtonConfig } from "../Button/ButtonComponent";
 import { Component } from "../common";
 import { FigmaComparerBody } from "../figma-compare-body/FigmaComparerBody";

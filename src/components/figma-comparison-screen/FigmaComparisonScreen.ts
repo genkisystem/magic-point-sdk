@@ -8,9 +8,9 @@ import settingSvg from "../../asset/setting.svg";
 import sliderSvg from "../../asset/slider.svg";
 import unCollapsedIcon from "../../asset/un-collapsed-icon.svg";
 import { GenericRequest } from "../../base";
-import { CanvasWithDots } from "../../image-comparer/ImageComparer";
 import { ImageOverlay } from "../../services/image-comparator/overlay/ImageOverlay";
 import { ImageComparisonSlider } from "../../services/image-comparator/slide/ImageComparatorSlide";
+import { CanvasWithDots } from "../../services/image-comparer/ImageComparer";
 import { resizeCanvas } from "../../utils/canvas";
 import { getComposedPathForHTMLElement, getPointDom } from "../../utils/dom";
 import {

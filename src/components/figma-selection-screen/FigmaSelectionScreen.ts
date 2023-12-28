@@ -1,7 +1,7 @@
 import closeIconSvg from "../../asset/input-close.svg";
 import searchIconSvg from "../../asset/look.svg";
-import { FigmaClient } from "../../figma/figma";
-import { FigmaProjectFileResponse, FileImageMap } from "../../figma/type";
+import { FigmaClient } from "../../services/figma/figma";
+import { FigmaProjectFileResponse, FileImageMap } from "../../services/figma/type";
 import { createDivElement } from "../../utils/html";
 import { Component } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";

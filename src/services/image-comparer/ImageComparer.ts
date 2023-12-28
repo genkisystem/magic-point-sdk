@@ -1,7 +1,7 @@
 import html2canvas from "html2canvas";
 import resemble from "resemblejs";
-import { resizeCanvas } from "../utils/canvas";
-import { APP_ID } from "../utils/constants";
+import { resizeCanvas } from "../../utils/canvas";
+import { APP_ID } from "../../utils/constants";
 
 export interface ElementBounds {
     pageX: number;

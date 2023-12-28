@@ -3,16 +3,16 @@ import { Component } from "../common";
 import css from "./modal.scss";
 
 export class BaseModal {
-    private modalElement: HTMLElement;
-    private contentElement: HTMLElement;
+    private modal: HTMLElement;
+    private content: HTMLElement;
 
     constructor(size: "sm" | "md" | "lg" | "full" = "lg") {
-        this.modalElement = document.createElement("div");
-        this.modalElement.classList.add(css["modal"]);
+        this.modal = document.createElement("div");
+        this.modal.classList.add(css["modal"]);
 
-        this.contentElement = document.createElement("div");
-        this.contentElement.classList.add(css["modal-content"]);
-        this.modalElement.appendChild(this.contentElement);
+        this.content = document.createElement("div");
+        this.content.classList.add(css["modal-content"]);
+        this.modal.appendChild(this.content);
 
         this.setSize(size);
     }
@@ -20,28 +20,28 @@ export class BaseModal {
     private setSize(size: "sm" | "md" | "lg" | "full"): void {
         switch (size) {
             case "sm":
-                this.contentElement.style.width = "60%";
-                this.contentElement.style.height = "60%";
-                this.contentElement.style.maxWidth = "600px";
-                this.contentElement.style.maxHeight = "calc(100vh - 400px)";
+                this.content.style.width = "60%";
+                this.content.style.height = "60%";
+                this.content.style.maxWidth = "600px";
+                this.content.style.maxHeight = "calc(100vh - 400px)";
                 break;
             case "md":
-                this.contentElement.style.width = "70%";
-                this.contentElement.style.height = "70%";
-                this.contentElement.style.maxWidth = "900px";
-                this.contentElement.style.maxHeight = "calc(100vh - 300px)";
+                this.content.style.width = "70%";
+                this.content.style.height = "70%";
+                this.content.style.maxWidth = "900px";
+                this.content.style.maxHeight = "calc(100vh - 300px)";
                 break;
             case "lg":
-                this.contentElement.style.width = "80%";
-                this.contentElement.style.height = "80%";
-                this.contentElement.style.maxWidth = "1200px";
-                this.contentElement.style.maxHeight = "calc(100vh - 225px)";
+                this.content.style.width = "80%";
+                this.content.style.height = "80%";
+                this.content.style.maxWidth = "1200px";
+                this.content.style.maxHeight = "calc(100vh - 225px)";
                 break;
             case "full":
-                this.contentElement.style.width = "100%";
-                this.contentElement.style.height = "100%";
-                this.contentElement.style.maxWidth = "none";
-                this.contentElement.style.maxHeight = "none";
+                this.content.style.width = "100%";
+                this.content.style.height = "100%";
+                this.content.style.maxWidth = "none";
+                this.content.style.maxHeight = "none";
                 break;
             default:
                 console.error("Invalid size specified.");
@@ -51,27 +51,31 @@ export class BaseModal {
 
     setBody(component: Component): void {
         const renderedContent = component.render();
-        this.contentElement.innerHTML = "";
-        this.contentElement.appendChild(renderedContent);
+        this.content.innerHTML = "";
+        this.content.appendChild(renderedContent);
     }
 
     show(): void {
-        const targetDiv: HTMLElement | null = document.getElementById(APP_ID);
-
-        if (targetDiv) {
-            if (!this.modalElement.parentElement) {
-                targetDiv.appendChild(this.modalElement);
-            }
-            this.modalElement.style.display = "flex";
-        } else {
-            console.error("Target div with ID 'A' not found.");
+        if (this.modal.parentElement) {
+            return;
         }
+
+        const appDiv: HTMLElement | null = document.getElementById(APP_ID);
+        if (!appDiv) {
+            console.error(`Target div with ID ${APP_ID} not found.`);
+            return;
+        }
+
+        appDiv.appendChild(this.modal);
+        this.modal.style.display = "flex";
     }
-    hide(): void {
-        const targetDiv: HTMLElement | null = document.getElementById(APP_ID);
 
-        if (targetDiv && this.modalElement.parentElement === targetDiv) {
-            targetDiv.removeChild(this.modalElement);
+    hide(): void {
+        const appDiv: HTMLElement | null = document.getElementById(APP_ID);
+        if (!appDiv || this.modal.parentElement !== appDiv) {
+            return;
         }
+
+        appDiv.removeChild(this.modal);
     }
 }

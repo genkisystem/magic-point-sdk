@@ -1,6 +1,6 @@
 import { GenericRequest } from "../../base";
-import { FigmaClient } from "../../figma/figma";
-import { CanvasWithDots } from "../../image-comparer/ImageComparer";
+import { FigmaClient } from "../../services/figma/figma";
+import { CanvasWithDots } from "../../services/image-comparer/ImageComparer";
 import { Component } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";
 import { FigmaComparisonScreen } from "../figma-comparison-screen/FigmaComparisonScreen";
