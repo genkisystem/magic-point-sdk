@@ -21,7 +21,7 @@ export abstract class Base {
     public baseUrl: string
     constructor(config: ConfigurationOptions) {
         this.apiKey = config.apiKey
-        this.baseUrl = config.baseUrl || "http://localhost:8080/api/"
+        this.baseUrl = config.baseUrl || `http://localhost:${process.env.PORT}/api/`
     }
 
 

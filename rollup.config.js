@@ -1,7 +1,9 @@
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import resolve, { nodeResolve } from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
 import autoprefixer from "autoprefixer";
+import dotenv from "dotenv";
 import genericNames from "generic-names";
 import path from "path";
 import nativePlugin from "rollup-plugin-natives";
@@ -10,6 +12,7 @@ import globals from "rollup-plugin-node-globals";
 import postcss from "rollup-plugin-postcss";
 import svg from "rollup-plugin-svg";
 import typescript from "rollup-plugin-typescript2";
+dotenv.config();
 
 const generateScopedNameDefault = genericNames(
     "[name]__[local]___[hash:base64:5]",
@@ -73,6 +76,10 @@ export default {
             originTransform: (path, exists) => path,
             sourcemap: true,
             targetEsm: false,
+        }),
+        replace({
+            preventAssignment: true,
+            "process.env.PORT": process.env.PORT,
         }),
     ],
 };
