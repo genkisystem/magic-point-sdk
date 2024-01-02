@@ -5,7 +5,7 @@ export class TagManager {
     private offsetX: number = 0;
     private offsetY: number = 0;
 
-    constructor() {
+    constructor(private magicPointContainer: HTMLElement) {
         this.onTagClick = this.onTagClick.bind(this);
         this.startDrag = this.startDrag.bind(this);
         this.drag = this.drag.bind(this);
@@ -18,7 +18,7 @@ export class TagManager {
         this.divElement.style.left = `${x}px`;
         this.divElement.style.top = `${y}px`;
 
-        document.body.appendChild(this.divElement);
+        this.magicPointContainer.appendChild(this.divElement);
 
         this.divElement.addEventListener("click", this.onTagClick);
         this.divElement.addEventListener("mousedown", this.startDrag);

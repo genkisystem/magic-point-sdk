@@ -1,50 +1,90 @@
 import { toPng } from "html-to-image";
+import figmaIcon from "./asset/figma.svg";
 import hand from "./asset/hand-slapped.svg";
 import penTool from "./asset/pen-tool.svg";
-import { Base, ConfigurationOptions, Request } from "./base";
+import { Base, ConfigurationOptions, GenericRequest } from "./base";
+import { EventBusInstance } from "./components/EventBus";
 import { FormManager } from "./components/form";
-import css from "./index.scss";
-import taskListCss from './components/list-task/listTask.scss'
+import { ListTaskManager } from "./components/list-task";
+import taskListCss from "./components/list-task/listTask.scss";
+import { Task } from "./components/list-task/types/Task";
 import { ModalManager } from "./components/modal";
 import { notification } from "./components/notification";
+import { NotificationManager } from "./components/notification/notification";
 import { TagManager } from "./components/tag";
-import { ListTaskManager } from "./components/list-task";
-import { Task } from "./components/list-task/types/Task";
-// import { applyMixins } from "./utils";
-import { NotificationManager } from './components/notification/notification';
-import { EventBusInstance } from "./components/EventBus";
+import css from "./index.scss";
+import { FigmaComparerModal } from "./screens/figma-comparison-modal/FigmaCompareModal";
+import { FigmaClient } from "./services/figma/figma";
+import { UIManager } from "./services/ui-manager/UIManager";
+import { createDivElement } from "./utils";
+import { APP_ID } from "./utils/constants";
+import { getPointDom } from "./utils/dom";
 
 class MagicPoint extends Base {
+    private isMagicPointEnabled: boolean = false;
     private isFormOpen: boolean = false;
+
     private tagManager: TagManager;
     private notificationManager: NotificationManager;
     private formManager: FormManager;
     private modalManager: ModalManager;
-    private listTaskManager: ListTaskManager
-    private RENDER_TASK_OPERATOR = {
+    private listTaskManager: ListTaskManager;
+
+    private readonly RENDER_TASK_OPERATOR = {
         RENDER: true,
-        NOT_RENDER: false
-    }
+        NOT_RENDER: false,
+    };
+
+    private magicPointContainer: HTMLElement;
+
+    private magicPointDiv: HTMLDivElement | null = null;
+
+    private figmaClient: FigmaClient = new FigmaClient(
+        "fQajLA73u5Megnj2UIfugu",
+        "http://localhost:8080/api/figma/oauth-callback"
+    );
+
+    private figmaTeamIds: string[] = [];
+
+    private figmaComparerModal: FigmaComparerModal = new FigmaComparerModal(
+        this.figmaClient,
+        this.createTasks.bind(this)
+    );
+
+    private uiManager: UIManager;
 
     constructor(config: ConfigurationOptions) {
         super(config);
         console.log("add magic dot listener");
-        this.tagManager = new TagManager();
         this.notificationManager = notification;
-        console.log("notificationManager: ", this.notificationManager);
         this.formManager = new FormManager(config);
         this.modalManager = new ModalManager();
-        this.listTaskManager = new ListTaskManager(config);
-        console.log('task manager: ', this.listTaskManager)
-        this.configTrix();
+        this.uiManager = new UIManager();
+
+        this.magicPointContainer = createDivElement({
+            className: css["magic-point-container"],
+        });
+        this.magicPointContainer.id = APP_ID;
+
+        this.listTaskManager = new ListTaskManager(
+            config,
+            this.magicPointContainer
+        );
+
+        this.tagManager = new TagManager(this.magicPointContainer);
+
+        this.setupMagicPoint();
+
         this.initializeBindings();
-        this.insertMagicPointToggle();
-        this.setupEventBuses()
+        this.setupEventBuses();
+        this.setupKeystrokeListener();
+        this.fetchInformation();
     }
 
     private initializeBindings(): void {
         this.createDotEventListenerHandler =
             this.createDotEventListenerHandler.bind(this);
+        this.magicPointListener = this.magicPointListener.bind(this);
     }
 
     private enableMagicPoint(): void {
@@ -57,16 +97,37 @@ class MagicPoint extends Base {
         document.body.classList.remove(css["red-dot-cursor"]);
     }
 
+    private async fetchInformation() {
+        const res: any = await this.get("sdk/figma-team");
+        if (res.appData && Array.isArray(res.appData)) {
+            this.figmaTeamIds = res.appData;
+        }
+    }
+
     private async createTask(data: any): Promise<boolean> {
         let res: any = await this.post("sdk/task", data);
         if (!res?.hasError) {
-            this.notificationManager.createNotification("CREATE", "SUCCESS", res.appData);
-            this.listTaskManager.fetchListTask(this.RENDER_TASK_OPERATOR.NOT_RENDER)
+            this.notificationManager.createNotification(
+                "CREATE",
+                "SUCCESS",
+                res.appData
+            );
+            this.listTaskManager.fetchListTask(
+                this.RENDER_TASK_OPERATOR.RENDER
+            );
         } else {
-            this.notificationManager.createNotification("CREATE", "FAILED", res.appData);
+            this.notificationManager.createNotification(
+                "CREATE",
+                "FAILED",
+                res.appData
+            );
         }
         this.closeForm();
-        return !res?.hasError
+        return !res?.hasError;
+    }
+
+    private async createTasks(tasks: any[]): Promise<void> {
+        await Promise.all(tasks.map((data) => this.createTask(data)));
     }
 
     private closeForm() {
@@ -89,12 +150,10 @@ class MagicPoint extends Base {
         );
     }
 
-    private configTrix() {
-        document.addEventListener("trix-before-initialize", () => { });
-    }
-
     private createDotEventListenerHandler(e: MouseEvent) {
-        this.formManager.setCurrentDomString(this.getPointDomTree(e))
+        const path = e.composedPath();
+        this.formManager.setCurrentDomString(getPointDom(path));
+
         this.autoCaptureCurrentUserView(e).then((canvas: HTMLCanvasElement) => {
             this.isFormOpen = true;
             this.formManager.createForm(canvas);
@@ -104,52 +163,31 @@ class MagicPoint extends Base {
         this.disableMagicPoint();
     }
 
-    private getPointDomTree(e: MouseEvent): string {
-        let composedPath = e.composedPath()
-        console.log('composedPath', composedPath)
-        composedPath.splice(-3) // remove window, document, html tag
-        let pointDomTreeSelectorString = []
-        for (const nodeInPath of composedPath as HTMLElement[]) {
-            let singleNodeCSSSelector = ''
-
-            singleNodeCSSSelector += nodeInPath.tagName.toLowerCase()
-
-            if (nodeInPath.id) {
-                singleNodeCSSSelector += `#${nodeInPath.id}`
-            } else {
-                if (nodeInPath.parentNode!.childNodes.length > 0) {
-                    console.log(nodeInPath.parentNode!.childNodes) // nodeType = 3 is mean it is the text node, we dont care about this node
-                    singleNodeCSSSelector += `:nth-child(${Array.from(nodeInPath.parentNode!.childNodes).filter(node => node.nodeType !== 3).indexOf(nodeInPath) + 1})`
-                }
-            }
-            pointDomTreeSelectorString.push(singleNodeCSSSelector)
-        }
-        console.log('pointDomTreeSelectorString', pointDomTreeSelectorString)
-        console.log('selectorString', pointDomTreeSelectorString.reverse().join(' '))
-        return pointDomTreeSelectorString.reverse().join(' ')
-    }
-
     private setupFormSubmission(e: MouseEvent): void {
-        this.formManager.onSubmit((formData: Request<Task>) => {
+        this.formManager.onSubmit((formData: GenericRequest<Task>) => {
             this.createTask(formData).then((isSuccess) => {
                 if (isSuccess) {
                     this.tagManager.createTag(e.clientX, e.clientY);
                     this.enableMagicPoint();
                 }
-            })
+            });
         });
     }
 
     private toggleSDKElementsInOneSec() {
-        const taskList: HTMLDivElement = document.querySelector(`#${taskListCss['list-task-wrapper']}`)!
-        taskList.style.display = 'none';
+        const taskList: HTMLDivElement = document.querySelector(
+            `#${taskListCss["list-task-wrapper"]}`
+        )!;
+        taskList.style.display = "none";
 
-        const magicPointToggleWrap: HTMLDivElement = document.querySelector(`.${css['active']}`)?.parentElement as HTMLDivElement
-        magicPointToggleWrap.style.display = 'none';
+        const magicPointToggleWrap: HTMLDivElement = document.querySelector(
+            `.${css["active"]}`
+        )?.parentElement as HTMLDivElement;
+        magicPointToggleWrap.style.display = "none";
 
         setTimeout(() => {
-            taskList.style.display = 'flex';
-            magicPointToggleWrap.style.display = 'block';
+            taskList.style.display = "flex";
+            magicPointToggleWrap.style.display = "block";
         }, 1);
     }
 
@@ -157,7 +195,7 @@ class MagicPoint extends Base {
         e: MouseEvent
     ): Promise<HTMLCanvasElement> {
         const outermostTag = this.findOutermostTag(e.target as HTMLElement);
-        this.toggleSDKElementsInOneSec()
+        this.toggleSDKElementsInOneSec();
         const base64png = await toPng(outermostTag);
 
         return new Promise<HTMLCanvasElement>((resolve) => {
@@ -201,15 +239,7 @@ class MagicPoint extends Base {
         // }
         // console.log("selected element: ", currentElement);
         // return currentElement;
-        return document.getElementsByTagName('html')[0];
-    }
-
-    private toggleButtonClass(
-        activeButton: HTMLElement,
-        inactiveButton: HTMLElement
-    ): void {
-        activeButton.classList.add(css["active"]);
-        inactiveButton.classList.remove(css["active"]);
+        return document.getElementsByTagName("html")[0];
     }
 
     private handleNormalButtonClick(
@@ -245,7 +275,7 @@ class MagicPoint extends Base {
         normalButton: HTMLElement,
         magicButton: HTMLElement
     ): void {
-        this.toggleButtonClass(normalButton, magicButton);
+        this.uiManager.toggleButtonClass(normalButton, magicButton);
         this.disableMagicPoint();
     }
 
@@ -253,7 +283,7 @@ class MagicPoint extends Base {
         magicButton: HTMLElement,
         normalButton: HTMLElement
     ): void {
-        this.toggleButtonClass(magicButton, normalButton);
+        this.uiManager.toggleButtonClass(magicButton, normalButton);
         this.enableMagicPoint();
     }
 
@@ -263,13 +293,7 @@ class MagicPoint extends Base {
     ): HTMLDivElement {
         const button = document.createElement("div");
         button.innerHTML = icon;
-        button.style.width = "50px";
-        button.style.height = "50px";
-        button.style.display = "flex"
-        button.style.alignItems = "center";
-        button.style.justifyContent = "center";
-        button.style.borderRadius = "8px"
-        button.style.cursor = "pointer"
+        button.className = css["toggle-button"];
         button.addEventListener("click", (e) => {
             clickHandler();
             e.stopPropagation();
@@ -277,9 +301,9 @@ class MagicPoint extends Base {
         return button;
     }
 
-    private insertMagicPointToggle(): void {
-        const div = document.createElement("div");
-        Object.assign(div.style, {
+    private setupMagicPoint() {
+        this.magicPointDiv = document.createElement("div");
+        Object.assign(this.magicPointDiv.style, {
             position: "fixed",
             top: "10px",
             right: "10px",
@@ -291,26 +315,62 @@ class MagicPoint extends Base {
         const normalButton = this.createButton(hand, () =>
             this.handleNormalButtonClick(normalButton, magicButton)
         );
+
         normalButton.classList.add(css["active"]);
         const magicButton = this.createButton(penTool, () =>
             this.handleMagicButtonClick(magicButton, normalButton)
         );
 
-        div.append(normalButton, magicButton);
-        document.body.appendChild(div);
+        const figmaBtn = this.createButton(figmaIcon, () => {
+            this.figmaComparerModal.showModal(this.figmaTeamIds);
+        });
+
+        this.magicPointDiv.append(normalButton, magicButton, figmaBtn);
+
+        this.magicPointContainer.appendChild(this.magicPointDiv);
+        document.body.appendChild(this.magicPointContainer);
+    }
+
+    private insertMagicPointToggle(): void {
+        this.magicPointContainer.style.display = "none";
+    }
+
+    private removeMagicPointToggle() {
+        this.magicPointContainer.style.display = "flex";
+        this.disableMagicPoint();
+    }
+
+    private toggleMagicPointFeature() {
+        this.isMagicPointEnabled = !this.isMagicPointEnabled;
+        this.isMagicPointEnabled
+            ? this.insertMagicPointToggle()
+            : this.removeMagicPointToggle();
+    }
+
+    private setupKeystrokeListener() {
+        window.addEventListener("keydown", this.magicPointListener);
+    }
+
+    private magicPointListener(event: KeyboardEvent) {
+        if (event.ctrlKey && event.shiftKey && event.key === "M") {
+            this.toggleMagicPointFeature();
+        }
+    }
+
+    public removeKeystrokeListener() {
+        window.removeEventListener("keydown", this.magicPointListener);
     }
 
     private setupEventBuses(): void {
-        EventBusInstance.on('create-tags', (x, y) => {
-            this.tagManager.createTag(x, y)
-        })
+        EventBusInstance.on("create-tags", (x, y) => {
+            this.tagManager.createTag(x, y);
+        });
 
-        EventBusInstance.on('close-form', () => {
-            console.log('close form')
-            this.enableMagicPoint()
-        })
+        EventBusInstance.on("close-form", () => {
+            console.log("close form");
+            this.enableMagicPoint();
+        });
     }
-
 }
 
 export default MagicPoint;

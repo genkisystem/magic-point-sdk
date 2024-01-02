@@ -1,15 +1,15 @@
-import css from './listTask.scss'
+import css from './listTask.scss';
 
-import editIcon from '../../asset/edit.svg'
-import trash from '../../asset/trash.svg'
-import minimize from '../../asset/minimize.svg'
+import editIcon from '../../asset/edit.svg';
+import minimize from '../../asset/minimize.svg';
+import trash from '../../asset/trash.svg';
 
 import { Base, ConfigurationOptions, Response } from '../../base';
-import { Task } from './types/Task';
+import { EventBusInstance } from '../EventBus/index';
 import { FormManager } from '../form';
 import { ModalManager } from '../modal/modal';
 import { NotificationManager, notification } from '../notification';
-import { EventBusInstance } from '../EventBus/index';
+import { Task } from './types/Task';
 
 const FILTER_VALUE = ['ALL', 'SHOWN', 'HIDDEN'] as const
 type Filter = typeof FILTER_VALUE[number];
@@ -22,7 +22,7 @@ export class ListTaskManager extends Base {
     private notificationManager: NotificationManager;
     private filter: string = FILTER_VALUE[0];
 
-    constructor(config: ConfigurationOptions) {
+    constructor(config: ConfigurationOptions, private magicPointContainer: HTMLElement) {
         super(config);
         this.fetchListTask()
         this.updateFormElement = new FormManager(config)
@@ -58,7 +58,7 @@ export class ListTaskManager extends Base {
         }
         const listTaskElement = this.getListTaskHTML()
         if (listTaskElement) {
-            document.body.appendChild(listTaskElement)
+            this.magicPointContainer.appendChild(listTaskElement)
             this.addEditEventListener()
             this.addDeleteEventListener()
             this.addMinimizeEventListener()

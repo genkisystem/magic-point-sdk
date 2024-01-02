@@ -1,0 +1,263 @@
+@import "../variables";
+
+.figma-compare {
+    position: relative;
+    line-height: 32px;
+    font-weight: 500;
+}
+
+.text-icon {
+    position: absolute;
+    top: 0.5px;
+    left: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.close-icon {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.modal-components-close-d {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: $br-9xs;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 4px;
+}
+
+.modal-components-base-head {
+    position: absolute;
+    width: 100%;
+    top: 24px;
+    right: 0;
+    left: 0;
+    height: 32px;
+}
+
+.text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    line-height: 32px;
+    font-weight: 500;
+}
+
+.divider {
+    align-self: stretch;
+    position: relative;
+}
+
+.divider {
+    border-radius: $br-9xs;
+    background-color: $gray-gray-500;
+    height: 4px;
+}
+
+.step-icon {
+    position: relative;
+    width: 16px;
+    height: 16px;
+}
+
+.step-text {
+    text-align: left;
+    flex: 1;
+    position: relative;
+    line-height: 16px;
+    font-weight: 500;
+}
+
+.icon-text,
+.wizard-step-complete {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.icon-text {
+    align-self: stretch;
+    flex-direction: row;
+    gap: $gap-9xs;
+}
+
+.wizard-step-complete {
+    flex: 1;
+    flex-direction: column;
+    gap: $gap-5xs;
+}
+
+.divider1 {
+    align-self: stretch;
+    position: relative;
+    border-radius: $br-9xs;
+    background-color: $gray-200;
+    height: 4px;
+}
+
+.wizard-step-incomplete1 {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: $gap-5xs;
+    color: $gray-500;
+}
+
+.wizard-stepper-loaded,
+.wizard-steps-6 {
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.wizard-steps-6 {
+    align-self: stretch;
+    flex-direction: row;
+    gap: $gap-9xs;
+    font-size: $small-500-size;
+    color: $gray-700;
+}
+
+.wizard-stepper-loaded {
+    position: absolute;
+    width: 100%;
+    right: 0;
+    bottom: 8px;
+    left: 0;
+    flex-direction: column;
+    gap: 12px;
+    color: $gray-gray-900;
+}
+
+.filler,
+.spacer,
+.spacer-24px {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    right: 0;
+    left: 0;
+    background-color: $base-white;
+    height: 24px;
+    opacity: 0;
+}
+
+.filler,
+.spacer {
+    top: 56px;
+    height: 16px;
+}
+
+.filler {
+    top: 104px;
+    height: 8px;
+}
+
+.modal-components-base-head-parent {
+    align-self: stretch;
+    position: relative;
+    height: 112px;
+}
+
+.modal-components-wizard-he {
+    align-self: stretch;
+    border-radius: $br-5xs $br-5xs 0 0;
+    border: 1px solid $color-gainsboro;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0 $padding-5xl;
+    flex: 0 0 auto;
+}
+
+.sign-in-button-google-child {
+    position: relative;
+    border-radius: 12px;
+    background-color: transparent;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+    width: 204px;
+    height: 42px;
+    z-index: 0;
+}
+
+.image-2-icon,
+.sign-in-with {
+    position: absolute;
+    margin: 0 !important;
+}
+
+.sign-in-with {
+    top: 11px;
+    left: 56px;
+    letter-spacing: 0.03em;
+    font-weight: 500;
+    display: inline-block;
+    width: 147.69px;
+    height: 21.69px;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.image-2-icon {
+    top: 9px;
+    left: 37px;
+    width: 19px;
+    height: 24.4px;
+    object-fit: cover;
+    z-index: 2;
+}
+
+.sign-in-button-google {
+    width: 238px;
+    height: 42px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    gap: 10px;
+}
+
+.header-content,
+.modal-components-content-b {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-components-content-b {
+    border-radius: $br-9xs;
+    height: 397px;
+    justify-content: center;
+    padding: $padding-base;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: $body-500-size;
+    color: #000;
+    font-family: $font-poppins;
+}
+
+.header-content {
+    height: 509px;
+    overflow: hidden;
+    flex-shrink: 0;
+    justify-content: flex-start;
+}
