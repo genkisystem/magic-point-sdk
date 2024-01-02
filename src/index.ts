@@ -59,7 +59,7 @@ class MagicPoint extends Base {
         this.notificationManager = notification;
         this.formManager = new FormManager(config);
         this.modalManager = new ModalManager();
-        this.uiManager = new UIManager(this);
+        this.uiManager = new UIManager();
 
         this.magicPointContainer = createDivElement({
             className: css["magic-point-container"],
@@ -127,7 +127,6 @@ class MagicPoint extends Base {
     }
 
     private async createTasks(tasks: any[]): Promise<void> {
-        console.log("duytk createTasks", tasks);
         await Promise.all(tasks.map((data) => this.createTask(data)));
     }
 

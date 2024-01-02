@@ -278,8 +278,7 @@ export class HtmlImageComparer {
         }
 
         const diffImage = diffData.getImageDataUrl();
-        console.log("duytk diffImage", diffImage);
-
+        
         const img = new Image();
         img.src = diffImage;
 

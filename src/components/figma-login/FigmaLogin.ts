@@ -11,12 +11,7 @@ export class FigmaLoginBody implements Component {
 
     private teamId: string = "";
     private teams: Map<string, FigmaTeamProjectResponse> = new Map();
-    private teamOptions: SelectItem[] = [
-        {
-            display: "Magic. Test",
-            value: "1311165594770244704",
-        },
-    ];
+    private teamOptions: SelectItem[] = [];
 
     constructor(
         private figmaClient: FigmaClient,

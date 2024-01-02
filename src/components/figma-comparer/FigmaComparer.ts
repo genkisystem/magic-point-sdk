@@ -179,7 +179,6 @@ export class FigmaComparer implements Component {
 
     private handleImageComparisonResult(diffPosition: any): void {
         if (diffPosition) {
-            console.log("Difference found at position:", diffPosition);
             this.bodyComponent.diffData = diffPosition;
         } else {
             console.log("No differences found");
