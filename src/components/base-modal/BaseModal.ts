@@ -1,58 +1,65 @@
+import { createDivElement } from "../../utils";
 import { APP_ID } from "../../utils/constants";
 import { Component } from "../common";
 import css from "./modal.scss";
+
+type ModalSize = "sm" | "md" | "lg" | "full";
 
 export class BaseModal {
     private modal: HTMLElement;
     private content: HTMLElement;
 
-    constructor(size: "sm" | "md" | "lg" | "full" = "lg") {
-        this.modal = document.createElement("div");
-        this.modal.classList.add(css["modal"]);
+    constructor(size: ModalSize = "lg") {
+        this.modal = createDivElement({ className: css["modal"] });
 
-        this.content = document.createElement("div");
-        this.content.classList.add(css["modal-content"]);
+        this.content = createDivElement({ className: css["modal-content"] });
+
         this.modal.appendChild(this.content);
 
         this.setSize(size);
     }
 
-    private setSize(size: "sm" | "md" | "lg" | "full"): void {
-        switch (size) {
-            case "sm":
-                this.content.style.width = "60%";
-                this.content.style.height = "60%";
-                this.content.style.maxWidth = "600px";
-                this.content.style.maxHeight = "calc(100vh - 400px)";
-                break;
-            case "md":
-                this.content.style.width = "70%";
-                this.content.style.height = "70%";
-                this.content.style.maxWidth = "900px";
-                this.content.style.maxHeight = "calc(100vh - 300px)";
-                break;
-            case "lg":
-                this.content.style.width = "80%";
-                this.content.style.height = "80%";
-                this.content.style.maxWidth = "1200px";
-                this.content.style.maxHeight = "calc(100vh - 225px)";
-                break;
-            case "full":
-                this.content.style.width = "100%";
-                this.content.style.height = "100%";
-                this.content.style.maxWidth = "none";
-                this.content.style.maxHeight = "none";
-                break;
-            default:
-                console.error("Invalid size specified.");
-                break;
-        }
+    private setSize(size: ModalSize) {
+        const sizes = {
+            sm: {
+                width: "60%",
+                height: "60%",
+                maxWidth: "600px",
+                maxHeight: "calc(100vh - 400px)",
+            },
+            md: {
+                width: "70%",
+                height: "70%",
+                maxWidth: "900px",
+                maxHeight: "calc(100vh - 300px)",
+            },
+            lg: {
+                width: "80%",
+                height: "80%",
+                maxWidth: "1200px",
+                maxHeight: "calc(100vh - 225px)",
+            },
+            full: {
+                width: "100%",
+                height: "100%",
+                maxWidth: "none",
+                maxHeight: "none",
+            },
+        };
+
+        const { width, height, maxWidth, maxHeight } =
+            sizes[size] || sizes["lg"];
+        Object.assign(this.content.style, {
+            width,
+            height,
+            maxWidth,
+            maxHeight,
+        });
     }
 
     setBody(component: Component): void {
-        const renderedContent = component.render();
         this.content.innerHTML = "";
-        this.content.appendChild(renderedContent);
+        this.content.appendChild(component.render());
     }
 
     show(): void {
