@@ -1,3 +1,8 @@
+## System Requirements
+
+Before installing `magic-point-sdk`, ensure that your operating system can run `canvas` applications. This is crucial for the proper functioning of the SDK, as it relies on canvas capabilities for rendering graphics and interactive elements.
+
+For more detailed information on canvas support, compatibility, and troubleshooting, please visit the [node-canvas](https://github.com/Automattic/node-canvas) GitHub page. This page provides comprehensive guidance on setting up and resolving common issues related to canvas in various operating environments.
 
 # Magic Point SDK Integration
 
