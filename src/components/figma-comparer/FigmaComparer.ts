@@ -22,7 +22,7 @@ export class FigmaComparer implements Component {
     ];
 
     private readonly DEFAULT_CANCEL_BUTTON_CONFIG: IButtonConfig = {
-        text: i18next.t('figma:comparer.buttonText.cancel'),
+        text: i18next.t('common:buttonText.cancel'),
         variant: "outlined",
         color: "primary",
         onClick: this.closeModal.bind(this),
@@ -98,7 +98,7 @@ export class FigmaComparer implements Component {
 
     private createPreviousButtonConfig(): IButtonConfig {
         return {
-            text: i18next.t('figma:comparer.buttonText.previous'),
+            text: i18next.t('common:buttonText.previous'),
             variant: "contained",
             color: "primary",
             onClick: this.handlePrevious.bind(this),
@@ -107,7 +107,7 @@ export class FigmaComparer implements Component {
 
     private createNextButtonConfig(): IButtonConfig {
         return {
-            text: i18next.t('figma:comparer.buttonText.next'),
+            text: i18next.t('common:buttonText.next'),
             variant: "contained",
             color: "primary",
             onClick: this.handleNext.bind(this),
