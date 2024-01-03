@@ -44,7 +44,7 @@ export class FigmaSelectionScreen implements Component {
         );
         const searchInput = this.createInputElement(
             css["search-input"],
-            `${i18next.t('figmaSelectionScreen:searchInputPlaceholder')}`
+            `${i18next.t('figma:selectionScreen.searchInputPlaceholder')}`
         );
         const closeIcon = this.createSpanElement(
             `${css["icon"]} ${css["close-icon"]}`,

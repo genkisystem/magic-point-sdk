@@ -34,11 +34,6 @@ export default {
             login: 'Figma Login',
             screenSelection: "Screen Selection",
             tasksEdition: 'Tasks Edition',
-        },
-        buttonText: {
-            previous: "Previous",
-            next: "Next",
-            cancel: 'Cancel'
         }
     },
     compareHeader: {
