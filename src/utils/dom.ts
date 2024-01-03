@@ -27,8 +27,8 @@ export const getPointDom = (path: EventTarget[]): string => {
             if (nodeInPath.parentNode!.childNodes.length > 0) {
                 // nodeType = 3 is mean it is the text node, we dont care about this node
                 singleNodeCSSSelector += `:nth-child(${Array.from(nodeInPath.parentNode!.childNodes)
-                        .filter((node) => node.nodeType !== 3)
-                        .indexOf(nodeInPath) + 1
+                    .filter((node) => node.nodeType !== 3)
+                    .indexOf(nodeInPath) + 1
                     })`;
             }
         }
