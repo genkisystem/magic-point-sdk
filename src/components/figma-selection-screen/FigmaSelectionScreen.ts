@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import closeIconSvg from "../../asset/input-close.svg";
 import searchIconSvg from "../../asset/look.svg";
 import { FigmaClient } from "../../services/figma/figma";
@@ -43,7 +44,7 @@ export class FigmaSelectionScreen implements Component {
         );
         const searchInput = this.createInputElement(
             css["search-input"],
-            "Search..."
+            `${i18next.t('figmaSelectionScreen:searchInputPlaceholder')}`
         );
         const closeIcon = this.createSpanElement(
             `${css["icon"]} ${css["close-icon"]}`,

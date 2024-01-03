@@ -10,6 +10,7 @@ import { FormManager } from '../form';
 import { ModalManager } from '../modal/modal';
 import { NotificationManager, notification } from '../notification';
 import { Task } from './types/Task';
+import i18next from 'i18next';
 
 const FILTER_VALUE = ['ALL', 'SHOWN', 'HIDDEN'] as const
 type Filter = typeof FILTER_VALUE[number];
@@ -203,7 +204,7 @@ export class ListTaskManager extends Base {
             <div class="${css['filter']}">
                 <div class="${css['option-wrap']}">
                     <input class="${css['filter-checkbox']}" ${this.filter === FILTER_VALUE[0] ? "checked" : ''} type="checkbox" name="" id="all">
-                    <label class="${css['type-text']}" for="all">All</label>
+                    <label class="${css['type-text']}" for="all">${i18next.t('listTask:filters.all')}</label>
                 </div>
                 <div class="${css['option-wrap']}">
                     <input class="${css['filter-checkbox']}" ${this.filter === FILTER_VALUE[1] ? "checked" : ''} type="checkbox" name="" id="shown">

@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { GenericRequest } from "../../base";
 import { FigmaClient } from "../../services/figma/figma";
 import { HtmlImageComparer } from "../../services/image-comparer/ImageComparer";
@@ -15,13 +16,13 @@ import css from "./figma-comparer.scss";
 
 export class FigmaComparer implements Component {
     private readonly STEPS: string[] = [
-        "Figma Login",
-        "Screen Selection",
-        "Tasks Edition",
+        i18next.t('figma:comparer.steps.login'),
+        i18next.t('figma:comparer.steps.screenSelection'),
+        i18next.t('figma:comparer.steps.tasksEdition'),
     ];
 
     private readonly DEFAULT_CANCEL_BUTTON_CONFIG: IButtonConfig = {
-        text: "Cancel",
+        text: i18next.t('figma:comparer.buttonText.cancel'),
         variant: "outlined",
         color: "primary",
         onClick: this.closeModal.bind(this),
@@ -97,7 +98,7 @@ export class FigmaComparer implements Component {
 
     private createPreviousButtonConfig(): IButtonConfig {
         return {
-            text: "Previous",
+            text: i18next.t('figma:comparer.buttonText.previous'),
             variant: "contained",
             color: "primary",
             onClick: this.handlePrevious.bind(this),
@@ -106,7 +107,7 @@ export class FigmaComparer implements Component {
 
     private createNextButtonConfig(): IButtonConfig {
         return {
-            text: "Next",
+            text: i18next.t('figma:comparer.buttonText.next'),
             variant: "contained",
             color: "primary",
             onClick: this.handleNext.bind(this),

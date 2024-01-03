@@ -16,7 +16,7 @@ export interface ITask {
     issueType?: Type;
 }
 
-export interface TaskExtended extends Task {}
+export interface TaskExtended extends Task { }
 
 export class TaskEditorComponent implements Component {
     private taskData: ITask;
@@ -24,6 +24,7 @@ export class TaskEditorComponent implements Component {
     // TODO: mapping
     private formManager: FormManager = new FormManager({
         apiKey: "ap8BuTMGR43fFzXuDze1Ve2pU7ZZvEjmvQMETTyPQRWMGMsrrMxiAsD9jvjKl52NZ4gKhuYu72mjd7wSCkQOCTwoOi62oazYzR5f3I1kmgUZhzNymAhA8HN5aRxtgOad",
+        lng: 'en'
     });
     private onSubmit: (updatedTask: ITask) => void;
     private onCancel: () => void;

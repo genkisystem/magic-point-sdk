@@ -61,6 +61,7 @@
     "browserify-fs": "^1.0.0",
     "html-to-image": "^1.11.11",
     "html2canvas": "^1.4.1",
+    "i18next": "^23.7.13",
     "img-comparison-slider": "^8.0.6",
     "quill": "^1.3.7",
     "resemblejs": "^5.0.0",

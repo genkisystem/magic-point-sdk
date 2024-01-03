@@ -1,5 +1,6 @@
 import { BaseModal } from "../base-modal/BaseModal";
 import { ITask, TaskEditorComponent } from "../task-editor/TaskEditorComponent";
+import i18next from "i18next";
 
 export class TaskEditorModal {
     private myModal: BaseModal;
@@ -21,7 +22,7 @@ export class TaskEditorModal {
     private setupModal(): void {
         if (!this.taskData || !this.onTaskUpdate) {
             throw new Error(
-                "Task data and update callback must be initialized before showing the modal."
+                `${i18next.t('taskEditorModal:setupError')}`
             );
         }
 
@@ -35,7 +36,7 @@ export class TaskEditorModal {
 
     private updateTaskData(updatedTask: ITask): void {
         if (!this.onTaskUpdate) {
-            throw new Error("Update callback function is not initialized.");
+            throw new Error(`${i18next.t('taskEditorModal:updateTaskError')}`);
         }
 
         this.taskData = updatedTask;

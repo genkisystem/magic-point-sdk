@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import checkedIcon from "../../asset/checked-circle.svg";
 import closeIconSvg from "../../asset/close-icon.svg";
 import uncheckedIcon from "../../asset/unchecked-circle.svg";
@@ -65,7 +66,7 @@ export class FigmaComparerHeader implements Component {
         });
         const figmaCompare = createDivElement({
             className: css["figma-compare"],
-            innerHTML: "Figma compare",
+            innerHTML: i18next.t('figma:compareHeader.text'),
         });
         const closeDiv = createDivElement({
             className: css["modal-components-close-d"],
