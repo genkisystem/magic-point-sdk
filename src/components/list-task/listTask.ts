@@ -312,5 +312,4 @@ export class ListTaskManager extends Base {
 
         return null
     }
-
 }

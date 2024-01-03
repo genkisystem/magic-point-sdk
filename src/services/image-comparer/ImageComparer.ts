@@ -278,7 +278,7 @@ export class HtmlImageComparer {
         }
 
         const diffImage = diffData.getImageDataUrl();
-        
+
         const img = new Image();
         img.src = diffImage;
 

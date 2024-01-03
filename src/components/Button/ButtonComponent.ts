@@ -38,9 +38,8 @@ export class ButtonComponent implements Component {
             preClick,
         } = this.config;
         this.componentElement.innerHTML = "";
-        this.componentElement.className = `${BUTTON_BASE_CLASS} ${
-            variant ? css[variant] : ""
-        } ${color ? css[color] : ""} ${extendClasses?.join(" ") || ""}`;
+        this.componentElement.className = `${BUTTON_BASE_CLASS} ${variant ? css[variant] : ""
+            } ${color ? css[color] : ""} ${extendClasses?.join(" ") || ""}`;
         if (disabled) {
             (this.componentElement as HTMLButtonElement).disabled = true;
             this.componentElement.classList.add(css["disabled"]);

@@ -4,7 +4,7 @@ import {
 } from "../components/Button/ButtonComponent";
 
 export class DivElementConfig {
-    constructor(public className?: string, public innerHTML?: string) {}
+    constructor(public className?: string, public innerHTML?: string) { }
 }
 
 /**
