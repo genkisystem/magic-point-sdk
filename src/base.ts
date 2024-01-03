@@ -1,8 +1,29 @@
 // import fetch from 'isomorphic-unfetch'
+const Iso639_1LanguageCodes = [
+    "en",
+    "es",
+    "fr",
+    "de",
+    "zh",
+    "ja",
+    "ru",
+    "ar",
+    "pt",
+    "it",
+    "hi",
+    "nl",
+    "sv",
+    "el",
+    "ko"
+    // Add more languages as needed
+] as const
+
+type Iso639_1LanguageCodesValue = typeof Iso639_1LanguageCodes[number]
 
 export type ConfigurationOptions = {
     apiKey: string,
-    baseUrl?: string
+    baseUrl?: string,
+    lng: Iso639_1LanguageCodesValue
 }
 
 export type Response<T> = {
@@ -22,6 +43,7 @@ export abstract class Base {
     constructor(config: ConfigurationOptions) {
         this.apiKey = config.apiKey
         this.baseUrl = config.baseUrl || `http://localhost:${process.env.PORT}/api/`
+        console.log('baseUrl:', this.baseUrl)
     }
 
 
@@ -38,6 +60,7 @@ export abstract class Base {
 
     protected async invoke<T>(method: string, path: string, data?: object | null, options?: RequestInit): Promise<T> {
         const url = `${this.baseUrl}${path}`
+        console.log('final url: ', url)
 
         const headers = new Headers({
             "content-type": "application/json",

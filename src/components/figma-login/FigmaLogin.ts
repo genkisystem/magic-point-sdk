@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { FigmaClient } from "../../services/figma/figma";
 import { FigmaTeamProjectResponse, FigmaUser } from "../../services/figma/type";
 import { ButtonComponent, IButtonConfig } from "../Button/ButtonComponent";
@@ -24,7 +25,7 @@ export class FigmaLoginBody implements Component {
         this.componentElement.className = css["login"];
 
         this.loadingIndicator = document.createElement("div");
-        this.loadingIndicator.textContent = "Loading...";
+        this.loadingIndicator.textContent = i18next.t('figma:login.loadingText');
 
         this.renderComponent();
     }
@@ -45,7 +46,7 @@ export class FigmaLoginBody implements Component {
     private createUserInfoText(userInfo: FigmaUser) {
         const userInfoText = document.createElement("div");
         userInfoText.className = css["user-info-text"];
-        userInfoText.innerHTML = `<p>Name: ${userInfo.handle}</p><p>Email: ${userInfo.email}</p>`;
+        userInfoText.innerHTML = `<p>${i18next.t('figma:login.userInfoText.name')}: ${userInfo.handle}</p><p>${i18next.t('figma:login.userInfoText.email')}: ${userInfo.email}</p>`;
         return userInfoText;
     }
 
@@ -65,7 +66,7 @@ export class FigmaLoginBody implements Component {
 
     private createLinkButton() {
         const linkButtonConfig: IButtonConfig = {
-            text: "Connect to your Figma",
+            text: i18next.t('figma:login.linkButtonText'),
             variant: "outlined",
             color: "primary",
             onClick: () => this.onLinkClick(),
@@ -121,9 +122,8 @@ export class FigmaLoginBody implements Component {
         this.hideLoading();
 
         const errorMessage = document.createElement("p");
-        errorMessage.textContent = `Error: ${
-            error.message || "Something went wrong"
-        }`;
+        errorMessage.textContent = `${i18next.t('figma:login.error.prefix')}: ${error.message || i18next.t('figma:login.error.content')
+            }`;
         errorMessage.style.color = "red";
         this.componentElement.appendChild(errorMessage);
     }
@@ -140,7 +140,7 @@ export class FigmaLoginBody implements Component {
         // Default option
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
-        defaultOption.textContent = "Select your figma team...";
+        defaultOption.textContent = i18next.t('figma:login.defaultSelectOption');
         teamSelectBox.appendChild(defaultOption);
 
         // Adding options from teamOptions
@@ -179,7 +179,7 @@ export class FigmaLoginBody implements Component {
             } catch (error) {
                 console.error("Error fetching Figma team information:", error);
                 this.showError(error);
-                return new Error("Fetch Figma team information failed");
+                return new Error(i18next.t('figma:login.fetchTeamFailedMsg'));
             } finally {
                 this.hideLoading();
                 this.updateFooter({

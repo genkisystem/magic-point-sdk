@@ -2,7 +2,7 @@ import css from "./modal.scss";
 
 export class ModalManager {
     private modalElement: HTMLDivElement | null = null;
-    private callback: () => void = () => {};
+    private callback: () => void = () => { };
 
     private createModal(): HTMLDivElement {
         const modal = document.createElement("div");

@@ -20,6 +20,7 @@ import {
     Type as IssueType,
 } from "../list-task/types/Type";
 import { NotificationManager } from "../notification/notification";
+import i18next from "i18next";
 
 export class FormManager extends Base {
     private form: HTMLFormElement | null = null;
@@ -27,7 +28,7 @@ export class FormManager extends Base {
     private textEditor!: Quill;
     private notificationManager: NotificationManager;
 
-    private onSubmitCallback: (data: GenericRequest<Task>) => void = () => {};
+    private onSubmitCallback: (data: GenericRequest<Task>) => void = () => { };
     private currentDomString: string;
     private assignees: Assignee[] = [];
     private issueTypes: IssueType[] = [];
@@ -41,10 +42,10 @@ export class FormManager extends Base {
     public types: {
         [key in "assignee" | "issueType" | "issueStatus"]: string;
     } = {
-        assignee: "assignee",
-        issueType: "issue-type",
-        issueStatus: "issue-status",
-    };
+            assignee: "assignee",
+            issueType: "issue-type",
+            issueStatus: "issue-status",
+        };
 
     constructor(config: ConfigurationOptions) {
         super(config);
@@ -432,10 +433,10 @@ export class FormManager extends Base {
     }
 
     private loadSubmitButtonContent(): string {
-        return this.isUpdatingTask() ? "Update" : "Submit";
+        return this.isUpdatingTask() ? i18next.t('form:update') : i18next.t('form:submit');
     }
 
-    private getFormHTML(task?: Task): HTMLFormElement {
+    private getFormHTML(): HTMLFormElement {
         const formElement = document.createElement("form");
         formElement.classList.add(formCss["form-wrapper"]);
 
@@ -447,58 +448,53 @@ export class FormManager extends Base {
             <div class="${formCss["row"]}">
                 <select name="" id="${formCss["task-type"]}">
                     ${this.issueTypes
-                        .map((issueType) => {
-                            return `<option value="${issueType.id}">${issueType.name}</option>`;
-                        })
-                        .join("")}
+                .map((issueType) => {
+                    return `<option value="${issueType.id}">${issueType.name}</option>`;
+                })
+                .join("")}
                 </select>
             </div>
             <div class="${formCss["row"]}">
                 <div class="${formCss["subject-wrap"]}">
-                    <input type="text" name="" id="${
-                        formCss["subject"]
-                    }" placeholder="Subject">
+                    <input type="text" name="" id="${formCss["subject"]
+            }" placeholder="${i18next.t('form:subject')}">
                 </div>
             </div>
             <div class="${formCss["row"]} ${formCss["no-margin"]}">
                 <div class="${formCss["assignee-wrap"]}">
-                    <label class="${
-                        formCss["label"]
-                    }" for="assignee">Assignee</label>
+                    <label class="${formCss["label"]
+            }" for="assignee">${i18next.t('form:Assignee')}</label>
                     <select class="${formCss["value"]}" name="" id="assignee">
                     ${this.assignees
-                        .map((assignee) => {
-                            return `<option value="${assignee.id}">${assignee.name}</option>`;
-                        })
-                        .join("")}
+                .map((assignee) => {
+                    return `<option value="${assignee.id}">${assignee.name}</option>`;
+                })
+                .join("")}
                     </select>
                 </div>
                 <div class="${formCss["task-status-wrap"]}">
-                    <label class="${
-                        formCss["label"]
-                    }" for="status">Status</label>
+                    <label class="${formCss["label"]
+            }" for="status">${i18next.t('form:Status')}</label>
                     <select class="${formCss["value"]}" name="" id="status">
                     ${this.issueStatuses
-                        .map((issueStatus) => {
-                            return `<option value="${issueStatus.id}">${issueStatus.name}</option>`;
-                        })
-                        .join("")}
+                .map((issueStatus) => {
+                    return `<option value="${issueStatus.id}">${issueStatus.name}</option>`;
+                })
+                .join("")}
                     </select>
                 </div>
             </div>
             <div class="${formCss["row"]}">
                 <div id="editor" class="${formCss["text-area"]}"></div>
             </div>
-            <div id="actions" class="${formCss["row"]} ${
-            formCss["row-actions"]
-        }">
+            <div id="actions" class="${formCss["row"]} ${formCss["row-actions"]
+            }">
                 <div class="${formCss["btn-wrap"]}">
-                    <div id="${formCss["cancel-btn"]}">Cancel</div>
+                    <div id="${formCss["cancel-btn"]}">${i18next.t('form:Cancel')}</div>
                 </div>
                 <div class="${formCss["btn-wrap"]}">
-                    <div id="${
-                        formCss["submit-btn"]
-                    }">${this.loadSubmitButtonContent()}</div>
+                    <div id="${formCss["submit-btn"]
+            }">${this.loadSubmitButtonContent()}</div>
                     <div class="${formCss["hide"]}" id="${formCss["loading"]}">
                         ${loading}
                     </div>

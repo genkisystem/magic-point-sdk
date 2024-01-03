@@ -19,6 +19,7 @@ import { UIManager } from "./services/ui-manager/UIManager";
 import { createDivElement } from "./utils";
 import { APP_ID } from "./utils/constants";
 import { getPointDom } from "./utils/dom";
+import { I18nManager } from './services/i18n';
 
 class MagicPoint extends Base {
     private isMagicPointEnabled: boolean = false;
@@ -60,7 +61,7 @@ class MagicPoint extends Base {
         this.formManager = new FormManager(config);
         this.modalManager = new ModalManager();
         this.uiManager = new UIManager();
-
+        new I18nManager(config.lng)
         this.magicPointContainer = createDivElement({
             className: css["magic-point-container"],
         });
@@ -367,7 +368,7 @@ class MagicPoint extends Base {
         });
 
         EventBusInstance.on("close-form", () => {
-            console.log("close form");
+            console.log("[EventBus] - triggered: close form");
             this.enableMagicPoint();
         });
     }

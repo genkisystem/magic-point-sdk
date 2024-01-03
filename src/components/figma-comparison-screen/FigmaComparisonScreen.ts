@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import bugSvg from "../../asset/bug.svg";
 import collapsedIcon from "../../asset/collapsed-icon.svg";
 import editSvg from "../../asset/editSvg.svg";
@@ -271,16 +272,15 @@ export class FigmaComparisonScreen implements Component {
     private getModeName(mode: CompareMode): string {
         switch (mode) {
             case CompareMode.Bug:
-                return "Bugs image";
+                return i18next.t('figma:comparisonScreen.modeName.bug');
             case CompareMode.Slider:
-                return "Split screen";
+                return i18next.t('figma:comparisonScreen.modeName.slider');
             case CompareMode.FigmaDark:
-                return "Original figma design";
+                return i18next.t('figma:comparisonScreen.modeName.figmaDark');
             case CompareMode.LiveWebsite:
-                return "Live Website design";
+                return i18next.t('figma:comparisonScreen.modeName.liveWebsite');
             case CompareMode.Overlay:
-                return "Overlay opacity";
-
+                return i18next.t('figma:comparisonScreen.modeName.overlay');
             default:
                 return "";
         }
@@ -488,7 +488,7 @@ export class FigmaComparisonScreen implements Component {
         // Title Label and Read-Only Field
         const titleLabel = document.createElement("label");
         titleLabel.className = css["input-label"];
-        titleLabel.textContent = "Title";
+        titleLabel.textContent = i18next.t('figma:comparisonScreen.taskInnerCreation.title');
         taskInner.appendChild(titleLabel);
 
         const titleField = createDivElement({
@@ -500,7 +500,7 @@ export class FigmaComparisonScreen implements Component {
         // Description Label and Read-Only Field
         const descriptionLabel = document.createElement("label");
         descriptionLabel.className = css["input-label"];
-        descriptionLabel.textContent = "Description";
+        descriptionLabel.textContent = i18next.t('figma:comparisonScreen.taskInnerCreation.description');
         taskInner.appendChild(descriptionLabel);
 
         const descriptionField = createDivElement({
