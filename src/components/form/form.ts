@@ -30,6 +30,7 @@ export class FormManager extends Base {
 
     private onSubmitCallback: (data: GenericRequest<Task>) => void = () => { };
     private currentDomString: string;
+    private currentCoordinate: string;
     private assignees: Assignee[] = [];
     private issueTypes: IssueType[] = [];
     private issueStatuses: IssueStatus[] = [];
@@ -50,8 +51,9 @@ export class FormManager extends Base {
     constructor(config: ConfigurationOptions) {
         super(config);
         this.loadEditorStyles();
-        this.currentDomString = "";
-        this.notificationManager = new NotificationManager();
+        this.currentDomString = ""
+        this.currentCoordinate = ""
+        this.notificationManager = new NotificationManager()
     }
 
     private isUpdatingTask(): boolean {
@@ -96,14 +98,6 @@ export class FormManager extends Base {
             default:
                 break;
         }
-    }
-
-    public setCurrentDomString(domString: string) {
-        this.currentDomString = domString;
-    }
-
-    public getCurrentDomString(): string {
-        return this.currentDomString || this.currentTaskToUpdate.pointDom || "";
     }
 
     public createForm(
@@ -156,7 +150,6 @@ export class FormManager extends Base {
             this.initializeImageEditor(canvasImage.toDataURL());
 
             if (this.currentTaskToUpdate) {
-                console.log("task update: ", taskToUpdate);
                 this.injectTaskDataToForm(this.currentTaskToUpdate);
             }
 
@@ -341,6 +334,8 @@ export class FormManager extends Base {
                 issueType: this.getCurrentSelectedIssueType(),
                 taskStatus: this.getCurrentSelectedIssueStatus(),
                 endPoint: window.location.pathname,
+                pointCoordinate: this.getCurrentCoordinate(),
+                screenSize: window.innerWidth
             },
         };
 
@@ -348,8 +343,23 @@ export class FormManager extends Base {
             taskRequest.appData.id = this.currentTaskToUpdate?.id;
         }
         this.toggleLoading(false);
-        console.log("formData: ", taskRequest.appData);
         return taskRequest;
+    }
+
+    public setCurrentDomString(domString: string) {
+        this.currentDomString = domString;
+    }
+
+    private getCurrentDomString(): string {
+        return this.currentDomString || this.currentTaskToUpdate.pointDom || "";
+    }
+
+    public setCurrentCoordinate(coordinate: string): void {
+        this.currentCoordinate = coordinate;
+    }
+
+    private getCurrentCoordinate(): string {
+        return this.currentCoordinate
     }
 
     private getCurrentSelectedAssignee(): Assignee {
@@ -522,7 +532,6 @@ export class FormManager extends Base {
     }
 
     private injectTaskDataToForm(task: Task) {
-        console.log("UPDATE: inject task data to form");
         const issueTypeSelectElement = document.getElementById(
             `${formCss["task-type"]}`
         ) as HTMLSelectElement;

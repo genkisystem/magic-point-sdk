@@ -14,6 +14,8 @@ export interface ITask {
     taskStatus?: Type;
     assignee?: Type | null;
     issueType?: Type;
+    pointCoordinate: string;
+    screenSize: number;
 }
 
 export interface TaskExtended extends Task { }
@@ -76,6 +78,8 @@ export class TaskEditorComponent implements Component {
                 taskStatus: updatedData.appData.taskStatus,
                 assignee: updatedData.appData.assignee,
                 issueType: updatedData.appData.issueType,
+                pointCoordinate: '',
+                screenSize: 0.1
             });
         }
     }
@@ -114,6 +118,8 @@ export class TaskEditorComponent implements Component {
                         : { id: 1, name: "" },
                     endPoint: window.location.pathname,
                     base64Images: [this.taskData.image],
+                    pointCoordinate: '',
+                    screenSize: 0.1
                 });
             };
 
