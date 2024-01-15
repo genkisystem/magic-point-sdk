@@ -1,8 +1,40 @@
 // import fetch from 'isomorphic-unfetch'
+const Iso639_1LanguageCodes = [
+    "en",
+    "es",
+    "fr",
+    "de",
+    "zh",
+    "ja",
+    "ru",
+    "ar",
+    "pt",
+    "it",
+    "hi",
+    "nl",
+    "sv",
+    "el",
+    "ko"
+    // Add more languages as needed
+] as const
+
+type Iso639_1LanguageCodesValue = typeof Iso639_1LanguageCodes[number]
 
 export type ConfigurationOptions = {
     apiKey: string,
-    baseUrl?: string
+    baseUrl?: string,
+    lng: Iso639_1LanguageCodesValue
+}
+
+export type Response<T> = {
+    appData: T,
+    errorCode: string,
+    hasError: boolean,
+    message: string,
+}
+
+export type GenericRequest<T> = {
+    appData: T
 }
 
 export abstract class Base {
@@ -10,7 +42,8 @@ export abstract class Base {
     public baseUrl: string
     constructor(config: ConfigurationOptions) {
         this.apiKey = config.apiKey
-        this.baseUrl = config.baseUrl || "http://localhost:3000/api/"
+        this.baseUrl = config.baseUrl || `http://localhost:${process.env.PORT}/api/`
+        console.log('baseUrl:', this.baseUrl)
     }
 
 
@@ -21,8 +54,13 @@ export abstract class Base {
         // return this.invoke('post', path, reqObj)
     }
 
-    protected async invoke<T>(method: string, path: string, data: object, options?: RequestInit): Promise<T> {
+    public async get(path: string): Promise<object | object[]> {
+        return await this.invoke('GET', path)
+    }
+
+    protected async invoke<T>(method: string, path: string, data?: object | null, options?: RequestInit): Promise<T> {
         const url = `${this.baseUrl}${path}`
+        console.log('final url: ', url)
 
         const headers = new Headers({
             "content-type": "application/json",
@@ -35,10 +73,13 @@ export abstract class Base {
             // mode: 'no-cors' as RequestMode,
             ...options,
             headers: headers,
-            body: JSON.stringify(data)
         }
 
-        return fetch(url, config).then(response => {
+        if (data && Object.keys(data).length > 0) {
+            config.body = JSON.stringify(data)
+        }
+
+        return await fetch(url, config).then(response => {
             if (response.ok) {
                 return response.json()
             } else {

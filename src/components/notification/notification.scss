@@ -1,0 +1,69 @@
+$success-color: green;
+$failure-color: red;
+$common-font-size: 1.5rem;
+$toast-animation-duration: 0.5s;
+$toast-height: 8vh;
+
+.toast {
+    position: fixed;
+    text-align: center;
+    color: #000;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    font-size: $common-font-size;
+    padding: .5rem 1.5rem;
+    border-radius: 4px;
+    z-index: 11;
+    height: $toast-height;
+    width: max-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    background-color: #fff;
+    transition: opacity $toast-animation-duration, transform $toast-animation-duration;
+    overflow: hidden;
+
+
+    @keyframes progress {
+        100% {
+            width: 0%;
+        }
+    }
+
+    &::before {
+        position: absolute;
+        content: '';
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        animation: progress 5s linear forwards;
+    }
+
+
+    &.slide-in {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+
+    &.slide-out {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+    }
+
+    &.success::before {
+        background-color: $success-color;
+    }
+
+    &.failure::before {
+        background-color: $failure-color;
+    }
+
+    a {
+        color: $success-color !important;
+        text-decoration: underline;
+        font-weight: bold;
+    }
+}
