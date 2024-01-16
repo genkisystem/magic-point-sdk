@@ -17,7 +17,7 @@ npm install magic-point-sdk
 To use `magic-point-sdk` add following lines of code into your entry file (index.js/ts, main.js/ts, ...)
 ```javascript
 /// your imports
-import MagicPoint from './magic-point-sdk'
+import MagicPoint from 'magic-point-sdk'
 
 /// your code
 new MagicPoint({apiKey: 'your-api-key-here'}) //Replaced `'your-api-key-here'` with your actual API key from Magic Point Management.
