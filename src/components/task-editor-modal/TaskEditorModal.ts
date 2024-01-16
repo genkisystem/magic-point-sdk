@@ -13,6 +13,8 @@ export interface ITask {
     taskStatus?: Type;
     assignee?: Type;
     issueType?: Type;
+    pointCoordinate: string;
+    screenSize: number;
 }
 
 export class TaskEditorModal {
@@ -48,6 +50,8 @@ export class TaskEditorModal {
                         ? formData.appData.assignee
                         : undefined,
                     issueType: formData.appData.issueType,
+                    pointCoordinate: "",
+                    screenSize: 0.1,
                 });
             }
             this.formManager.closeForm();
@@ -87,6 +91,8 @@ export class TaskEditorModal {
                         : this.noneOption,
                     endPoint: window.location.pathname,
                     base64Images: [this.taskData.image],
+                    pointCoordinate: "",
+                    screenSize: 0.1,
                 });
             };
 

@@ -1,4 +1,3 @@
-import tagCss from "../tag/tag.scss";
 import css from "./listTask.scss";
 
 import { editIcon, minimize, trash } from "@icons";
@@ -101,9 +100,9 @@ export class ListTaskManager extends Base {
                     (coordinates.y *
                         (element.clientHeight || element.offsetHeight)) /
                     (task.hostElementOriginCoordinates?.height ?? 1);
-                const dotElement = document.querySelectorAll(
-                    `.${tagCss["draggable-div"]}`,
-                )[this.findTaskIndex(task)] as HTMLDivElement;
+                const dotElement = document.querySelectorAll(".draggable-div")[
+                    this.findTaskIndex(task)
+                ] as HTMLDivElement;
                 dotElement.style.left = coordinates.x.toString() + "px";
                 dotElement.style.top = coordinates.y.toString() + "px";
             }

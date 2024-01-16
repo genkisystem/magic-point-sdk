@@ -1,5 +1,5 @@
+import { EventBusInstance } from "../event-bus";
 import css from "./tag.scss";
-import { EventBusInstance } from '../EventBus';
 
 export interface ITag {
     divElement: HTMLDivElement;
