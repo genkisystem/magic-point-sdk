@@ -139,7 +139,7 @@ export class FigmaComparisonScreen implements Component {
 
             this.imageSlider.create(
                 this.resizedFigmaCanvas.toDataURL(),
-                this.resizedBugCanvas.toDataURL(),
+                this.resizedWebCanvas.toDataURL(),
             );
             this.imageSlider.disableSlider();
             this.handleDisplayBug();
@@ -420,7 +420,6 @@ export class FigmaComparisonScreen implements Component {
                 break;
             case CompareMode.Overlay:
                 this.handleDisplayOverlay();
-
                 break;
         }
     }
@@ -445,7 +444,7 @@ export class FigmaComparisonScreen implements Component {
             this.resizedFigmaCanvas?.toDataURL() ?? "",
         );
         this.imageOverlay.setOverlayImage(
-            this.resizedBugCanvas?.toDataURL() ?? "",
+            this.resizedWebCanvas?.toDataURL() ?? "",
             parseInt(this.progressBar.value) / 100,
         );
 

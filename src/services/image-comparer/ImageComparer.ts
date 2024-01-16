@@ -35,7 +35,7 @@ export class HtmlImageComparer {
         newHeight: number,
     ): Promise<HTMLCanvasElement> {
         const capturedCanvas: HTMLCanvasElement = await html2canvas(element, {
-            scale: 2,
+            scale: window.devicePixelRatio,
             width: newWidth,
             height: newHeight,
         });
@@ -163,9 +163,9 @@ export class HtmlImageComparer {
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            const textX = position.right + 5;
-            const textY = position.top + height / 2;
-            ctx.font = "36px Arial";
+            const textX = position.right - 5;
+            const textY = position.top + 5;
+            ctx.font = "24px Arial";
             ctx.fillStyle = "blue";
             ctx.fillText(`${index + 1}`, textX, textY);
         };

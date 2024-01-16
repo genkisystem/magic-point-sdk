@@ -1,7 +1,7 @@
 export const resizeCanvas = (
     sourceCanvas: HTMLCanvasElement,
     width: number,
-    height: number
+    height: number,
 ): HTMLCanvasElement => {
     const canvas: HTMLCanvasElement = document.createElement("canvas");
     canvas.width = width;
@@ -21,7 +21,7 @@ export const resizeCanvas = (
         0,
         0,
         width,
-        height
+        height,
     );
     return canvas;
 };

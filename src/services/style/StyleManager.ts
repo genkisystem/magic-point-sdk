@@ -12,11 +12,10 @@ import formStyle from "@style/form.scss";
 import imageComparatorOverlayStyle from "@style/image-comparator-overlay.scss";
 import imageComparatorSlideStyle from "@style/image-comparator-slide.css";
 import appStyle from "@style/index.scss";
-import listTaskType from '@style/listTask.scss';
-import messageModalStyle from '@style/message-modal.scss';
+import listTaskType from "@style/listTask.scss";
+import messageModalStyle from "@style/message-modal.scss";
 import modalStyle from "@style/modal.scss";
-import notificationStyle from '@style/notification.scss';
-import resetStyle from "@style/reset.css";
+import notificationStyle from "@style/notification.scss";
 import tagStyle from "@style/tag.scss";
 import textEditorStyle from "@style/text-editor.css";
 import treeStyle from "@style/treeCss.scss";
@@ -39,7 +38,6 @@ class StyleManager {
     public init(): void {
         this.loadEditorStyles();
         const styles = [
-            resetStyle,
             appStyle,
             buttonStyle,
             tuiImageEditorStyle,
