@@ -1,7 +1,7 @@
 import html2canvas from "html2canvas";
 import resemble from "resemblejs";
-import { resizeCanvas } from "../../utils/canvas";
-import { APP_ID } from "../../utils/constants";
+
+import { APP_ID, resizeCanvas } from "@utils";
 
 export interface ElementBounds {
     pageX: number;
@@ -23,7 +23,7 @@ export interface CanvasWithDots {
 
 export class HtmlImageComparer {
     private async captureElementAsDataURL(
-        element: HTMLElement
+        element: HTMLElement,
     ): Promise<string> {
         const canvas = await html2canvas(element);
         return canvas.toDataURL("image/png");
@@ -32,7 +32,7 @@ export class HtmlImageComparer {
     async captureAndResizeElement(
         element: HTMLElement,
         newWidth: number,
-        newHeight: number
+        newHeight: number,
     ): Promise<HTMLCanvasElement> {
         const capturedCanvas: HTMLCanvasElement = await html2canvas(element, {
             scale: 2,
@@ -45,7 +45,7 @@ export class HtmlImageComparer {
     async loadImage(url: string): Promise<HTMLImageElement> {
         return new Promise((resolve, reject) => {
             const img = new Image();
-            img.crossOrigin = "Anonymous";
+            img.crossOrigin = "anonymous";
             img.onload = () => resolve(img);
             img.onerror = () => reject(new Error("Failed to load image"));
             img.src = url;
@@ -55,7 +55,7 @@ export class HtmlImageComparer {
     resizeImage(
         img: HTMLImageElement,
         width: number,
-        height: number
+        height: number,
     ): HTMLCanvasElement {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
@@ -70,11 +70,10 @@ export class HtmlImageComparer {
 
     async findDifferencePosition(
         element: HTMLElement,
-        figmaImageUrl: string
+        figmaImageUrl: string,
     ): Promise<CanvasWithDots | undefined> {
-        const originalFigmaImage: HTMLImageElement = await this.loadImage(
-            figmaImageUrl
-        );
+        const originalFigmaImage: HTMLImageElement =
+            await this.loadImage(figmaImageUrl);
 
         const bodyCopy: HTMLElement = this.cloneBody();
         this.styleBodyCopy(bodyCopy);
@@ -86,12 +85,12 @@ export class HtmlImageComparer {
         const canvas1: HTMLCanvasElement = await this.captureAndResizeElement(
             bodyCopy,
             originalFigmaImage.naturalWidth,
-            originalFigmaImage.naturalHeight
+            originalFigmaImage.naturalHeight,
         );
         const canvas2: HTMLCanvasElement = this.resizeImage(
             originalFigmaImage,
             originalFigmaImage.naturalWidth,
-            originalFigmaImage.naturalHeight
+            originalFigmaImage.naturalHeight,
         );
 
         const ctx1: CanvasRenderingContext2D | null = canvas1.getContext("2d");
@@ -104,13 +103,13 @@ export class HtmlImageComparer {
             0,
             0,
             canvas1.width,
-            canvas1.height
+            canvas1.height,
         );
         const imageData2: ImageData = ctx2.getImageData(
             0,
             0,
             canvas2.width,
-            canvas2.height
+            canvas2.height,
         );
 
         this.configureResemble();
@@ -126,7 +125,7 @@ export class HtmlImageComparer {
             const element = this.findElementAtPosition(
                 bodyCopy,
                 point.pageX,
-                point.pageY
+                point.pageY,
             );
             if (element) {
                 const dataURL = await this.captureElementAsDataURL(element);
@@ -226,7 +225,7 @@ export class HtmlImageComparer {
 
     private cloneBody(): HTMLElement {
         const bodyCopy: HTMLElement = document.body.cloneNode(
-            true
+            true,
         ) as HTMLElement;
         this.removeMagicPointDiv(bodyCopy);
         return bodyCopy;
@@ -234,7 +233,7 @@ export class HtmlImageComparer {
 
     private removeMagicPointDiv(bodyCopy: HTMLElement): void {
         const magicPointDiv: HTMLElement | null = bodyCopy.querySelector(
-            `div#${APP_ID}`
+            `div#${APP_ID}`,
         );
         magicPointDiv?.remove();
     }
@@ -262,7 +261,7 @@ export class HtmlImageComparer {
 
     private async compareImages(
         imageData1: ImageData,
-        imageData2: ImageData
+        imageData2: ImageData,
     ): Promise<resemble.ComparisonResult> {
         return new Promise((resolve, reject) => {
             resemble(imageData1).compareTo(imageData2).onComplete(resolve);
@@ -271,7 +270,7 @@ export class HtmlImageComparer {
 
     private async processDifferences(
         diffData: resemble.ComparisonResult,
-        bodyCopy: HTMLElement
+        bodyCopy: HTMLElement,
     ): Promise<ElementBounds[]> {
         if (diffData.misMatchPercentage <= 0) {
             return [];
@@ -284,14 +283,14 @@ export class HtmlImageComparer {
 
         const elementBoundsArray = await this.loadAndProcessImage(
             img,
-            bodyCopy
+            bodyCopy,
         );
         return elementBoundsArray;
     }
 
     private async loadAndProcessImage(
         img: HTMLImageElement,
-        bodyCopy: HTMLElement
+        bodyCopy: HTMLElement,
     ): Promise<ElementBounds[]> {
         return new Promise((resolve) => {
             img.onload = () => {
@@ -309,7 +308,7 @@ export class HtmlImageComparer {
                     0,
                     0,
                     canvas.width,
-                    canvas.height
+                    canvas.height,
                 );
                 const data = imageData.data;
 
@@ -319,7 +318,7 @@ export class HtmlImageComparer {
                     rect,
                     bodyCopy,
                     canvas.width,
-                    canvas.height
+                    canvas.height,
                 );
                 resolve(boundsArray);
             };
@@ -331,7 +330,7 @@ export class HtmlImageComparer {
         rect: DOMRect,
         bodyCopy: HTMLElement,
         width: number,
-        height: number
+        height: number,
     ): ElementBounds[] {
         const boundsArray: ElementBounds[] = [];
 
@@ -344,7 +343,7 @@ export class HtmlImageComparer {
                     const elementBounds = this.getElementBoundsAtPosition(
                         bodyCopy,
                         pageX,
-                        pageY
+                        pageY,
                     );
                     if (
                         elementBounds &&
@@ -362,7 +361,7 @@ export class HtmlImageComparer {
         data: Uint8ClampedArray,
         x: number,
         y: number,
-        width: number
+        width: number,
     ): boolean {
         const index = (y * width + x) * 4;
         return (
@@ -373,12 +372,12 @@ export class HtmlImageComparer {
     private getElementBoundsAtPosition(
         bodyCopy: HTMLElement,
         pageX: number,
-        pageY: number
+        pageY: number,
     ): ElementBounds | null {
         const elementAtPosition = this.findElementAtPosition(
             bodyCopy,
             pageX,
-            pageY
+            pageY,
         );
         if (!elementAtPosition) {
             return null;
@@ -397,21 +396,21 @@ export class HtmlImageComparer {
 
     private isInAnyElement(
         boundsArray: ElementBounds[],
-        elementBounds: ElementBounds
+        elementBounds: ElementBounds,
     ): boolean {
         return boundsArray.some(
             (bounds) =>
                 elementBounds.pageX >= bounds.left &&
                 elementBounds.pageX <= bounds.right &&
                 elementBounds.pageY >= bounds.top &&
-                elementBounds.pageY <= bounds.bottom
+                elementBounds.pageY <= bounds.bottom,
         );
     }
 
     private findElementAtPosition(
         root: HTMLElement,
         x: number,
-        y: number
+        y: number,
     ): HTMLElement | null {
         let foundElement: HTMLElement | null = null;
 

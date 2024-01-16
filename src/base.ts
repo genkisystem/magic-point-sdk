@@ -26,7 +26,7 @@ export type ConfigurationOptions = {
     lng: Iso639_1LanguageCodesValue
 }
 
-export type Response<T> = {
+export type GenericResponse<T> = {
     appData: T,
     errorCode: string,
     hasError: boolean,

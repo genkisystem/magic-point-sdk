@@ -1,17 +1,29 @@
+import { FigmaClient, OAuthClient, OAuthConfig } from "@services";
+import { createDivElement } from "@utils";
+import {
+    GetTeamProjectsResult,
+    GetUserMeResult,
+} from "figma-api/lib/api-types";
 import i18next from "i18next";
-import { FigmaClient } from "../../services/figma/figma";
-import { FigmaTeamProjectResponse, FigmaUser } from "../../services/figma/type";
-import { ButtonComponent, IButtonConfig } from "../Button/ButtonComponent";
+import { ButtonComponent, IButtonConfig } from "../button/ButtonComponent";
 import { Component, SelectItem } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";
-import css from "./login.scss";
+
+type ExtendedGetTeamProjectsResult = GetTeamProjectsResult & { name: string };
 
 export class FigmaLoginBody implements Component {
     private componentElement: HTMLElement;
-    private loadingIndicator: HTMLElement;
+    private oAuthClient: OAuthClient;
+
+    private readonly oAuthConfig: OAuthConfig = {
+        authorizationUrl: "https://www.figma.com/oauth",
+        clientId: "fQajLA73u5Megnj2UIfugu",
+        redirectUri: "http://localhost:8080/api/figma/oauth-callback",
+        scope: "files:read",
+    };
 
     private teamId: string = "";
-    private teams: Map<string, FigmaTeamProjectResponse> = new Map();
+    private teams: Map<string, ExtendedGetTeamProjectsResult> = new Map();
     private teamOptions: SelectItem[] = [];
 
     constructor(
@@ -19,41 +31,52 @@ export class FigmaLoginBody implements Component {
         private updateFooter: (configs: FooterButtonConfigs) => void,
         private showLoading: () => void,
         private hideLoading: () => void,
-        private teamIds: string[]
+        private teamIds: string[],
     ) {
-        this.componentElement = document.createElement("div");
-        this.componentElement.className = css["login"];
+        this.componentElement = createDivElement({
+            className: "login-container",
+        });
 
-        this.loadingIndicator = document.createElement("div");
-        this.loadingIndicator.textContent = i18next.t('figma:login.loadingText');
+        this.oAuthClient = new OAuthClient(this.oAuthConfig);
 
         this.renderComponent();
     }
 
     private createFlexContainer() {
-        const container = document.createElement("div");
-        container.className = css["flex-column"];
+        const container = createDivElement({ className: "info-row" });
         return container;
     }
 
-    private createUserImage(userInfo: FigmaUser) {
+    private createUserImage(userInfo: GetUserMeResult) {
         const image = document.createElement("img");
         image.src = userInfo.img_url;
-        image.className = css["user-image"];
+        image.className = "user-image";
         return image;
     }
 
-    private createUserInfoText(userInfo: FigmaUser) {
-        const userInfoText = document.createElement("div");
-        userInfoText.className = css["user-info-text"];
-        userInfoText.innerHTML = `<p>${i18next.t('figma:login.userInfoText.name')}: ${userInfo.handle}</p><p>${i18next.t('figma:login.userInfoText.email')}: ${userInfo.email}</p>`;
+    // private createUserInfoText(userInfo: GetUserMeResult) {
+    //     const userInfoText = createDivElement({ className: "user-info-text" });
+    //     userInfoText.innerHTML = `<p>${i18next.t(
+    //         "figma:login.userInfoText.name",
+    //     )}: ${userInfo.handle}</p><p>${i18next.t(
+    //         "figma:login.userInfoText.email",
+    //     )}: ${userInfo.email}</p>`;
+    //     return userInfoText;
+    // }
+
+    private createUserInfoText(userInfo: GetUserMeResult) {
+        const userInfoText = createDivElement({ className: "user-info-text" });
+        userInfoText.innerHTML = `<p><strong>${i18next.t(
+            "figma:login.userInfoText.name",
+        )}:</strong> ${userInfo.handle}</p><p><strong>${i18next.t(
+            "figma:login.userInfoText.email",
+        )}:</strong> ${userInfo.email}</p>`;
         return userInfoText;
     }
 
-    private displayUserInfo(userInfo: FigmaUser): HTMLDivElement {
+    private displayUserInfo(userInfo: GetUserMeResult): HTMLElement {
         const flexContainer = this.createFlexContainer();
-        const userInfoRow = document.createElement("div");
-        userInfoRow.className = css["user-info-row"];
+        const userInfoRow = createDivElement({ className: "user-info-row" });
 
         const userImage = this.createUserImage(userInfo);
         const userInfoText = this.createUserInfoText(userInfo);
@@ -66,7 +89,7 @@ export class FigmaLoginBody implements Component {
 
     private createLinkButton() {
         const linkButtonConfig: IButtonConfig = {
-            text: i18next.t('figma:login.linkButtonText'),
+            text: i18next.t("figma:login.linkButtonText"),
             variant: "outlined",
             color: "primary",
             onClick: () => this.onLinkClick(),
@@ -76,7 +99,7 @@ export class FigmaLoginBody implements Component {
     }
 
     private onLinkClick() {
-        this.figmaClient.initiateOAuthFlow();
+        this.oAuthClient.initiateOAuthFlow();
         this.listenForToken();
     }
 
@@ -92,24 +115,23 @@ export class FigmaLoginBody implements Component {
                     this.showLoading();
                     this.figmaClient.setToken(figma_token);
                     this.teams = await this.figmaClient.fetchFigmaTeams(
-                        this.teamIds
+                        this.teamIds,
                     );
 
                     this.teamOptions = Array.from(this.teams.entries()).map(
                         ([id, response]) => ({
                             display: response.name,
                             value: id,
-                        })
+                        }),
                     );
 
                     this.figmaClient.fetchFigmaInformation(
-                        this.updateScreen.bind(this)
+                        this.updateScreen.bind(this),
                     );
                 } catch (error) {
                     console.error("Error fetching Figma information:", error);
-                    this.showError(error); // Handle the error
+                    this.showError(error);
                 } finally {
-                    // Remove the event listener in either case
                     window.removeEventListener("message", tokenListener);
                 }
             }
@@ -122,8 +144,9 @@ export class FigmaLoginBody implements Component {
         this.hideLoading();
 
         const errorMessage = document.createElement("p");
-        errorMessage.textContent = `${i18next.t('figma:login.error.prefix')}: ${error.message || i18next.t('figma:login.error.content')
-            }`;
+        errorMessage.textContent = `${i18next.t("figma:login.error.prefix")}: ${
+            error.message || i18next.t("figma:login.error.content")
+        }`;
         errorMessage.style.color = "red";
         this.componentElement.appendChild(errorMessage);
     }
@@ -135,12 +158,14 @@ export class FigmaLoginBody implements Component {
 
     private addTeamSelectionElements(): void {
         const teamSelectBox = document.createElement("select");
-        teamSelectBox.className = css["team-select"];
+        teamSelectBox.className = "team-select";
 
         // Default option
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
-        defaultOption.textContent = i18next.t('figma:login.defaultSelectOption');
+        defaultOption.textContent = i18next.t(
+            "figma:login.defaultSelectOption",
+        );
         teamSelectBox.appendChild(defaultOption);
 
         // Adding options from teamOptions
@@ -163,7 +188,6 @@ export class FigmaLoginBody implements Component {
             });
         });
 
-        // Appending elements to the component
         this.componentElement.appendChild(teamSelectBox);
     }
 
@@ -179,7 +203,7 @@ export class FigmaLoginBody implements Component {
             } catch (error) {
                 console.error("Error fetching Figma team information:", error);
                 this.showError(error);
-                return new Error(i18next.t('figma:login.fetchTeamFailedMsg'));
+                return new Error(i18next.t("figma:login.fetchTeamFailedMsg"));
             } finally {
                 this.hideLoading();
                 this.updateFooter({

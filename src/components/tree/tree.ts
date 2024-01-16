@@ -1,13 +1,14 @@
-import collapsedIcon from "../../asset/collapsed-icon.svg";
-import unCollapsedIcon from "../../asset/un-collapsed-icon.svg";
+import { collapsedIcon, unCollapsedIcon } from "@icons";
+import { createDivElement } from "@utils";
+import { Node } from "figma-api/lib/ast-types";
 import { Component } from "../common";
-import css from "./treeCss.scss";
 
 export type TreeItem = {
     id: string;
     name: string;
     imageUrl?: string;
     children?: TreeItem[];
+    node?: Node;
 };
 
 export class ScreenComponent implements Component {
@@ -18,12 +19,11 @@ export class ScreenComponent implements Component {
 
     constructor(
         treeData: TreeItem[],
-        onSelectionChange: (selectedItem: TreeItem) => void
+        onSelectionChange: (selectedItem: TreeItem) => void,
     ) {
         this.treeData = treeData;
         this.onSelectionChange = onSelectionChange;
-        this.container = document.createElement("div");
-        this.container.className = css["tree-view-container"];
+        this.container = createDivElement({ className: "tree-view-container" });
         this.renderComponent();
     }
 
@@ -43,7 +43,7 @@ export class ScreenComponent implements Component {
 
     private createTreeItem(item: TreeItem): HTMLElement {
         const listItem = document.createElement("li");
-        listItem.classList.add(css["tree-item"]);
+        listItem.classList.add("tree-item");
 
         listItem.appendChild(this.createItemContainer(item));
 
@@ -55,8 +55,7 @@ export class ScreenComponent implements Component {
     }
 
     private createItemContainer(item: TreeItem): HTMLElement {
-        const divContainer = document.createElement("div");
-        divContainer.classList.add(css["item-container"]);
+        const divContainer = createDivElement({ className: "item-container" });
 
         if (item.children && item.children.length > 0) {
             divContainer.appendChild(this.createCollapseIcon());
@@ -73,11 +72,11 @@ export class ScreenComponent implements Component {
 
     private createCollapseIcon(): HTMLElement {
         const collapseIcon = document.createElement("span");
-        collapseIcon.classList.add(css["collapse-icon"]);
+        collapseIcon.classList.add("collapse-icon");
         collapseIcon.innerHTML = unCollapsedIcon;
         collapseIcon.addEventListener(
             "click",
-            this.toggleChildrenVisibility.bind(this, collapseIcon)
+            this.toggleChildrenVisibility.bind(this, collapseIcon),
         );
         return collapseIcon;
     }
@@ -87,11 +86,11 @@ export class ScreenComponent implements Component {
             collapseIcon.parentElement?.nextElementSibling;
         if (
             childrenContainer &&
-            childrenContainer.classList.contains(css["children-container"])
+            childrenContainer.classList.contains("children-container")
         ) {
-            childrenContainer.classList.toggle(css["collapsed"]);
+            childrenContainer.classList.toggle("collapsed");
             collapseIcon.innerHTML = childrenContainer.classList.contains(
-                css["collapsed"]
+                "collapsed",
             )
                 ? collapsedIcon
                 : unCollapsedIcon;
@@ -108,9 +107,9 @@ export class ScreenComponent implements Component {
 
     private createChildrenContainer(children: TreeItem[]): HTMLElement {
         const subList = document.createElement("ul");
-        subList.classList.add(css["children-container"]);
+        subList.classList.add("children-container");
         children.forEach((child) =>
-            subList.appendChild(this.createTreeItem(child))
+            subList.appendChild(this.createTreeItem(child)),
         );
         return subList;
     }
@@ -119,9 +118,9 @@ export class ScreenComponent implements Component {
         this.container.innerHTML = "";
 
         const treeView = document.createElement("ul");
-        treeView.classList.add(css["tree-view"]);
+        treeView.classList.add("tree-view");
         this.treeData.forEach((item) =>
-            treeView.appendChild(this.createTreeItem(item))
+            treeView.appendChild(this.createTreeItem(item)),
         );
         this.container.appendChild(treeView);
     }

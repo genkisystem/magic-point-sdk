@@ -1,5 +1,3 @@
-import css from "./overlay.scss";
-
 export class ImageOverlay {
     private container: HTMLElement;
     private baseImage: HTMLImageElement;
@@ -7,7 +5,7 @@ export class ImageOverlay {
 
     constructor(container: HTMLElement) {
         this.container = container;
-        this.container.className = css["overlay-container"];
+        this.container.className = "overlay-container";
         this.baseImage = this.createImageElement();
         this.overlayImage = this.createImageElement();
         this.setupContainer();
@@ -15,7 +13,7 @@ export class ImageOverlay {
 
     private createImageElement(): HTMLImageElement {
         const img = document.createElement("img");
-        img.className = css["overlay-item"];
+        img.className = "overlay-item";
         return img;
     }
 

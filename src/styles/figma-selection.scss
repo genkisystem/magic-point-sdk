@@ -1,0 +1,100 @@
+@import "./variables";
+
+.figma-selection-screen {
+    width: 100%;
+    height: 100%;
+    align-self: stretch;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    border-radius: $br-9xs;
+    box-sizing: border-box;
+    text-align: center;
+    background-color: $base-white;
+    box-shadow:
+        0 20px 24px -4px rgba(16, 24, 40, 0.1),
+        0 8px 8px -4px rgba(16, 24, 40, 0.04);
+    border: 1px solid $color-gainsboro;
+
+    .figma-selection {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        align-self: stretch;
+        max-height: 80vh;
+        border-right: 1px solid $color-gainsboro;
+        padding: $padding-xs $padding-base;
+        gap: $br-9xs;
+
+        .search-container {
+            align-self: stretch;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            align-self: stretch;
+            border: 1px solid #ccc;
+            padding: 5px;
+            min-height: 32px;
+            border-radius: $br-3xs;
+            background-color: $system-materials-sm-l-thick;
+            flex-direction: row;
+            align-items: center;
+            padding: $padding-5xs;
+            box-sizing: border-box;
+
+            .icon {
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+            }
+
+            .search-icon {
+                margin-right: 10px;
+            }
+
+            .close-icon {
+                margin-left: 10px;
+            }
+
+            .search-input {
+                border: none;
+                outline: none;
+                flex-grow: 1;
+                background-color: $system-materials-sm-l-thick;
+            }
+        }
+    }
+
+    .figma-preview {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        align-self: stretch;
+        padding: $padding-xs;
+
+        .preview-container {
+            position: relative;
+            background-color: $base-white;
+            border: 1px solid #000;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            flex-shrink: 0;
+
+            .preview-image {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+    }
+}

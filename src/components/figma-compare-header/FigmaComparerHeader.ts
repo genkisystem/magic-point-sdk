@@ -1,10 +1,7 @@
+import { checkedIcon, closeIconSvg, uncheckedIcon } from "@icons";
+import { createDivElement } from "@utils";
 import i18next from "i18next";
-import checkedIcon from "../../asset/checked-circle.svg";
-import closeIconSvg from "../../asset/close-icon.svg";
-import uncheckedIcon from "../../asset/unchecked-circle.svg";
-import { createDivElement } from "../../utils/html";
 import { Component } from "../common";
-import css from "./figma-header.scss";
 
 export class FigmaComparerHeader implements Component {
     private containerElement: HTMLElement;
@@ -13,13 +10,13 @@ export class FigmaComparerHeader implements Component {
     constructor(
         private steps: string[],
         private onClose: () => void,
-        activeStepIndex: number = 0
+        activeStepIndex: number = 0,
     ) {
         this.steps = steps;
         this._activeStepIndex = activeStepIndex;
 
         this.containerElement = createDivElement({
-            className: css["modal-components-wizard-he"],
+            className: "modal-components-wizard-he",
         });
 
         this.renderComponent();
@@ -37,16 +34,16 @@ export class FigmaComparerHeader implements Component {
     private createWizardStep(stepName: string, index: number): string {
         const isActive = index < this._activeStepIndex;
         const className = isActive
-            ? css["wizard-step-complete"]
-            : css["wizard-step-incomplete1"];
+            ? "wizard-step-complete"
+            : "wizard-step-incomplete1";
         const iconSrc = isActive ? checkedIcon : uncheckedIcon;
-        const dividerClass = isActive ? css["divider"] : css["divider1"];
+        const dividerClass = isActive ? "divider" : "divider1";
         return `
             <div class="${className}">
                 <div class="${dividerClass}"></div>
-                <div class="${css["icon-text"]}">
-                    <div class="${css["step-icon"]}">${iconSrc}</div>
-                    <div class="${css["step-text"]}">${stepName}</div>
+                <div class="icon-text">
+                    <div class="step-icon">${iconSrc}</div>
+                    <div class="step-text">${stepName}</div>
                 </div>
             </div>
         `;
@@ -56,23 +53,23 @@ export class FigmaComparerHeader implements Component {
         this.containerElement.innerHTML = "";
 
         const baseHeadParent = createDivElement({
-            className: css["modal-components-base-head-parent"],
+            className: "modal-components-base-head-parent",
         });
         const baseHead = createDivElement({
-            className: css["modal-components-base-head"],
+            className: "modal-components-base-head",
         });
         const textIcon = createDivElement({
-            className: css["text-icon"],
+            className: "text-icon",
         });
         const figmaCompare = createDivElement({
-            className: css["figma-compare"],
-            innerHTML: i18next.t('figma:compareHeader.text'),
+            className: "figma-compare",
+            innerHTML: i18next.t("figma:compareHeader.text"),
         });
         const closeDiv = createDivElement({
-            className: css["modal-components-close-d"],
+            className: "modal-components-close-d",
         });
         const closeIcon = createDivElement({
-            className: css["close-icon"],
+            className: "close-icon",
             innerHTML: closeIconSvg,
         });
 
@@ -81,14 +78,14 @@ export class FigmaComparerHeader implements Component {
         });
 
         const wizardSteps6 = createDivElement({
-            className: css["wizard-steps-6"],
+            className: "wizard-steps-6",
         });
         wizardSteps6.innerHTML = this.steps
             .map((step, index) => this.createWizardStep(step, index))
             .join("");
 
         const stepperLoaded = createDivElement({
-            className: css["wizard-stepper-loaded"],
+            className: "wizard-stepper-loaded",
         });
         stepperLoaded.appendChild(wizardSteps6);
 
@@ -99,14 +96,10 @@ export class FigmaComparerHeader implements Component {
         baseHeadParent.appendChild(baseHead);
         baseHeadParent.appendChild(stepperLoaded);
         baseHeadParent.appendChild(
-            createDivElement({ className: css["spacer-24px"] })
+            createDivElement({ className: "spacer-24px" }),
         );
-        baseHeadParent.appendChild(
-            createDivElement({ className: css["spacer"] })
-        );
-        baseHeadParent.appendChild(
-            createDivElement({ className: css["filler"] })
-        );
+        baseHeadParent.appendChild(createDivElement({ className: "spacer" }));
+        baseHeadParent.appendChild(createDivElement({ className: "filler" }));
 
         this.containerElement.appendChild(baseHeadParent);
     }

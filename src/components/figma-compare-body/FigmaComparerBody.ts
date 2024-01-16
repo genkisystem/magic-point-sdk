@@ -1,6 +1,6 @@
+import { CanvasWithDots, FigmaClient } from "@services";
+import { createDivElement } from "@utils";
 import { GenericRequest } from "../../base";
-import { FigmaClient } from "../../services/figma/figma";
-import { CanvasWithDots } from "../../services/image-comparer/ImageComparer";
 import { Component } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";
 import { FigmaComparisonScreen } from "../figma-comparison-screen/FigmaComparisonScreen";
@@ -8,7 +8,6 @@ import { FigmaLoginBody } from "../figma-login/FigmaLogin";
 import { FigmaSelectionScreen } from "../figma-selection-screen/FigmaSelectionScreen";
 import { Task } from "../list-task/types/Task";
 import { TreeItem } from "../tree/tree";
-import css from "./body.scss";
 
 export class FigmaComparerBody implements Component {
     private _activeStepIndex: number;
@@ -23,11 +22,10 @@ export class FigmaComparerBody implements Component {
         private showLoading: () => void,
         private hideLoading: () => void,
         private teamIds: string[],
-        initialActiveScreenIndex?: number
+        initialActiveScreenIndex?: number,
     ) {
         this._activeStepIndex = initialActiveScreenIndex ?? 0;
-        this.container = document.createElement("div");
-        this.container.className = css["figma-comparer-body"];
+        this.container = createDivElement({ className: "figma-comparer-body" });
         this.renderComponent();
     }
 
@@ -67,7 +65,7 @@ export class FigmaComparerBody implements Component {
                 const selection = new FigmaSelectionScreen(
                     this.figmaClient,
                     this.updateFooter,
-                    this.onSelectedItemChange
+                    this.onSelectedItemChange,
                 );
                 this.container.appendChild(selection.render());
                 break;
@@ -75,7 +73,7 @@ export class FigmaComparerBody implements Component {
                 const compare = new FigmaComparisonScreen(
                     this.updateFooter,
                     this.onTaskChange,
-                    this.diffData
+                    this.diffData,
                 );
                 this.container.appendChild(compare.render());
                 break;

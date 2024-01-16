@@ -1,5 +1,3 @@
-import { ButtonComponent, IButtonConfig } from "./Button/ButtonComponent";
-
 export interface SelectItem {
     display: string;
     value: string;
@@ -10,28 +8,22 @@ export interface Component {
     renderComponent(): void;
 }
 
-/**
- * BaseComponent provides basic functionalities for other components,
- * such as creating common DOM elements.
- */
-export class BaseComponent {
-    /**
-     * Creates a div element with the specified class name.
-     * @param className The class name to assign to the div element.
-     * @returns The created div element.
-     */
-    protected createDivElement(className: string): HTMLElement {
-        const element = document.createElement("div");
-        element.className = className;
-        return element;
-    }
+export const convertTypeToSelectItem = <T extends { id: number; name: string }>(
+    input: T,
+): SelectItem => {
+    return {
+        display: input.name,
+        value: input.id.toString(),
+    };
+};
 
-    /**
-     * Creates a button element based on the given configuration.
-     * @param config The configuration for the button component.
-     * @returns The rendered button element.
-     */
-    protected createButton(config: IButtonConfig): HTMLElement {
-        return new ButtonComponent({ ...config }).render();
-    }
-}
+
+export const convertSelectItemToType = <T extends { id: number; name: string }>(
+    input: SelectItem,
+): T => {
+    return {
+        id: parseInt(input.value, 10),
+        name: input.display,
+    } as T;
+};
+
