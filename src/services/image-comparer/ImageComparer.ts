@@ -81,6 +81,7 @@ export class HtmlImageComparer {
         bodyCopy.style.height = `${originalFigmaImage.naturalHeight}px`;
         bodyCopy.style.maxHeight = `${originalFigmaImage.naturalHeight}px`;
         bodyCopy.style.minHeight = `${originalFigmaImage.naturalHeight}px`;
+        bodyCopy.style.overflow = "hidden";
         document.body.appendChild(bodyCopy);
         const canvas1: HTMLCanvasElement = await this.captureAndResizeElement(
             bodyCopy,

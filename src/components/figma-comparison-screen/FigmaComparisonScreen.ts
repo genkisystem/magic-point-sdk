@@ -106,9 +106,9 @@ export class FigmaComparisonScreen implements Component {
                 image: t.image ?? "data:image/png;base64,...",
                 pageX: t.pageX,
                 pageY: t.pageY,
-                pointCoordinate: '',
-                screenSize: 0.1
-            })
+                pointCoordinate: "",
+                screenSize: 0.1,
+            }),
         );
     }
     private resizeCanvasAndInitSlider(target: HTMLElement): void {
@@ -224,15 +224,19 @@ export class FigmaComparisonScreen implements Component {
             this.checkedTasks.includes(i),
         );
 
-        const originalWidth = document.body.style.width;
-        const originalHeight = document.body.style.height;
-        const originalMaxHeight = document.body.style.maxHeight;
-        const originalMinHeight = document.body.style.minHeight;
+        const originalStyles = {
+            width: document.body.style.width,
+            height: document.body.style.height,
+            maxHeight: document.body.style.maxHeight,
+            minHeight: document.body.style.minHeight,
+            overflow: document.body.style.overflow,
+        };
 
         document.body.style.width = `${1920}px`;
         document.body.style.height = `${1080}px`;
         document.body.style.maxHeight = `${1080}px`;
         document.body.style.minHeight = `${1080}px`;
+        document.body.style.overflow = "hidden";
 
         const request = selectedTask.map((t): GenericRequest<Task> => {
             let pDom = "";
@@ -266,15 +270,15 @@ export class FigmaComparisonScreen implements Component {
                     },
                     endPoint: window.location.pathname,
                     screenSize: 0.1,
-                    pointCoordinate: ''
+                    pointCoordinate: "",
                 },
             };
         });
-
-        document.body.style.width = originalWidth;
-        document.body.style.height = originalHeight;
-        document.body.style.minHeight = originalMinHeight;
-        document.body.style.maxHeight = originalMaxHeight;
+        document.body.style.width = originalStyles.width;
+        document.body.style.height = originalStyles.height;
+        document.body.style.minHeight = originalStyles.minHeight;
+        document.body.style.maxHeight = originalStyles.maxHeight;
+        document.body.style.overflow = originalStyles.overflow;
 
         return request;
     }
