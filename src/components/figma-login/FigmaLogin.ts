@@ -105,10 +105,6 @@ export class FigmaLoginBody implements Component {
 
     private listenForToken(): void {
         const tokenListener = async (event: MessageEvent) => {
-            if (event.origin !== "http://localhost:8080") {
-                return;
-            }
-
             const { figma_token } = event.data;
             if (figma_token) {
                 try {

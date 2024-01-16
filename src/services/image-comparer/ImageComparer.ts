@@ -45,10 +45,10 @@ export class HtmlImageComparer {
     async loadImage(url: string): Promise<HTMLImageElement> {
         return new Promise((resolve, reject) => {
             const img = new Image();
-            img.crossOrigin = "anonymous";
+            img.crossOrigin = "Anonymous";
             img.onload = () => resolve(img);
             img.onerror = () => reject(new Error("Failed to load image"));
-            img.src = url;
+            img.src = url + "?not-from-cache-please";
         });
     }
 
