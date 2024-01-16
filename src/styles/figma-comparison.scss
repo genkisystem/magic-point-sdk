@@ -12,7 +12,8 @@
     box-sizing: border-box;
     text-align: center;
     background-color: $base-white;
-    box-shadow: 0 20px 24px -4px rgba(16, 24, 40, 0.1),
+    box-shadow:
+        0 20px 24px -4px rgba(16, 24, 40, 0.1),
         0 8px 8px -4px rgba(16, 24, 40, 0.04);
     border: 1px solid $color-gainsboro;
 }
@@ -64,53 +65,135 @@
             object-fit: cover;
         }
     }
-}
 
-.task {
-    border: 1px solid $color-darkgray;
-    flex-shrink: 0;
-    gap: $gap-5xs;
-    background-color: $base-white;
-    display: flex;
-    align-self: stretch;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding: $padding-base;
-}
+    .task {
+        border: 1px solid $color-darkgray;
+        flex-shrink: 0;
+        gap: $gap-5xs;
+        background-color: $base-white;
+        display: flex;
+        align-self: stretch;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: $padding-base;
+    }
 
-.task-header {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-    align-self: stretch;
-    border-radius: 0 0 $br-5xs $br-5xs;
-    overflow: hidden;
-    gap: $gap-5xs;
-
-    .collapse-div {
+    .task-header {
         display: flex;
         flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        align-self: stretch;
+        border-radius: 0 0 $br-5xs $br-5xs;
+        overflow: hidden;
         gap: $gap-5xs;
+
+        .collapse-div {
+            display: flex;
+            flex-direction: row;
+            gap: $gap-5xs;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 5px;
+        }
+
+        .task-checkbox {
+            margin-left: 10px;
+            cursor: pointer;
+
+            background-color: #fff;
+            border: 2px solid #ccc;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
     }
 
-    .checkbox-wrapper {
+    .task-inner {
+        position: relative;
+        background-color: $base-white;
         display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        padding: 5px;
-    }
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        align-self: stretch;
+        padding: $padding-xs;
+        border-radius: $br-9xs;
+        box-shadow: $effect;
+        overflow: hidden;
+        font-size: $small-400-size;
+        color: $gray-600;
+        overflow: hidden;
+        transition: display 0.3s ease-out;
+        gap: 24px;
 
-    .task-checkbox {
-        margin-left: 10px;
-        cursor: pointer;
+        &.collapsed {
+            // max-height: 0;
+            display: none;
+        }
 
-        background-color: #fff;
-        border: 2px solid #ccc;
-        width: 20px;
-        height: 20px;
-        border-radius: 3px;
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .read-only-field {
+            display: block;
+            padding: $padding-9xs $padding-xs;
+            font-size: 14px;
+        }
+
+        .title-input,
+        .description-input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .image-display {
+            width: 100%;
+            height: 200px; // Adjust as needed
+            background-color: #ddd; // Placeholder color
+            margin-bottom: 10px;
+            border-radius: 4px;
+            // If using an img tag, you might want to add specific styles for it
+        }
+
+        .edit-button {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: fit-content;
+            min-width: fit-content;
+            padding: 8px;
+
+            &:hover {
+                background-color: darken($gray-50, 10%);
+            }
+
+            & span {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+            }
+        }
     }
 }
 
@@ -139,88 +222,6 @@
     position: relative;
     line-height: 20px;
     font-weight: 500;
-}
-
-.task-inner {
-    position: relative;
-    background-color: $base-white;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    align-self: stretch;
-    padding: $padding-xs;
-    border-radius: $br-9xs;
-    box-shadow: $effect;
-    overflow: hidden;
-    font-size: $small-400-size;
-    color: $gray-600;
-    overflow: hidden;
-    transition: display 0.3s ease-out;
-    gap: 24px;
-
-    &.collapsed {
-        // max-height: 0;
-        display: none;
-    }
-
-    .input-label {
-        display: block;
-        margin-bottom: 5px;
-        color: #333;
-        font-size: 18px;
-        font-weight: bold;
-    }
-
-    .read-only-field {
-        display: block;
-        padding: $padding-9xs $padding-xs;
-        font-size: 14px;
-    }
-
-    .title-input,
-    .description-input {
-        display: block;
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-
-    .image-display {
-        width: 100%;
-        height: 200px; // Adjust as needed
-        background-color: #ddd; // Placeholder color
-        margin-bottom: 10px;
-        border-radius: 4px;
-        // If using an img tag, you might want to add specific styles for it
-    }
-
-    .edit-button {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        color: white;
-        border: none;
-        cursor: pointer;
-        width: fit-content;
-        min-width: fit-content;
-        padding: 8px;
-
-        &:hover {
-            background-color: darken($gray-50, 10%);
-        }
-
-        & span {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-    }
 }
 
 .collapse-icon {

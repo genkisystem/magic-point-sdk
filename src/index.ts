@@ -9,7 +9,6 @@ import {
 
 import { FormManager } from "./components/form";
 import { ListTaskManager } from "./components/list-task";
-import taskListCss from "./components/list-task/listTask.scss";
 import { Task } from "./components/list-task/types/Task";
 import { ModalManager } from "./components/modal";
 
@@ -19,7 +18,6 @@ import {
     EventBusInstance,
     FigmaClient,
     I18nManager,
-    NotificationManager,
     StateKeys,
     TagManager,
     dataManager,
@@ -43,7 +41,6 @@ class MagicPoint extends Base {
     private isFormOpen: boolean = false;
 
     private tagManager: TagManager;
-    private notificationManager: NotificationManager;
     private formManager!: FormManager;
     private modalManager: ModalManager;
     private listTaskManager!: ListTaskManager;
@@ -65,8 +62,6 @@ class MagicPoint extends Base {
         super(config);
         console.log("add magic dot listener");
         licenseManagerInstance.setApiKey(config.apiKey);
-
-        this.notificationManager = notification;
 
         this.modalManager = new ModalManager();
         new I18nManager(config.lng ? config.lng : "en");
@@ -133,13 +128,13 @@ class MagicPoint extends Base {
             );
             if (res && !res.hasError && Object.keys(res.appData).length > 0) {
                 EventBusInstance.emit("fetchTask"); // emit event to re-fetch task
-                this.notificationManager.createNotification(
+                notification.createNotification(
                     "UPDATE",
                     "SUCCESS",
                     res.appData,
                 );
             } else {
-                this.notificationManager.createNotification("UPDATE", "FAILED");
+                notification.createNotification("UPDATE", "FAILED");
             }
             this.closeForm();
             return !res?.hasError;
@@ -147,20 +142,12 @@ class MagicPoint extends Base {
         // Create task
         let res: any = await this.post("sdk/task", task);
         if (!res?.hasError) {
-            this.notificationManager.createNotification(
-                "CREATE",
-                "SUCCESS",
-                res.appData,
-            );
+            notification.createNotification("CREATE", "SUCCESS", res.appData);
             this.listTaskManager.fetchListTask(
                 this.RENDER_TASK_OPERATOR.RENDER,
             );
         } else {
-            this.notificationManager.createNotification(
-                "CREATE",
-                "FAILED",
-                res.appData,
-            );
+            notification.createNotification("CREATE", "FAILED", res.appData);
         }
         this.closeForm();
         return !res?.hasError;
@@ -197,8 +184,8 @@ class MagicPoint extends Base {
 
         this.autoCaptureCurrentUserView(e).then((canvas: HTMLCanvasElement) => {
             this.isFormOpen = true;
-            this.formManager.createForm(canvas);
             this.setupFormSubmission(e);
+            this.formManager.createForm(canvas);
         });
 
         this.disableMagicPoint();
@@ -225,8 +212,7 @@ class MagicPoint extends Base {
 
     private toggleSDKElementsInOneSec() {
         const taskList: HTMLDivElement | null =
-            document.querySelector(`#${taskListCss["list-task-wrapper"]}`) ??
-            null;
+            document.querySelector("#list-task-wrapper") ?? null;
         if (taskList) taskList.style.display = "none";
 
         const magicPointToggleWrap: HTMLDivElement = document.querySelector(
@@ -425,7 +411,8 @@ class MagicPoint extends Base {
 
         EventBusInstance.on("close-form", () => {
             console.log("[EventBus] - triggered: close form");
-            this.enableMagicPoint();
+            // TODO: close form
+            // this.enableMagicPoint();
         });
     }
 }

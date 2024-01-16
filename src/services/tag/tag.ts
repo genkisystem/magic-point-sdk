@@ -1,5 +1,4 @@
 import { EventBusInstance } from "../event-bus";
-import css from "./tag.scss";
 
 export interface ITag {
     divElement: HTMLDivElement;
@@ -12,8 +11,8 @@ export class TagManager {
     // private offsetX: number = 0;
     // private offsetY: number = 0;
 
-    private listTag: ITag[] = []
-    private currentSelectedTagIndex: number = Number.MAX_VALUE
+    private listTag: ITag[] = [];
+    private currentSelectedTagIndex: number = Number.MAX_VALUE;
 
     constructor(private magicPointContainer: HTMLElement) {
         this.onTagClick = this.onTagClick.bind(this);
@@ -22,17 +21,17 @@ export class TagManager {
         this.endDrag = this.endDrag.bind(this);
         this.clearListTag = this.clearListTag.bind(this);
         this.setupEventBuses = this.setupEventBuses.bind(this);
-        this.setupEventBuses()
+        this.setupEventBuses();
     }
 
     public createTag(x: number, y: number, title?: string): void {
         const tagElement = document.createElement("div");
-        tagElement.classList.add(css["draggable-div"]);
-        tagElement.title = title || '';
+        tagElement.classList.add("draggable-div");
+        tagElement.title = title || "";
         tagElement.style.left = `${x}px`;
         tagElement.style.top = `${y}px`;
-        this.magicPointContainer.appendChild(tagElement)
-        this.listTag.push({ divElement: tagElement, offsetX: 0, offsetY: 0 })
+        this.magicPointContainer.appendChild(tagElement);
+        this.listTag.push({ divElement: tagElement, offsetX: 0, offsetY: 0 });
         tagElement.addEventListener("click", this.onTagClick);
         tagElement.addEventListener("mousedown", this.startDrag);
     }
@@ -42,25 +41,29 @@ export class TagManager {
     }
 
     private findTagIndexInListTag(fTag: HTMLDivElement): number {
-        return this.listTag.findIndex(tag => tag.divElement === fTag);
+        return this.listTag.findIndex((tag) => tag.divElement === fTag);
     }
 
     private startDrag(event: MouseEvent): void {
-        this.currentSelectedTagIndex = this.findTagIndexInListTag(event.target as HTMLDivElement)
-        console.log(this.currentSelectedTagIndex)
-        const tagItem = this.listTag[this.currentSelectedTagIndex]
+        this.currentSelectedTagIndex = this.findTagIndexInListTag(
+            event.target as HTMLDivElement,
+        );
+        console.log(this.currentSelectedTagIndex);
+        const tagItem = this.listTag[this.currentSelectedTagIndex];
         if (!tagItem) return;
-        tagItem.offsetX = event.clientX - tagItem.divElement.getBoundingClientRect().left;
-        tagItem.offsetY = event.clientY - tagItem.divElement.getBoundingClientRect().top;
-        tagItem.divElement.style.cursor = "grabbing"
+        tagItem.offsetX =
+            event.clientX - tagItem.divElement.getBoundingClientRect().left;
+        tagItem.offsetY =
+            event.clientY - tagItem.divElement.getBoundingClientRect().top;
+        tagItem.divElement.style.cursor = "grabbing";
 
         document.addEventListener("mousemove", this.drag);
         document.addEventListener("mouseup", this.endDrag);
     }
 
     private drag(event: MouseEvent): void {
-        const tagItem = this.listTag[this.currentSelectedTagIndex]
-        console.log("tagItem: ", tagItem)
+        const tagItem = this.listTag[this.currentSelectedTagIndex];
+        console.log("tagItem: ", tagItem);
         if (!tagItem) return;
         tagItem.divElement.style.left = `${event.clientX - tagItem.offsetX}px`;
         tagItem.divElement.style.top = `${event.clientY - tagItem.offsetY}px`;
@@ -70,9 +73,9 @@ export class TagManager {
         // if (!this.divElement) return;
 
         // this.divElement.style.cursor = "grab";
-        const tagItem = this.listTag[this.currentSelectedTagIndex]
-        if (!tagItem) return
-        tagItem.divElement.style.cursor = "grab"
+        const tagItem = this.listTag[this.currentSelectedTagIndex];
+        if (!tagItem) return;
+        tagItem.divElement.style.cursor = "grab";
         document.removeEventListener("mousemove", this.drag);
         document.removeEventListener("mouseup", this.endDrag);
     }
@@ -87,17 +90,19 @@ export class TagManager {
     // }
 
     private clearListTag(): void {
-        if (this.listTag?.length === 0) return
+        if (this.listTag?.length === 0) return;
         for (const tagItem of this.listTag) {
-            tagItem.divElement.remove()
+            tagItem.divElement.remove();
         }
-        this.listTag = []
+        this.listTag = [];
     }
 
     private setupEventBuses() {
-        EventBusInstance.on("clear-tags", this.clearListTag)
-        EventBusInstance.on('remove-dot', (index: number) => {
-            this.listTag.length > 0 && this.listTag[index] && this.listTag[index]?.divElement.remove()
-        })
+        EventBusInstance.on("clear-tags", this.clearListTag);
+        EventBusInstance.on("remove-dot", (index: number) => {
+            this.listTag.length > 0 &&
+                this.listTag[index] &&
+                this.listTag[index]?.divElement.remove();
+        });
     }
 }

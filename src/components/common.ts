@@ -21,6 +21,9 @@ export const convertTypeToSelectItem = <T extends { id: number; name: string }>(
 export const convertSelectItemToType = <T extends { id: number; name: string }>(
     input: SelectItem,
 ): T => {
+    console.trace();
+    console.log(input);
+    console.log(input.value)
     return {
         id: parseInt(input.value, 10),
         name: input.display,

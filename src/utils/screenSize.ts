@@ -2,7 +2,6 @@
 import i18next from "i18next";
 import { EventBusInstance } from "src/services/event-bus";
 import Toastify from "toastify-js";
-import "toastify-js/src/toastify.css";
 
 export type Breakpoints = Readonly<{
     [key: string]: number;

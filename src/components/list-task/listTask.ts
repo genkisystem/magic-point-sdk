@@ -1,5 +1,3 @@
-import css from "./listTask.scss";
-
 import { editIcon, minimize, trash } from "@icons";
 
 import {
@@ -152,7 +150,7 @@ export class ListTaskManager extends Base {
     private addMinimizeEventListener() {
         console.log("add minimize event listener");
         const minimizeBtnElement = document.querySelector(
-            `.${css["minimize-btn"]}`,
+            ".minimize-btn",
         ) as HTMLDivElement;
         minimizeBtnElement.onclick = (e) => {
             e.stopPropagation();
@@ -167,7 +165,7 @@ export class ListTaskManager extends Base {
     private addEditEventListener() {
         console.log("add edit event listener");
         const editElements = document.querySelectorAll(
-            `.${css["edit-wrap"]}`,
+            ".edit-wrap",
         ) as unknown as HTMLDivElement[];
         editElements.forEach((element, index) => {
             element.onclick = (e) => this.onEditClick(e, index);
@@ -193,7 +191,7 @@ export class ListTaskManager extends Base {
     private addDeleteEventListener() {
         console.log("add delete event listener");
         const deleteElements = document.querySelectorAll(
-            `.${css["delete-wrap"]}`,
+            ".delete-wrap",
         ) as unknown as HTMLDivElement[];
         deleteElements.forEach((element, index) => {
             element.onclick = () => this.onDeleteClick(index);
@@ -232,37 +230,28 @@ export class ListTaskManager extends Base {
 
     private turnDotToTaskList(): void {
         if (
-            this.HTMLElement?.classList.contains(`${css["dot-blink"]}`) ||
-            this.HTMLElement?.classList.contains(`${css["dotted-list"]}`)
+            this.HTMLElement?.classList.contains("dot-blink") ||
+            this.HTMLElement?.classList.contains("dotted-list")
         ) {
-            this.HTMLElement.classList.remove(
-                `${css["dot-blink"]}`,
-                `${css["dotted-list"]}`,
-            );
-            this.HTMLElement.classList.add(
-                `${css["dot-unblink"]}`,
-                `${css["slide-in"]}`,
-            );
+            this.HTMLElement.classList.remove("dot-blink", "dotted-list");
+            this.HTMLElement.classList.add("dot-unblink", "slide-in");
         }
     }
 
     private turnTaskListToDot(): void {
-        if (!this.HTMLElement?.classList.contains(`${css["dotted-list"]}`)) {
-            this.HTMLElement?.classList.add(`${css["dotted-list"]}`);
-            this.HTMLElement?.classList.remove(`${css["slide-in"]}`);
+        if (!this.HTMLElement?.classList.contains("dotted-list")) {
+            this.HTMLElement?.classList.add("dotted-list");
+            this.HTMLElement?.classList.remove("slide-in");
         }
     }
 
     private turnTaskListToDotByPressESC(e: KeyboardEvent): void {
         if (
             e.key === "Escape" &&
-            this.HTMLElement?.classList.contains(`${css["slide-in"]}`)
+            this.HTMLElement?.classList.contains("slide-in")
         ) {
-            this.HTMLElement!.classList.remove(`${css["slide-in"]}`);
-            this.HTMLElement!.classList.add(
-                `${css["dotted-list"]}`,
-                `${css["dot-blink"]}`,
-            );
+            this.HTMLElement!.classList.remove("slide-in");
+            this.HTMLElement!.classList.add("dotted-list", "dot-blink");
         }
     }
 
@@ -294,93 +283,79 @@ export class ListTaskManager extends Base {
                 break;
         }
         const listTaskWrapper = document.createElement("div");
-        listTaskWrapper.id = `${css["list-task-wrapper"]}`;
-        listTaskWrapper.classList.add(
-            `${css["slide-in"]}`,
-            `${css["dotted-list"]}`,
-            `${css["dot-blink"]}`,
-        );
+        listTaskWrapper.id = "list-task-wrapper";
+        listTaskWrapper.classList.add("slide-in", "dotted-list", "dot-blink");
         listTaskWrapper.innerHTML = `
-        <div class="${css["operator-wrap"]}">
-            <div class="${css["minimize-btn"]}">
+        <div class="operator-wrap">
+            <div class="minimize-btn">
                 ${minimize}
             </div>
-            <div class="${css["filter"]}">
-                <div class="${css["option-wrap"]}">
-                    <input class="${css["filter-checkbox"]}" ${
+            <div class="filter">
+                <div class="option-wrap">
+                    <input class="filter-checkbox" ${
                         this.filter === FILTER_VALUE[0] ? "checked" : ""
                     } type="checkbox" name="" id="all">
-                    <label class="${css["type-text"]}" for="all">${i18next.t(
+                    <label class="type-text" for="all">${i18next.t(
                         "listTask:filters.all",
                     )}</label>
                 </div>
-                <div class="${css["option-wrap"]}">
-                    <input class="${css["filter-checkbox"]}" ${
+                <div class="option-wrap">
+                    <input class="filter-checkbox" ${
                         this.filter === FILTER_VALUE[1] ? "checked" : ""
                     } type="checkbox" name="" id="shown">
-                    <label class="${css["type-text"]}" for="shown">${i18next.t(
+                    <label class="type-text" for="shown">${i18next.t(
                         "listTask:filters.shown",
                     )}</label>
                 </div>
-                <div class="${css["option-wrap"]}">
-                    <input class="${css["filter-checkbox"]}" ${
+                <div class="option-wrap">
+                    <input class="filter-checkbox" ${
                         this.filter === FILTER_VALUE[2] ? "checked" : ""
                     } type="checkbox" name="" id="hidden">
-                    <label class="${css["type-text"]}" for="hidden">${i18next.t(
+                    <label class="type-text" for="hidden">${i18next.t(
                         "listTask:filters.hidden",
                     )}</label>
                 </div>
-                <div class="${css["option-wrap"]}">
-                    <input class="${css["filter-checkbox"]}" ${
+                <div class="option-wrap">
+                    <input class="filter-checkbox" ${
                         this.filter === FILTER_VALUE[3] ? "checked" : ""
                     } type="checkbox" name="" id="not-found">
-                    <label class="${
-                        css["type-text"]
-                    }" for="not-found">${i18next.t(
+                    <label class="type-text" for="not-found">${i18next.t(
                         "listTask:filters.notFound",
                     )}</label>
                 </div>
             </div>
         </div>
 
-        <hr class="${css["hr"]}">
+        <hr class="hr">
 
         <!-- Task element -->
         ${localListTask
             .map((task) => {
                 return `
-                        <div class="${css["task"]}">
-                            <div class="${css["task-info"]}">
-                                <h2 class="${css["task-title"]}">${
-                                    task.title
-                                }</>
-                                    <p class="${
-                                        css["task-assignee"]
-                                    }">Assignee: ${
+                        <div class="task">
+                            <div class="task-info">
+                                <h2 class="task-title">${task.title}</>
+                                    <p class="task-assignee">Assignee: ${
                                         task.assignee?.name || "Unassigned"
                                     }</p>
-                                    <p class="${
-                                        css["issue-type"]
-                                    }">Issue type: ${task.issueType.name}</p>
-                                    <p class="${
-                                        css["time-created"]
-                                    }">Last updated: ${
+                                    <p class="issue-type">Issue type: ${
+                                        task.issueType.name
+                                    }</p>
+                                    <p class="time-created">Last updated: ${
                                         task.createdDate ||
                                         task.updatedDate ||
                                         ""
                                     }</p>
                             </div>
-                            <div class="${css["task-status"]} ${
-                                css[
-                                    `task-status-${this.getTaskStatusCssPostfixClass(
-                                        task.taskStatus.name,
-                                    )}`
-                                ] || css["task-status-default"]
+                            <div class="task-status ${
+                                `task-status-${this.getTaskStatusCssPostfixClass(
+                                    task.taskStatus.name,
+                                )}` || "task-status-default"
                             }">${task.taskStatus.name}</div>
-                            <div class="${css["edit-wrap"]}">
+                            <div class="edit-wrap">
                                 ${editIcon}
                             </div>
-                            <div class="${css["delete-wrap"]}">
+                            <div class="delete-wrap">
                                 ${trash}
                             </div>
                         </div>

@@ -44,8 +44,11 @@ export class FormComponent {
     private subject: string = "";
     private description: string = "";
     private selectedAssignee: SelectItem = {} as SelectItem;
+    private initialSelectedAssignee: SelectItem = {} as SelectItem;
     private selectedIssueType: SelectItem = {} as SelectItem;
+    private initialSelectedIssueType: SelectItem = {} as SelectItem;
     private selectedIssueStatus: SelectItem = {} as SelectItem;
+    private initialSelectedIssueStatus: SelectItem = {} as SelectItem;
 
     private _currentDomString: string = "";
     private _currentCoordinate: string = "";
@@ -108,13 +111,23 @@ export class FormComponent {
         switch (key) {
             case StateKeys.Assignee:
                 this.assignees = convertedData;
+                this.initialSelectedAssignee =
+                    this.assignees[0] ?? ({} as SelectItem);
+                this.selectedAssignee = { ...this.initialSelectedAssignee };
                 break;
             case StateKeys.Issue:
                 this.issueTypes = convertedData;
+                this.initialSelectedIssueType =
+                    this.issueTypes[0] ?? ({} as SelectItem);
+                this.selectedIssueType = { ...this.initialSelectedIssueType };
                 break;
             case StateKeys.Status:
                 this.issueStatuses = convertedData;
-
+                this.initialSelectedIssueStatus =
+                    this.issueStatuses[0] ?? ({} as SelectItem);
+                this.selectedIssueStatus = {
+                    ...this.initialSelectedIssueStatus,
+                };
             default:
                 break;
         }
@@ -133,7 +146,7 @@ export class FormComponent {
     }
 
     set currentCoordinate(newValue: string) {
-        this.currentCoordinate = newValue;
+        this._currentCoordinate = newValue;
     }
 
     public show(
@@ -215,7 +228,7 @@ export class FormComponent {
         );
         secondCol.appendChild(
             this.createSelectFieldRow(
-                FieldTypes.ISSUE_TYPE,
+                FieldTypes.ISSUE_STATUS,
                 i18next.t("form:Status"),
                 this.issueStatuses,
                 this.selectedIssueStatus,
@@ -386,9 +399,9 @@ export class FormComponent {
 
     private resetComponent(): void {
         this.subject = "";
-        this.selectedAssignee = {} as SelectItem;
-        this.selectedIssueType = {} as SelectItem;
-        this.selectedIssueStatus = {} as SelectItem;
+        this.selectedAssignee = { ...this.initialSelectedAssignee };
+        this.selectedIssueType = { ...this.initialSelectedIssueType };
+        this.selectedIssueStatus = { ...this.initialSelectedIssueStatus };
 
         this.imageEditorWrapper.reset();
         this.renderComponent();
@@ -413,7 +426,7 @@ export class FormComponent {
                 pointDom: this._currentDomString,
                 endPoint: window.location.pathname,
                 pointCoordinate: this._currentCoordinate,
-                screenSize: window.innerWidth
+                screenSize: window.innerWidth,
             },
         };
 
