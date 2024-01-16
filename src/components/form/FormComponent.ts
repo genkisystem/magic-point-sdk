@@ -48,6 +48,7 @@ export class FormComponent {
     private selectedIssueStatus: SelectItem = {} as SelectItem;
 
     private _currentDomString: string = "";
+    private _currentCoordinate: string = "";
 
     private initialTask?: Task;
 
@@ -129,6 +130,10 @@ export class FormComponent {
 
     get currentDomString(): string {
         return this._currentDomString;
+    }
+
+    set currentCoordinate(newValue: string) {
+        this.currentCoordinate = newValue;
     }
 
     public show(
@@ -407,6 +412,8 @@ export class FormComponent {
                 taskStatus: convertSelectItemToType(this.selectedIssueStatus),
                 pointDom: this._currentDomString,
                 endPoint: window.location.pathname,
+                pointCoordinate: this._currentCoordinate,
+                screenSize: window.innerWidth
             },
         };
 
