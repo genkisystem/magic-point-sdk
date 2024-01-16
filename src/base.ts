@@ -1,29 +1,9 @@
 // import fetch from 'isomorphic-unfetch'
 import { Breakpoints } from "./utils"
-const Iso639_1LanguageCodes = [
-    "en",
-    "es",
-    "fr",
-    "de",
-    "zh",
-    "ja",
-    "ru",
-    "ar",
-    "pt",
-    "it",
-    "hi",
-    "nl",
-    "sv",
-    "el",
-    "ko"
-    // Add more languages as needed
-] as const
-
-export type Iso639_1LanguageCodesValue = typeof Iso639_1LanguageCodes[number]
+import { Iso639_1LanguageCodesValue } from "./services/i18n"
 
 export type ConfigurationOptions = {
     apiKey: string,
-    baseUrl?: string,
     lng?: Iso639_1LanguageCodesValue,
     breakPoints?: Readonly<Breakpoints>
 }
@@ -44,7 +24,8 @@ export abstract class Base {
     public baseUrl: string
     constructor(config: ConfigurationOptions) {
         this.apiKey = config.apiKey
-        this.baseUrl = config.baseUrl || `http://localhost:${process.env.PORT}/api/`
+        this.baseUrl = `https://d3qqulsjk5evnr.cloudfront.net/api/`
+        console.log('baseUrl:', this.baseUrl)
     }
 
 
@@ -64,7 +45,7 @@ export abstract class Base {
         const headers = new Headers({
             "content-type": "application/json",
             "api-key": this.apiKey,
-            "Access-Control-Allow-Origin": ''
+            // "Access-Control-Allow-Origin": '*'
         })
 
         const config = {

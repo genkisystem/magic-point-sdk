@@ -62,7 +62,7 @@ class MagicPoint extends Base {
         this.formManager = new FormManager(config);
         this.modalManager = new ModalManager();
         this.uiManager = new UIManager();
-        new I18nManager(config.lng ? config.lng : "en")
+        new I18nManager(config.lng || "en")
         this.magicPointContainer = createDivElement({
             className: css["magic-point-container"],
         });
