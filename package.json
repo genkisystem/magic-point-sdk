@@ -1,6 +1,6 @@
 {
   "name": "magic-point-sdk",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Software Developer Kit of Magic Point project build on Javascript/NodeJS",
   "main": "dist/index.cjs",
   "module": "dist/index.m.js",
@@ -43,6 +43,7 @@
     "@rollup/plugin-replace": "^5.0.5",
     "@types/node": "^20.10.5",
     "@types/resemblejs": "^4.1.3",
+    "@types/toastify-js": "^1.12.3",
     "autoprefixer": "^10.4.16",
     "dotenv": "^16.3.1",
     "prettier": "^3.1.1",
@@ -68,6 +69,7 @@
     "quill": "^1.3.7",
     "resemblejs": "^5.0.0",
     "rollup-plugin-alias": "^2.2.0",
+    "toastify-js": "^1.12.0",
     "tui-image-editor": "^3.15.3",
     "typescript": "^5.2.2",
     "uninstall": "^0.0.0"

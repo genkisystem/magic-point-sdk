@@ -38,8 +38,7 @@ const config: ConfigurationOptions = {
   apiKey: 'your-api-key-here'
 };
 
-const sdkInstance = new MagicPointSDK(config);
-export default sdkInstance;
+new MagicPointSDK(config);
 ```
 
 ### React (Create React App)

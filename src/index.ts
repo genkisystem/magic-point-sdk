@@ -32,6 +32,7 @@ import {
 
 import { APP_ID, createDivElement, getPointDom } from "@utils";
 import html2canvas from "html2canvas";
+import { defindeMediaQueriesAndSetupEventListener } from "./utils";
 
 class MagicPoint extends Base {
     private isMagicPointEnabled: boolean = false;
@@ -64,7 +65,7 @@ class MagicPoint extends Base {
         this.notificationManager = notification;
 
         this.modalManager = new ModalManager();
-        new I18nManager(config.lng);
+        new I18nManager(config.lng ? config.lng : "en")
 
         this.magicPointContainer = createDivElement({
             className: "magic-point-container",
@@ -83,13 +84,12 @@ class MagicPoint extends Base {
         });
 
         this.tagManager = new TagManager(this.magicPointContainer);
-
         this.setupMagicPoint();
-
         this.initializeBindings();
         this.setupEventBuses();
         this.setupKeystrokeListener();
         this.fetchInformation();
+        defindeMediaQueriesAndSetupEventListener(config.breakPoints)
     }
 
     private init(): void {
@@ -189,6 +189,7 @@ class MagicPoint extends Base {
     private createDotEventListenerHandler(e: MouseEvent) {
         const path = e.composedPath();
         this.formManager.setCurrentDomString(getPointDom(path));
+        this.formManager.setCurrentCoordinate(this.calcPointCoordinate(e))
 
         this.autoCaptureCurrentUserView(e).then((canvas: HTMLCanvasElement) => {
             this.isFormOpen = true;
@@ -199,11 +200,17 @@ class MagicPoint extends Base {
         this.disableMagicPoint();
     }
 
+    private calcPointCoordinate(e: MouseEvent): string {
+        const { x: rectX, y: rectY } = (e.target as HTMLElement).getBoundingClientRect()
+        const [targetX, targetY] = [e.clientX, e.clientY]
+        return `${targetX - rectX}#${targetY - rectY}`
+    }
+
     private setupFormSubmission(e: MouseEvent): void {
         this.formManager.onSubmit((formData: GenericRequest<Task>) => {
             this.createTask(formData).then((isSuccess) => {
                 if (isSuccess) {
-                    this.tagManager.createTag(e.clientX, e.clientY);
+                    // this.tagManager.createTag(e.clientX, e.clientY, formData.appData.title);
                     this.enableMagicPoint();
                 }
             });
@@ -211,12 +218,11 @@ class MagicPoint extends Base {
     }
 
     private toggleSDKElementsInOneSec() {
-        const taskList: HTMLDivElement = document.querySelector(
-            `#${taskListCss["list-task-wrapper"]}`,
-        )!;
-        if (!taskList) return;
+        const taskList: HTMLDivElement | null = document.querySelector(
+            `#${taskListCss["list-task-wrapper"]}`
+        ) ?? null;
+        if (taskList) taskList.style.display = "none";
 
-        taskList.style.display = "none";
 
         const magicPointToggleWrap: HTMLDivElement = document.querySelector(
             `.${"active"}`,
@@ -224,7 +230,7 @@ class MagicPoint extends Base {
         magicPointToggleWrap.style.display = "none";
 
         setTimeout(() => {
-            taskList.style.display = "flex";
+            if (taskList) taskList.style.display = "flex";
             magicPointToggleWrap.style.display = "block";
         }, 1);
     }
@@ -408,8 +414,8 @@ class MagicPoint extends Base {
     }
 
     private setupEventBuses(): void {
-        EventBusInstance.on("create-tags", (x, y) => {
-            this.tagManager.createTag(x, y);
+        EventBusInstance.on("create-tags", (x, y, title) => {
+            this.tagManager.createTag(x, y, title);
         });
 
         EventBusInstance.on("close-form", () => {

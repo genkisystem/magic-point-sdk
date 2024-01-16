@@ -5,10 +5,12 @@ import { FormComponent } from "./FormComponent";
 export class FormManager {
     private onSubmitCallback: (data: GenericRequest<Task>) => void = () => {};
     private currentDomString: string;
+    private currentCoordinate: string;
     private formComponent: FormComponent;
 
     constructor() {
         this.currentDomString = "";
+        this.currentCoordinate = "";
         this.formComponent = FormComponent.getInstance();
         this.formComponent.currentDomString = this.currentDomString;
     }
@@ -16,6 +18,11 @@ export class FormManager {
     public setCurrentDomString(domString: string): void {
         this.currentDomString = domString;
         this.formComponent.currentDomString = this.currentDomString;
+    }
+
+    public setCurrentCoordinate(coordinate: string): void {
+        this.currentCoordinate = coordinate;
+        this.formComponent.currentCoordinate = this.currentCoordinate;
     }
 
     public createForm(canvasImage: HTMLCanvasElement, task?: Task): void {

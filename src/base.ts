@@ -1,4 +1,5 @@
 // import fetch from 'isomorphic-unfetch'
+import { Breakpoints } from "./utils"
 const Iso639_1LanguageCodes = [
     "en",
     "es",
@@ -18,12 +19,13 @@ const Iso639_1LanguageCodes = [
     // Add more languages as needed
 ] as const
 
-type Iso639_1LanguageCodesValue = typeof Iso639_1LanguageCodes[number]
+export type Iso639_1LanguageCodesValue = typeof Iso639_1LanguageCodes[number]
 
 export type ConfigurationOptions = {
     apiKey: string,
     baseUrl?: string,
-    lng: Iso639_1LanguageCodesValue
+    lng?: Iso639_1LanguageCodesValue,
+    breakPoints?: Readonly<Breakpoints>
 }
 
 export type GenericResponse<T> = {
@@ -43,13 +45,10 @@ export abstract class Base {
     constructor(config: ConfigurationOptions) {
         this.apiKey = config.apiKey
         this.baseUrl = config.baseUrl || `http://localhost:${process.env.PORT}/api/`
-        console.log('baseUrl:', this.baseUrl)
     }
 
 
     public async post(path: string, reqObj: object) {
-        console.log(path)
-        console.log(reqObj)
         return await this.invoke('POST', path, reqObj)
         // return this.invoke('post', path, reqObj)
     }

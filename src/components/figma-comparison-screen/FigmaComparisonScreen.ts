@@ -106,7 +106,9 @@ export class FigmaComparisonScreen implements Component {
                 image: t.image ?? "data:image/png;base64,...",
                 pageX: t.pageX,
                 pageY: t.pageY,
-            }),
+                pointCoordinate: '',
+                screenSize: 0.1
+            })
         );
     }
     private resizeCanvasAndInitSlider(target: HTMLElement): void {
@@ -263,6 +265,8 @@ export class FigmaComparisonScreen implements Component {
                         name: "",
                     },
                     endPoint: window.location.pathname,
+                    screenSize: 0.1,
+                    pointCoordinate: ''
                 },
             };
         });
