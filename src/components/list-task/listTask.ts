@@ -1,4 +1,5 @@
 import css from './listTask.scss';
+import tagCss from '../tag/tag.scss'
 
 import editIcon from '../../asset/edit.svg';
 import minimize from '../../asset/minimize.svg';
@@ -11,8 +12,9 @@ import { ModalManager } from '../modal/modal';
 import { NotificationManager, notification } from '../notification';
 import { Task } from './types/Task';
 import i18next from 'i18next';
+import { checkTaskScreenSizeToRender } from '../../utils';
 
-const FILTER_VALUE = ['ALL', 'SHOWN', 'HIDDEN'] as const
+const FILTER_VALUE = ['ALL', 'SHOWN', 'HIDDEN', "NOT_FOUND"] as const
 type Filter = typeof FILTER_VALUE[number];
 export class ListTaskManager extends Base {
     // private isLoading: boolean = false;
@@ -30,6 +32,15 @@ export class ListTaskManager extends Base {
         this.modalManager = new ModalManager()
         this.setupDocumentEventHandler()
         this.notificationManager = notification
+        this.renderTaskAsDot = this.renderTaskAsDot.bind(this)
+        this.resetAllRenderState = this.resetAllRenderState.bind(this)
+        this.rePositionTask = this.rePositionTask.bind(this)
+        this.setupEventBuses()
+    }
+
+    private setupEventBuses(): void {
+        EventBusInstance.on('reset-tasks-is-render-state', this.resetAllRenderState)
+        EventBusInstance.on('re-render-tasks', this.renderTaskAsDot)
     }
 
     public setListTask(listTask: Task[]) {
@@ -43,14 +54,41 @@ export class ListTaskManager extends Base {
         this.setupListTask()
 
         if (renderTaskAsDot) {
-            this.showTaskAsDot()
+            EventBusInstance.emit('clear-tags')
+            this.renderTaskAsDot()
         }
     }
 
     private setupDocumentEventHandler() {
         document.onkeydown = (e) => {
-            this.turnTaskLitToDotByPressESC(e)
+            this.turnTaskListToDotByPressESC(e)
         }
+        window.onresize = (e: UIEvent) => this.rePositionTask()
+    }
+
+    private rePositionTask() {
+        for (const task of this.listTask) {
+            if (task.isRender) {
+                const element = this.findElementByDomString(task.pointDom)
+                if (!element) {
+                    EventBusInstance.emit('remove-dot', this.findTaskIndex(task))
+                    continue
+                }
+
+                // re-calc coordinate to show the point correctly
+                // if element has display = "inline" then element.clientWidth = 0 so we get width by element.offsetWidth
+                const coordinates: { x: number, y: number } = this.splitAndCalcCoordinate(task)!
+                coordinates.x = coordinates.x * (element.clientWidth || element.offsetWidth) / (task.hostElementOriginCoordinates?.width ?? 1)
+                coordinates.y = coordinates.y * (element.clientHeight || element.offsetHeight) / (task.hostElementOriginCoordinates?.height ?? 1)
+                const dotElement = document.querySelectorAll(`.${tagCss['draggable-div']}`)[this.findTaskIndex(task)] as HTMLDivElement
+                dotElement.style.left = coordinates.x.toString() + 'px'
+                dotElement.style.top = coordinates.y.toString() + 'px'
+            }
+        }
+    }
+
+    private findTaskIndex(fTask: Task): number {
+        return this.listTask.filter(task => !!task.isRender).findIndex((task) => task.id === fTask.id)
     }
 
     public setupListTask(): void {
@@ -72,15 +110,16 @@ export class ListTaskManager extends Base {
         const allCheckbox = document.getElementById('all')!
         const shownCheckbox = document.getElementById('shown')!
         const hiddenCheckbox = document.getElementById('hidden')!
+        const notfoundCheckbox = document.getElementById('not-found')!
 
         allCheckbox.onclick = (e) => this.updateFilterData(e, "ALL")
         shownCheckbox.onclick = (e) => this.updateFilterData(e, "SHOWN")
         hiddenCheckbox.onclick = (e) => this.updateFilterData(e, "HIDDEN")
+        notfoundCheckbox.onclick = (e) => this.updateFilterData(e, "NOT_FOUND")
     }
 
     private updateFilterData(e: MouseEvent, filter: Filter) {
         e.stopPropagation()
-        console.log(e.target)
         this.filter = filter
         this.setupListTask()
         this.turnDotToTaskList()
@@ -110,7 +149,7 @@ export class ListTaskManager extends Base {
     private async onEditClick(e: MouseEvent, elementIndex: number): Promise<void> {
         e.stopPropagation()
         this.turnTaskListToDot()
-        const base64Image = await this.getBase64Image(this.listTask[elementIndex].id!)
+        const base64Image = await this.getTaskImage(this.listTask[elementIndex].id!)
         const canvas = await this.createCanvasFromBase64(base64Image)
         this.updateFormElement.createForm(canvas, this.listTask[elementIndex])
         EventBusInstance.on('fetchTask', () => {
@@ -142,17 +181,7 @@ export class ListTaskManager extends Base {
         }
     }
 
-    // private minimizeListTaskByPressESC() {
-    //     const escEvent = new KeyboardEvent('keydown', {
-    //         key: 'Escape',
-    //         code: 'Escape',
-    //         bubbles: false, // Set to true if the event should bubble up through the DOM
-    //         cancelable: false // Set to true if the event can be canceled
-    //     });
-    //     document.dispatchEvent(escEvent)
-    // }
-
-    private async getBase64Image(id: number): Promise<string> {
+    private async getTaskImage(id: number): Promise<string> {
         const base64Image = await this.invoke<Response<string[]>>("GET", `sdk/attachments/${id}`)
         return base64Image.appData[0]
     }
@@ -171,7 +200,7 @@ export class ListTaskManager extends Base {
         }
     }
 
-    private turnTaskLitToDotByPressESC(e: KeyboardEvent): void {
+    private turnTaskListToDotByPressESC(e: KeyboardEvent): void {
         if (e.key === "Escape" && this.HTMLElement?.classList.contains(`${css['slide-in']}`)) {
             this.HTMLElement!.classList.remove(`${css['slide-in']}`)
             this.HTMLElement!.classList.add(`${css['dotted-list']}`, `${css['dot-blink']}`)
@@ -189,6 +218,11 @@ export class ListTaskManager extends Base {
             }
             case FILTER_VALUE[2]: {
                 localListTask = localListTask.filter(task => !task.isRender)
+                break
+            }
+            case FILTER_VALUE[3]: {
+                localListTask = localListTask.filter(task => checkTaskScreenSizeToRender(task.screenSize) && !this.findElementByDomString(task.pointDom))
+                break
             }
             case FILTER_VALUE[0]:
             default: break
@@ -208,11 +242,15 @@ export class ListTaskManager extends Base {
                 </div>
                 <div class="${css['option-wrap']}">
                     <input class="${css['filter-checkbox']}" ${this.filter === FILTER_VALUE[1] ? "checked" : ''} type="checkbox" name="" id="shown">
-                    <label class="${css['type-text']}" for="shown">Shown</label>
+                    <label class="${css['type-text']}" for="shown">${i18next.t('listTask:filters.shown')}</label>
                 </div>
                 <div class="${css['option-wrap']}">
                     <input class="${css['filter-checkbox']}" ${this.filter === FILTER_VALUE[2] ? "checked" : ''} type="checkbox" name="" id="hidden">
-                    <label class="${css['type-text']}" for="hidden">Hidden</label>
+                    <label class="${css['type-text']}" for="hidden">${i18next.t('listTask:filters.hidden')}</label>
+                </div>
+                <div class="${css['option-wrap']}">
+                    <input class="${css['filter-checkbox']}" ${this.filter === FILTER_VALUE[3] ? "checked" : ''} type="checkbox" name="" id="not-found">
+                    <label class="${css['type-text']}" for="not-found">${i18next.t('listTask:filters.notFound')}</label>
                 </div>
             </div>
         </div>
@@ -285,26 +323,49 @@ export class ListTaskManager extends Base {
         })
     }
 
-    private showTaskAsDot(): void {
+    private resetAllRenderState(): void {
+        this.listTask.forEach(task => task.isRender ? task.isRender = undefined : task)
+    }
+
+    private renderTaskAsDot(): void {
         if (!this.listTask) return
         for (const task of this.listTask) {
-            if (task.isRender == null || task.isRender == undefined) {
-                if (!task.pointDom) continue
-                console.log('task: ', task)
-                const element = this.findElementByDomString(task.pointDom)
-                if (element) {
-                    console.log(element.getBoundingClientRect())
-                    const { left, top } = element.getBoundingClientRect()
-                    EventBusInstance.emit('create-tags', left, top)
-                    task.isRender = true
-                } else {
+            if (!task.pointDom || task.pointDom.length === 0) {
+                task.isRender = false;
+                continue
+            }
+
+            if ((task.isRender == null || task.isRender == undefined) && checkTaskScreenSizeToRender(task.screenSize)) {
+                const dotCoordinate = this.splitAndCalcCoordinate(task)
+                if (!dotCoordinate) {
                     task.isRender = false
+                    continue
                 }
+                task.isRender = true
+                EventBusInstance.emit('create-tags', dotCoordinate.x, dotCoordinate.y, task.title)
             }
         }
     }
 
+    private splitAndCalcCoordinate(task: Task): { x: number, y: number } | null {
+        const element = this.findElementByDomString(task.pointDom)
+        if (element) {
+            const [width, height] = [element.clientWidth || element.offsetWidth, element.clientHeight || element.offsetHeight]
+            if (!task.hostElementOriginCoordinates) task.hostElementOriginCoordinates = { width, height }
+            const { left: xRect, top: yRect } = element.getBoundingClientRect()
+            const [taskX, taskY] = task.pointCoordinate?.split("#") || [0, 0]
+            const coordinate = {
+                x: xRect + parseFloat(taskX),
+                y: yRect + parseFloat(taskY)
+            }
+            return coordinate
+        } else {
+            return null
+        }
+    }
+
     private findElementByDomString(domString: string): HTMLElement | null {
+        if (!domString || domString.length <= 0) return null
         const el = document.querySelector(domString) as HTMLElement;
         if (el?.isConnected) {
             return el

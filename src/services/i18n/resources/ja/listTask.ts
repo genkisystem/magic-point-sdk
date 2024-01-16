@@ -3,5 +3,6 @@ export default {
         all: 'All',
         shown: 'Shown',
         hidden: 'Hidden',
+        notFound: 'Not Found'
     }
 }
