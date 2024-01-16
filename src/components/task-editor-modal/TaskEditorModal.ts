@@ -37,7 +37,7 @@ export class TaskEditorModal {
     }
 
     private setupFormSubmission(): void {
-        this.formManager.onSubmit((formData: GenericRequest<Task>) => {
+        this.formManager.setCallback((formData: GenericRequest<Task>) => {
             if (this.onTaskUpdate) {
                 this.onTaskUpdate({
                     title: formData.appData.title,

@@ -4,6 +4,7 @@ import { FormComponent } from "./FormComponent";
 
 export class FormManager {
     private onSubmitCallback: (data: GenericRequest<Task>) => void = () => {};
+    private onCloseCallback?: () => void;
     private currentDomString: string;
     private currentCoordinate: string;
     private formComponent: FormComponent;
@@ -29,6 +30,7 @@ export class FormManager {
         this.formComponent.show(
             canvasImage.toDataURL(),
             this.onSubmitCallback.bind(this),
+            this.onCloseCallback?.bind(this),
             task,
         );
     }
@@ -37,10 +39,12 @@ export class FormManager {
         this.formComponent.close();
     }
 
-    public onSubmit(
-        callback: (data: GenericRequest<Task>) => void,
+    public setCallback(
+        submitCallback: (data: GenericRequest<Task>) => void,
+        closeCallback?: () => void,
     ): FormManager {
-        this.onSubmitCallback = callback;
+        this.onSubmitCallback = submitCallback;
+        this.onCloseCallback = closeCallback;
         return this;
     }
 }

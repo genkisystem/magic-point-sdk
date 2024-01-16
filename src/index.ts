@@ -200,14 +200,19 @@ class MagicPoint extends Base {
     }
 
     private setupFormSubmission(e: MouseEvent): void {
-        this.formManager.onSubmit((formData: GenericRequest<Task>) => {
-            this.createTask(formData).then((isSuccess) => {
-                if (isSuccess) {
-                    // this.tagManager.createTag(e.clientX, e.clientY, formData.appData.title);
-                    this.enableMagicPoint();
-                }
-            });
-        });
+        this.formManager.setCallback(
+            (formData: GenericRequest<Task>) => {
+                this.createTask(formData).then((isSuccess) => {
+                    if (isSuccess) {
+                        // this.tagManager.createTag(e.clientX, e.clientY, formData.appData.title);
+                        this.enableMagicPoint();
+                    }
+                });
+            },
+            () => {
+                this.enableMagicPoint();
+            },
+        );
     }
 
     private toggleSDKElementsInOneSec() {
@@ -407,12 +412,6 @@ class MagicPoint extends Base {
     private setupEventBuses(): void {
         EventBusInstance.on("create-tags", (x, y, title) => {
             this.tagManager.createTag(x, y, title);
-        });
-
-        EventBusInstance.on("close-form", () => {
-            console.log("[EventBus] - triggered: close form");
-            // TODO: close form
-            // this.enableMagicPoint();
         });
     }
 }

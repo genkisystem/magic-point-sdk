@@ -8,10 +8,9 @@ import { Task } from "@components/list-task/types/Task";
 import { Type } from "@components/list-task/types/Type";
 import {
     DataApiInterface,
-    EventBusInstance,
     StateKeys,
     globalStateManager,
-    uiManager,
+    uiManager
 } from "@services";
 import {
     BASE64_IMAGE_PREFIX,
@@ -56,6 +55,7 @@ export class FormComponent {
     private initialTask?: Task;
 
     private _onClickSubmit?: (formData: GenericRequest<Task>) => void;
+    private _onCloseCallback?: () => void;
 
     constructor() {
         this.componentElement = createDivElement({
@@ -151,7 +151,8 @@ export class FormComponent {
 
     public show(
         image: string,
-        callback: (data: GenericRequest<Task>) => void,
+        submitCallback: (data: GenericRequest<Task>) => void,
+        closeCallback?: () => void,
         initTask?: Task,
     ): void {
         if (initTask) {
@@ -160,13 +161,13 @@ export class FormComponent {
         this.renderComponent();
         this.imageEditorWrapper.loadImage(image);
         this.componentElement.style.display = "block";
-        this._onClickSubmit = callback;
+        this._onClickSubmit = submitCallback;
+        this._onCloseCallback = closeCallback;
     }
 
     public close(): void {
         this.resetComponent();
         this.componentElement.style.display = "none";
-        EventBusInstance.emit("close-form");
     }
 
     private renderComponent(): void {
@@ -410,6 +411,9 @@ export class FormComponent {
     private onClose(event: MouseEvent): void {
         event.preventDefault();
         this.close();
+        if (this._onCloseCallback) {
+            this._onCloseCallback();
+        }
     }
 
     private onSubmit(event: MouseEvent): void {
