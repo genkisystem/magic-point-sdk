@@ -31,7 +31,7 @@ import {
 import {
     APP_ID,
     createDivElement,
-    defindeMediaQueriesAndSetupEventListener,
+    defineMediaQueriesAndSetupEventListener,
     getPointDom,
 } from "@utils";
 import html2canvas from "html2canvas";
@@ -59,18 +59,22 @@ class MagicPoint extends Base {
     private figmaComparerModal!: FigmaComparerModal;
 
     constructor(config: ConfigurationOptions) {
+        const existingElement = document.getElementById(APP_ID);
+        if (existingElement) {
+            existingElement.parentNode?.removeChild(existingElement);
+        }
         super(config);
         console.log("add magic dot listener");
         licenseManagerInstance.setApiKey(config.apiKey);
-
-        this.modalManager = new ModalManager();
-        new I18nManager(config.lng ? config.lng : "en");
 
         this.magicPointContainer = createDivElement({
             className: "magic-point-container",
         });
         this.magicPointContainer.id = APP_ID;
-        this.init();
+        this.initUI();
+
+        this.modalManager = new ModalManager();
+        new I18nManager(config.lng ? config.lng : "en");
 
         dataManager.init().then(() => {
             this.listTaskManager = new ListTaskManager(config);
@@ -80,18 +84,19 @@ class MagicPoint extends Base {
                 this.figmaClient,
                 this.createTasks.bind(this),
             );
+            this.setupMagicPointToggle();
         });
 
         this.tagManager = new TagManager(this.magicPointContainer);
-        this.setupMagicPoint();
+
         this.initializeBindings();
         this.setupEventBuses();
         this.setupKeystrokeListener();
         this.fetchInformation();
-        defindeMediaQueriesAndSetupEventListener(config.breakPoints);
+        defineMediaQueriesAndSetupEventListener(config.breakPoints);
     }
 
-    private init(): void {
+    private initUI(): void {
         uiManager.setContainer(this.magicPointContainer);
         styleManager.init();
     }
@@ -210,6 +215,7 @@ class MagicPoint extends Base {
                 });
             },
             () => {
+                this.isFormOpen = false;
                 this.enableMagicPoint();
             },
         );
@@ -349,7 +355,7 @@ class MagicPoint extends Base {
         return button;
     }
 
-    private setupMagicPoint() {
+    private setupMagicPointToggle() {
         this.magicPointDiv = document.createElement("div");
         Object.assign(this.magicPointDiv.style, {
             position: "fixed",
@@ -370,6 +376,7 @@ class MagicPoint extends Base {
         );
 
         const figmaBtn = this.createButton(figmaIcon, () => {
+            this.handleNormalButtonClick(normalButton, magicButton);
             this.figmaComparerModal.showModal();
         });
 

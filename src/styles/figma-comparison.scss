@@ -250,6 +250,17 @@
     color: $gray-700;
     max-height: calc(100vh - 212px);
     overflow: auto;
+
+    .not-found {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        align-self: stretch;
+        text-align: center;
+        font-size: $orion-h500-size;
+        color: $gray-700;
+    }
 }
 
 .control-panel {

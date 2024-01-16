@@ -64,7 +64,7 @@ export class FooterComponent {
     renderComponent() {
         this.componentElement.innerHTML = "";
 
-        const leftButtons = createDivElement({ className: "left-buttons" });
+        const leftButtons = createDivElement();
         if (this.cancelButtonConfig) {
             const cancelButton = new ButtonComponent(this.cancelButtonConfig);
             leftButtons.appendChild(cancelButton.render());

@@ -24,7 +24,7 @@
         align-items: flex-start;
         justify-content: flex-start;
         align-self: stretch;
-        max-height: 80vh;
+        max-height: calc(100vh - 190px);
         border-right: 1px solid $color-gainsboro;
         padding: $padding-xs $padding-base;
         gap: $br-9xs;

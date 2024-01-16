@@ -50,8 +50,8 @@ export class TaskEditorModal {
                         ? formData.appData.assignee
                         : undefined,
                     issueType: formData.appData.issueType,
-                    pointCoordinate: "",
-                    screenSize: 0.1,
+                    pointCoordinate: `${0}#${0}`,
+                    screenSize: window.innerWidth,
                 });
             }
             this.formManager.closeForm();
@@ -91,8 +91,8 @@ export class TaskEditorModal {
                         : this.noneOption,
                     endPoint: window.location.pathname,
                     base64Images: [this.taskData.image],
-                    pointCoordinate: "",
-                    screenSize: 0.1,
+                    pointCoordinate: `${0}#${0}`,
+                    screenSize: window.innerWidth,
                 });
             };
 

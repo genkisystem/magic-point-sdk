@@ -64,10 +64,18 @@
                 input,
                 select {
                     outline: none;
-                    padding: 0.3rem;
+                    padding: 0 8px;
                     border-radius: 8px;
-                    height: 42px;
                     border: 1px solid #ccc;
+                    border-width: 1px;
+                }
+
+                input {
+                    height: 42px;
+                }
+
+                select {
+                    height: 44px;
                 }
 
                 .text-area {
@@ -85,7 +93,8 @@
 
                 .label {
                     font-size: 18px;
-                    font-weight: bold;}
+                    font-weight: bold;
+                }
             }
 
             .row-actions {

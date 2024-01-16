@@ -14,6 +14,8 @@ export class FigmaComparerBody implements Component {
     private container: HTMLElement;
     private _diffData?: CanvasWithDots;
 
+    private loginScreen!: HTMLElement;
+
     constructor(
         private figmaClient: FigmaClient,
         private onSelectedItemChange: (selectedItem: TreeItem) => void,
@@ -26,6 +28,7 @@ export class FigmaComparerBody implements Component {
     ) {
         this._activeStepIndex = initialActiveScreenIndex ?? 0;
         this.container = createDivElement({ className: "figma-comparer-body" });
+
         this.renderComponent();
     }
 
@@ -52,14 +55,16 @@ export class FigmaComparerBody implements Component {
 
         switch (this._activeStepIndex) {
             case 0:
-                const login = new FigmaLoginBody(
-                    this.figmaClient,
-                    this.updateFooter,
-                    this.showLoading,
-                    this.hideLoading,
-                    this.teamIds,
-                );
-                this.container.appendChild(login.render());
+                if (!this.loginScreen) {
+                    this.loginScreen = new FigmaLoginBody(
+                        this.figmaClient,
+                        this.updateFooter,
+                        this.showLoading,
+                        this.hideLoading,
+                        this.teamIds,
+                    ).render();
+                }
+                this.container.appendChild(this.loginScreen);
                 break;
             case 1:
                 const selection = new FigmaSelectionScreen(

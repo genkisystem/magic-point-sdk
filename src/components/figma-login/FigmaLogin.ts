@@ -23,8 +23,8 @@ export class FigmaLoginBody implements Component {
     };
 
     private teamId: string = "";
-    private teams: Map<string, ExtendedGetTeamProjectsResult> = new Map();
-    private teamOptions: SelectItem[] = [];
+    private teams: Map<string, ExtendedGetTeamProjectsResult>;
+    private teamOptions: SelectItem[];
 
     constructor(
         private figmaClient: FigmaClient,
@@ -36,6 +36,9 @@ export class FigmaLoginBody implements Component {
         this.componentElement = createDivElement({
             className: "login-container",
         });
+
+        this.teams = new Map();
+        this.teamOptions = [];
 
         this.oAuthClient = new OAuthClient(this.oAuthConfig);
 
@@ -53,16 +56,6 @@ export class FigmaLoginBody implements Component {
         image.className = "user-image";
         return image;
     }
-
-    // private createUserInfoText(userInfo: GetUserMeResult) {
-    //     const userInfoText = createDivElement({ className: "user-info-text" });
-    //     userInfoText.innerHTML = `<p>${i18next.t(
-    //         "figma:login.userInfoText.name",
-    //     )}: ${userInfo.handle}</p><p>${i18next.t(
-    //         "figma:login.userInfoText.email",
-    //     )}: ${userInfo.email}</p>`;
-    //     return userInfoText;
-    // }
 
     private createUserInfoText(userInfo: GetUserMeResult) {
         const userInfoText = createDivElement({ className: "user-info-text" });
@@ -164,7 +157,6 @@ export class FigmaLoginBody implements Component {
         );
         teamSelectBox.appendChild(defaultOption);
 
-        // Adding options from teamOptions
         this.teamOptions.forEach((item) => {
             const option = document.createElement("option");
             option.value = item.value;

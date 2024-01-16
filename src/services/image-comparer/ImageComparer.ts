@@ -35,7 +35,7 @@ export class HtmlImageComparer {
         newHeight: number,
     ): Promise<HTMLCanvasElement> {
         const capturedCanvas: HTMLCanvasElement = await html2canvas(element, {
-            scale: window.devicePixelRatio,
+            scale: 1,
             width: newWidth,
             height: newHeight,
         });
@@ -69,7 +69,6 @@ export class HtmlImageComparer {
     }
 
     async findDifferencePosition(
-        element: HTMLElement,
         figmaImageUrl: string,
     ): Promise<CanvasWithDots | undefined> {
         const originalFigmaImage: HTMLImageElement =
@@ -81,7 +80,6 @@ export class HtmlImageComparer {
         bodyCopy.style.height = `${originalFigmaImage.naturalHeight}px`;
         bodyCopy.style.maxHeight = `${originalFigmaImage.naturalHeight}px`;
         bodyCopy.style.minHeight = `${originalFigmaImage.naturalHeight}px`;
-        bodyCopy.style.overflow = "hidden";
         document.body.appendChild(bodyCopy);
         const canvas1: HTMLCanvasElement = await this.captureAndResizeElement(
             bodyCopy,
@@ -117,7 +115,14 @@ export class HtmlImageComparer {
         const diffData = await this.compareImages(imageData1, imageData2);
 
         if (diffData.misMatchPercentage <= 0) {
-            return;
+            document.body.removeChild(bodyCopy);
+
+            return {
+                diffPositions: [],
+                bugCanvas: canvas1,
+                webCanvas: canvas1,
+                figmaCanvas: canvas2,
+            };
         }
 
         const diffPoints = await this.processDifferences(diffData, bodyCopy);
@@ -278,6 +283,7 @@ export class HtmlImageComparer {
         }
 
         const diffImage = diffData.getImageDataUrl();
+        console.log("diffImage", diffImage);
 
         const img = new Image();
         img.src = diffImage;

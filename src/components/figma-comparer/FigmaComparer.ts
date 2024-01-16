@@ -61,6 +61,7 @@ export class FigmaComparer implements Component {
             this.onClose,
             this.activeStep,
         );
+
         this.bodyComponent = new FigmaComparerBody(
             this.figmaClient,
             this.onSelectedItemChange.bind(this),
@@ -71,6 +72,7 @@ export class FigmaComparer implements Component {
             this.teamIds,
             this.activeStep,
         );
+
         this.footerComponent = new FooterComponent({
             cancelButtonConfig: this.DEFAULT_CANCEL_BUTTON_CONFIG,
             previousButtonConfig: this.createPreviousButtonConfig(),
@@ -163,15 +165,13 @@ export class FigmaComparer implements Component {
 
         this.showLoading();
         this.htmlComparer
-            .findDifferencePosition(
-                document.body,
-                this.selectedFigmaScreen.imageUrl,
-            )
+            .findDifferencePosition(this.selectedFigmaScreen.imageUrl)
             .then((diffPosition) => {
                 this.handleImageComparisonResult(diffPosition);
             })
             .catch((error) => {
                 console.error("Error during image comparison:", error);
+                console.trace();
             })
             .finally(() => {
                 this.hideLoading();
@@ -217,6 +217,8 @@ export class FigmaComparer implements Component {
     private reset() {
         this.activeStep = 0;
         this.selectedFigmaScreen = null;
+        this.updateComponentsStep();
+        this.updateFooterComponent();
     }
 
     showLoading() {

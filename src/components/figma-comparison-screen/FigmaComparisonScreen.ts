@@ -106,8 +106,8 @@ export class FigmaComparisonScreen implements Component {
                 image: t.image ?? "data:image/png;base64,...",
                 pageX: t.pageX,
                 pageY: t.pageY,
-                pointCoordinate: "",
-                screenSize: 0.1,
+                pointCoordinate: `${0}#${0}`,
+                screenSize: window.innerWidth,
             }),
         );
     }
@@ -151,10 +151,16 @@ export class FigmaComparisonScreen implements Component {
         if (!this.tasks) return;
 
         const taskParent = createDivElement({ className: "task-parent" });
+        if (this.tasks.length === 0) {
+            const notFound = createDivElement({className: "not-found"});
+            notFound.textContent = "No errors found";
+            taskParent.appendChild(notFound);
+        }
         this.tasks.forEach((t, index) => {
             const task = this.createTask(t, index);
             taskParent.appendChild(task);
         });
+
         this.previewElement.appendChild(taskParent);
     }
 
@@ -269,8 +275,8 @@ export class FigmaComparisonScreen implements Component {
                         name: "",
                     },
                     endPoint: window.location.pathname,
-                    screenSize: 0.1,
-                    pointCoordinate: "",
+                    screenSize: window.innerWidth,
+                    pointCoordinate: `${0}#${0}`,
                 },
             };
         });

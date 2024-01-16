@@ -54,7 +54,7 @@ export const checkTaskScreenSizeToRender = (
 };
 
 // Define your screen size ranges
-export const defindeMediaQueriesAndSetupEventListener = (
+export const defineMediaQueriesAndSetupEventListener = (
     breakpoints: Breakpoints = SCREEN_SIZES,
 ) => {
     const sortedBreakpoints = Object.entries(breakpoints).sort(
