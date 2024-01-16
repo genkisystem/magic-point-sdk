@@ -7,7 +7,12 @@ import {
     uiManager,
 } from "@services";
 import i18next from "i18next";
-import { Base, ConfigurationOptions, GenericResponse } from "../../base";
+import {
+    Base,
+    ConfigurationOptions,
+    GenericRequest,
+    GenericResponse,
+} from "../../base";
 import { BASE64_IMAGE_PREFIX, checkTaskScreenSizeToRender } from "../../utils";
 import { FormManager } from "../form";
 import { ModalManager } from "../modal/modal";
@@ -35,6 +40,28 @@ export class ListTaskManager extends Base {
         this.resetAllRenderState = this.resetAllRenderState.bind(this);
         this.rePositionTask = this.rePositionTask.bind(this);
         this.setupEventBuses();
+        this.setupFormManager();
+    }
+
+    private setupFormManager() {
+        this.updateFormElement.setCallback((formData) =>
+            this.updateTask(formData),
+        );
+    }
+
+    private async updateTask(task: GenericRequest<Task>) {
+        const res: GenericResponse<Task> = await this.invoke(
+            "PUT",
+            `sdk/task/${task.appData.id}`,
+            task,
+        );
+        if (res && !res.hasError && Object.keys(res.appData).length > 0) {
+            EventBusInstance.emit("fetchTask");
+            notification.createNotification("UPDATE", "SUCCESS", res.appData);
+        } else {
+            notification.createNotification("UPDATE", "FAILED");
+        }
+        this.updateFormElement.closeForm();
     }
 
     private setupEventBuses(): void {
