@@ -51,34 +51,29 @@ class MagicPoint extends Base {
     };
 
     private magicPointContainer: HTMLElement;
-
     private magicPointDiv: HTMLDivElement | null = null;
 
-    private figmaClient: FigmaClient = new FigmaClient();
-
+    private figmaClient: FigmaClient;
     private figmaComparerModal!: FigmaComparerModal;
 
     constructor(config: ConfigurationOptions) {
-        const existingElement = document.getElementById(APP_ID);
-        if (existingElement) {
-            existingElement.parentNode?.removeChild(existingElement);
-        }
-        super(config);
         console.log("add magic dot listener");
+        super(config);
         licenseManagerInstance.setApiKey(config.apiKey);
 
         this.magicPointContainer = createDivElement({
             className: "magic-point-container",
         });
         this.magicPointContainer.id = APP_ID;
-        this.initUI();
+        this.initializeUI();
 
         this.modalManager = new ModalManager();
+        this.figmaClient = new FigmaClient();
+
         new I18nManager(config.lng ? config.lng : "en");
 
         dataManager.init().then(() => {
             this.listTaskManager = new ListTaskManager(config);
-
             this.formManager = new FormManager();
             this.figmaComparerModal = new FigmaComparerModal(
                 this.figmaClient,
@@ -96,7 +91,7 @@ class MagicPoint extends Base {
         defineMediaQueriesAndSetupEventListener(config.breakPoints);
     }
 
-    private initUI(): void {
+    private initializeUI(): void {
         uiManager.setContainer(this.magicPointContainer);
         styleManager.init();
     }
@@ -383,6 +378,7 @@ class MagicPoint extends Base {
         this.magicPointDiv.append(normalButton, magicButton, figmaBtn);
 
         this.magicPointContainer.appendChild(this.magicPointDiv);
+
         document.body.appendChild(this.magicPointContainer);
     }
 

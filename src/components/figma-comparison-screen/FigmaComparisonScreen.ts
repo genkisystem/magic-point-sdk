@@ -15,6 +15,7 @@ import { CanvasWithDots, ImageComparisonSlider, ImageOverlay } from "@services";
 import {
     createButton,
     createDivElement,
+    drawBugCanvas,
     findElementAtPosition,
     getComposedPathForHTMLElement,
     getPointDom,
@@ -41,7 +42,7 @@ export class FigmaComparisonScreen implements Component {
     private static readonly CANVAS_MARGIN = 12;
 
     private componentElement: HTMLElement;
-    private previewElement: HTMLElement;
+    private taskElement: HTMLElement;
     private taskEditorModal: TaskEditorModal;
     private tasks: ITask[];
     private checkedTasks: number[];
@@ -87,7 +88,7 @@ export class FigmaComparisonScreen implements Component {
         this.leftPanel = createDivElement({
             className: "figma-comparison-left",
         });
-        this.previewElement = createDivElement({
+        this.taskElement = createDivElement({
             className: "figma-comparison-right",
         });
         this.tasks = this.initializeTasks();
@@ -108,6 +109,7 @@ export class FigmaComparisonScreen implements Component {
                 pageY: t.pageY,
                 pointCoordinate: `${0}#${0}`,
                 screenSize: window.innerWidth,
+                bugPosition: t,
             }),
         );
     }
@@ -147,7 +149,7 @@ export class FigmaComparisonScreen implements Component {
     }
 
     private createCollapsibleItems(): void {
-        this.previewElement.innerHTML = "";
+        this.taskElement.innerHTML = "";
         if (!this.tasks) return;
 
         const taskParent = createDivElement({ className: "task-parent" });
@@ -161,11 +163,15 @@ export class FigmaComparisonScreen implements Component {
             taskParent.appendChild(task);
         });
 
-        this.previewElement.appendChild(taskParent);
+        this.taskElement.appendChild(taskParent);
     }
 
     private createTask(t: ITask, index: number): HTMLElement {
-        const task = createDivElement({ className: "task" });
+        const task = createDivElement({
+            className: `task ${
+                !this.checkedTasks.includes(index) ? "disable" : ""
+            }`,
+        });
         task.appendChild(this.createTaskHeader(index));
         task.appendChild(this.createTaskInner(t, index));
         return task;
@@ -179,7 +185,11 @@ export class FigmaComparisonScreen implements Component {
         });
         const collapseButton = this.createCollapseButton(taskHeader);
         const taskTitle = createDivElement({ className: "task-title" });
-        taskTitle.textContent = `#${index + 1}`;
+        taskTitle.textContent = `#${
+            this.checkedTasks.includes(index)
+                ? this.checkedTasks.findIndex((item) => item === index) + 1
+                : 0
+        }`;
 
         collapseDiv.appendChild(collapseButton);
         collapseDiv.appendChild(taskTitle);
@@ -204,12 +214,32 @@ export class FigmaComparisonScreen implements Component {
     }
 
     private handleCheckboxChange(index: number, isChecked: boolean): void {
-        if (isChecked) {
-            this.checkedTasks.push(index);
-        } else {
-            this.checkedTasks = this.checkedTasks.filter(
-                (item) => item !== index,
+        isChecked
+            ? this.checkedTasks.push(index)
+            : (this.checkedTasks = this.checkedTasks.filter(
+                  (item) => item !== index,
+              ));
+
+        this.checkedTasks.sort((a, b) => a - b);
+
+        const selectedTask = this.tasks.filter((_, i) =>
+            this.checkedTasks.includes(i),
+        );
+
+        const diffPositions = selectedTask.map((t) => t.bugPosition);
+        if (this.diffData && this.diffData.webCanvas && this.resizedBugCanvas) {
+            const newBugCanvas = drawBugCanvas(
+                this.diffData.webCanvas,
+                diffPositions,
             );
+            this.resizedBugCanvas = resizeCanvas(
+                newBugCanvas,
+                this.resizedBugCanvas.width,
+                this.resizedBugCanvas.height,
+            );
+
+            this.handleDisplayBug();
+            this.createCollapsibleItems();
         }
         this.updateFooterBasedOnCheckedTasks();
     }
@@ -557,10 +587,14 @@ export class FigmaComparisonScreen implements Component {
         const selectedTask = this.tasks[index];
 
         this.taskEditorModal.initialize(selectedTask, (updatedTask) => {
-            this.tasks[index] = updatedTask;
+            this.tasks[index] = {
+                ...this.tasks[index],
+                ...updatedTask,
+            };
             this.renderComponent();
             this.updateFooterBasedOnCheckedTasks();
         });
+
         this.taskEditorModal.showModal();
     }
 
@@ -574,7 +608,7 @@ export class FigmaComparisonScreen implements Component {
         this.leftPanel.appendChild(this.overlayPanel);
 
         this.componentElement.appendChild(this.leftPanel);
-        this.componentElement.appendChild(this.previewElement);
+        this.componentElement.appendChild(this.taskElement);
 
         this.createCollapsibleItems();
         this.resizeCanvasAndInitSlider(this.sliderPanel);

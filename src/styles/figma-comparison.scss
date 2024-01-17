@@ -74,6 +74,10 @@
             align-items: flex-start;
             justify-content: flex-start;
             padding: $padding-base;
+
+            &.disable {
+                opacity: 0.5;
+            }
         }
 
         .task-header {

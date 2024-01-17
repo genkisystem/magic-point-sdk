@@ -15,7 +15,6 @@ export class UIManager {
     }
 
     public addElement(element: HTMLElement): void {
-        console.trace("Adding element:", element);
         if (!this._container) {
             console.warn("Container is not set. Unable to add element.");
             return;
