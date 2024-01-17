@@ -18,7 +18,7 @@ export class FigmaLoginBody implements Component {
     private readonly oAuthConfig: OAuthConfig = {
         authorizationUrl: "https://www.figma.com/oauth",
         clientId: "fQajLA73u5Megnj2UIfugu",
-        redirectUri: "http://localhost:8080/api/figma/oauth-callback",
+        redirectUri: `${process.env.BASE_URL || 'http://localhost:' + process.env.PORT + '/api/'}figma/oauth-callback`,
         scope: "files:read",
     };
 

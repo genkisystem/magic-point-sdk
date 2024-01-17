@@ -43,16 +43,50 @@ export const createSelectBox = (config: ISelectBoxConfig): HTMLElement => {
     return new SelectBoxComponent({ ...config }).render();
 };
 
+// export const findElementAtPosition = (
+//     root: HTMLElement,
+//     x: number,
+//     y: number,
+// ): HTMLElement | null => {
+//     let foundElement: HTMLElement | null = null;
+
+//     for (let child of Array.from(root.children)) {
+//         if (child instanceof HTMLElement) {
+//             let rect: DOMRect = child.getBoundingClientRect();
+
+//             // Check if the coordinates are within this element's bounds
+//             if (
+//                 x >= rect.left &&
+//                 x <= rect.right &&
+//                 y >= rect.top &&
+//                 y <= rect.bottom
+//             ) {
+//                 // Instead of returning immediately, continue to search for a more nested element
+//                 foundElement = child;
+//                 let deeperElement = findElementAtPosition(child, x, y);
+//                 if (deeperElement) {
+//                     foundElement = deeperElement;
+//                 }
+//             }
+//         }
+//     }
+
+//     return foundElement;
+// };
+
 export const findElementAtPosition = (
     root: HTMLElement,
     x: number,
     y: number,
 ): HTMLElement | null => {
     let foundElement: HTMLElement | null = null;
+    console.log("x - y", x, y);
 
     for (let child of Array.from(root.children)) {
         if (child instanceof HTMLElement) {
             let rect: DOMRect = child.getBoundingClientRect();
+            console.log("child", child);
+            console.log("rect", rect);
 
             // Check if the coordinates are within this element's bounds
             if (
