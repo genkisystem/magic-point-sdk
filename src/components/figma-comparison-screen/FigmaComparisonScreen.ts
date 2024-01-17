@@ -23,7 +23,7 @@ import {
 
 import i18next from "i18next";
 import { GenericRequest } from "../../base";
-import { ButtonComponent } from "../button/ButtonComponent";
+import { ButtonComponent } from "../Button/ButtonComponent";
 import { Component } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";
 import { Task } from "../list-task/types/Task";
@@ -152,7 +152,7 @@ export class FigmaComparisonScreen implements Component {
 
         const taskParent = createDivElement({ className: "task-parent" });
         if (this.tasks.length === 0) {
-            const notFound = createDivElement({className: "not-found"});
+            const notFound = createDivElement({ className: "not-found" });
             notFound.textContent = "No errors found";
             taskParent.appendChild(notFound);
         }

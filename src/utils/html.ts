@@ -1,7 +1,8 @@
 import {
     ButtonComponent,
     IButtonConfig,
-} from "../components/button/ButtonComponent";
+} from "../components/Button/ButtonComponent";
+
 import {
     ISelectBoxConfig,
     SelectBoxComponent,
@@ -11,7 +12,7 @@ export class DivElementConfig {
     constructor(
         public className?: string,
         public innerHTML?: string,
-    ) {}
+    ) { }
 }
 
 /**

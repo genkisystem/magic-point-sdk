@@ -1,5 +1,5 @@
 import { createDivElement } from "@utils";
-import { ButtonComponent, IButtonConfig } from "../button/ButtonComponent";
+import { ButtonComponent, IButtonConfig } from "../Button/ButtonComponent";
 
 export interface FooterButtonConfigs {
     cancelButtonConfig?: IButtonConfig;
