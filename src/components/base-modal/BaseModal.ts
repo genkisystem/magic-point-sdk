@@ -1,7 +1,6 @@
-import { createDivElement } from "../../utils";
-import { APP_ID } from "../../utils/constants";
+import { uiManager } from "@services";
+import { createDivElement } from "@utils";
 import { Component } from "../common";
-import css from "./modal.scss";
 
 type ModalSize = "sm" | "md" | "lg" | "full";
 
@@ -10,9 +9,9 @@ export class BaseModal {
     private content: HTMLElement;
 
     constructor(size: ModalSize = "lg") {
-        this.modal = createDivElement({ className: css["modal"] });
+        this.modal = createDivElement({ className: "modal" });
 
-        this.content = createDivElement({ className: css["modal-content"] });
+        this.content = createDivElement({ className: "modal-content" });
 
         this.modal.appendChild(this.content);
 
@@ -67,22 +66,11 @@ export class BaseModal {
             return;
         }
 
-        const appDiv: HTMLElement | null = document.getElementById(APP_ID);
-        if (!appDiv) {
-            console.error(`Target div with ID ${APP_ID} not found.`);
-            return;
-        }
-
-        appDiv.appendChild(this.modal);
         this.modal.style.display = "flex";
+        uiManager.addElement(this.modal);
     }
 
     hide(): void {
-        const appDiv: HTMLElement | null = document.getElementById(APP_ID);
-        if (!appDiv || this.modal.parentElement !== appDiv) {
-            return;
-        }
-
-        appDiv.removeChild(this.modal);
+        uiManager.removeElement(this.modal);
     }
 }

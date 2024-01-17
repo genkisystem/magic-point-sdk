@@ -1,22 +1,18 @@
-import css from "./modal.scss";
-
 export class ModalManager {
     private modalElement: HTMLDivElement | null = null;
-    private callback: () => void = () => { };
+    private callback: () => void = () => {};
 
     private createModal(): HTMLDivElement {
         const modal = document.createElement("div");
         modal.style.display = "none"; // Start hidden
-        modal.classList.add(css["modal"]);
+        modal.classList.add("modal-message");
         modal.innerHTML = `
-            <div class="${css["modal-content"]}">
+            <div class="modal-content">
                 <p id="modal-message"></p>
                 <button id="modal-ok">OK</button>
                 <button id="modal-cancel">Cancel</button>
             </div>
         `;
-        // Add styles for your modal here or use an external CSS class
-
         // Event listeners
         modal
             .querySelector("#modal-ok")
@@ -58,7 +54,7 @@ export class ModalManager {
         }
 
         const messageElement = this.modalElement.querySelector(
-            "#modal-message"
+            "#modal-message",
         ) as HTMLParagraphElement;
         messageElement.textContent = message;
 
