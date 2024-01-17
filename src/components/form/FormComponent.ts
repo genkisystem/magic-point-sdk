@@ -410,6 +410,7 @@ export class FormComponent {
 
     private onClose(event: MouseEvent): void {
         event.preventDefault();
+        event.stopPropagation();
         this.close();
         if (this._onCloseCallback) {
             this._onCloseCallback();
@@ -418,6 +419,7 @@ export class FormComponent {
 
     private onSubmit(event: MouseEvent): void {
         event.preventDefault();
+        event.stopPropagation()
         const formData: GenericRequest<Task> = {
             appData: {
                 ...this.initialTask,
