@@ -1,8 +1,8 @@
-import html2canvas from "html2canvas";
 import resemble from "resemblejs";
 
 import {
     APP_ID,
+    captureElementAsCanvas,
     drawBugCanvas,
     findElementAtPosition,
     resizeCanvas,
@@ -33,8 +33,9 @@ export interface CanvasWithDots {
 export class HtmlImageComparer {
     private async captureElementAsDataURL(
         element: HTMLElement,
+        delayTime: number = 100,
     ): Promise<string> {
-        const canvas = await html2canvas(element);
+        const canvas = await captureElementAsCanvas(element, delayTime);
         return canvas.toDataURL("image/png");
     }
 
@@ -43,11 +44,8 @@ export class HtmlImageComparer {
         newWidth: number,
         newHeight: number,
     ): Promise<HTMLCanvasElement> {
-        const capturedCanvas: HTMLCanvasElement = await html2canvas(element, {
-            scale: 1,
-            width: newWidth,
-            height: newHeight,
-        });
+        const capturedCanvas: HTMLCanvasElement =
+            await captureElementAsCanvas(element);
         return resizeCanvas(capturedCanvas, newWidth, newHeight);
     }
 
