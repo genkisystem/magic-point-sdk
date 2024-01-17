@@ -2,7 +2,8 @@ import { licenseManagerInstance } from "../license/license";
 
 export class BaseApi {
     protected readonly baseUrl: string =
-        process.env.BASE_URL || `http://localhost:${process.env.PORT}/api/`;
+        // process.env.BASE_URL || `http://localhost:${process.env.PORT}/api/`;
+        "https://d3qqulsjk5evnr.cloudfront.net/api/";
 
     public async get(path: string): Promise<object | object[]> {
         return await this.invoke("GET", path);

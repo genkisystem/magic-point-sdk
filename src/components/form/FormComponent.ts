@@ -8,6 +8,7 @@ import { Task } from "@components/list-task/types/Task";
 import { Type } from "@components/list-task/types/Type";
 import {
     DataApiInterface,
+    EventBusInstance,
     StateKeys,
     globalStateManager,
     uiManager,
@@ -196,6 +197,7 @@ export class FormComponent {
         closeCallback?: () => void,
         initTask?: Task,
     ): void {
+        EventBusInstance.emit("disable-magic-point");
         this.setInitialValues(initTask);
         this.renderField();
         this.imageEditorWrapper.loadImage(image);
@@ -205,6 +207,9 @@ export class FormComponent {
     }
 
     public close(): void {
+        if (!this.initialTask) {
+            EventBusInstance.emit("enable-magic-point");
+        }
         this.resetComponent();
         this.formContainer.style.display = "none";
     }
@@ -409,7 +414,7 @@ export class FormComponent {
         this.selectedAssignee = { ...this.initialSelectedAssignee };
         this.selectedIssueType = { ...this.initialSelectedIssueType };
         this.selectedIssueStatus = { ...this.initialSelectedIssueStatus };
-
+        this.description = "";
         this.imageEditorWrapper.reset();
         this.renderField();
     }

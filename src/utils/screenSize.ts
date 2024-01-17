@@ -88,8 +88,7 @@ export const defineMediaQueriesAndSetupEventListener = (
 
         mediaQueries.push({
             query: window.matchMedia(
-                `(min-width: ${sortedBreakpoints[i][1]}px) and (max-width: ${
-                    sortedBreakpoints[i + 1][1] - 1
+                `(min-width: ${sortedBreakpoints[i][1]}px) and (max-width: ${sortedBreakpoints[i + 1][1] - 1
                 }px)`,
             ),
             label: sortedBreakpoints[i][0],
@@ -114,15 +113,15 @@ const handleWindowSizeChange = (
         let toastText =
             upperBound === Number.MAX_VALUE
                 ? i18next.t("screenSize:toast.enterBiggestScreenRange", {
-                      lowerBound,
-                  })
+                    lowerBound,
+                })
                 : i18next.t("screenSize:toast.enterNewScreenRange", {
-                      lowerBound: lowerBound,
-                      upperBound: upperBound,
-                  });
+                    lowerBound: lowerBound,
+                    upperBound: upperBound,
+                });
         Toastify({
             text: toastText,
-            duration: 3000,
+            duration: 1000,
             gravity: "top",
             position: "right",
             stopOnFocus: true,

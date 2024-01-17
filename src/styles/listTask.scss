@@ -211,6 +211,7 @@
     // padding: 0 !important;
     // margin: 0 !important;
     height: 0;
+    scrollbar-width: none;
     top: 170px !important;
     overflow: hidden;
     right: 8px !important;
@@ -224,6 +225,10 @@
             }
         }
     }
+}
+
+.dotted-list::-webkit-scrollbar {
+    display: none;
 }
 
 .dot-blink {

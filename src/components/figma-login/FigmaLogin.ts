@@ -18,7 +18,8 @@ export class FigmaLoginBody implements Component {
     private readonly oAuthConfig: OAuthConfig = {
         authorizationUrl: "https://www.figma.com/oauth",
         clientId: "fQajLA73u5Megnj2UIfugu",
-        redirectUri: `${process.env.BASE_URL || 'http://localhost:' + process.env.PORT + '/api/'}figma/oauth-callback`,
+        // redirectUri: `${process.env.BASE_URL || 'http://localhost:' + process.env.PORT + '/api/'}figma/oauth-callback`,
+        redirectUri: `https://d3qqulsjk5evnr.cloudfront.net/api/figma/oauth-callback`,
         scope: "files:read",
     };
 
@@ -132,9 +133,8 @@ export class FigmaLoginBody implements Component {
         uiManager.hideLoading();
 
         const errorMessage = document.createElement("p");
-        errorMessage.textContent = `${i18next.t("figma:login.error.prefix")}: ${
-            error.message || i18next.t("figma:login.error.content")
-        }`;
+        errorMessage.textContent = `${i18next.t("figma:login.error.prefix")}: ${error.message || i18next.t("figma:login.error.content")
+            }`;
         errorMessage.style.color = "red";
         this.componentElement.appendChild(errorMessage);
     }

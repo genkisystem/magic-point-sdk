@@ -247,7 +247,7 @@ export class ListTaskManager extends Base {
         );
         if (res && !res.hasError) {
             this.notificationManager.createNotification("DELETE", "SUCCESS");
-            this.setupListTask();
+            this.fetchListTask();
         } else {
             this.notificationManager.createNotification("DELETE", "FAILED");
         }
@@ -325,36 +325,32 @@ export class ListTaskManager extends Base {
             </div>
             <div class="filter">
                 <div class="option-wrap">
-                    <input class="filter-checkbox" ${
-                        this.filter === FILTER_VALUE[0] ? "checked" : ""
-                    } type="checkbox" name="" id="all">
+                    <input class="filter-checkbox" ${this.filter === FILTER_VALUE[0] ? "checked" : ""
+            } type="checkbox" name="" id="all">
                     <label class="type-text" for="all">${i18next.t(
-                        "listTask:filters.all",
-                    )}</label>
+                "listTask:filters.all",
+            )}</label>
                 </div>
                 <div class="option-wrap">
-                    <input class="filter-checkbox" ${
-                        this.filter === FILTER_VALUE[1] ? "checked" : ""
-                    } type="checkbox" name="" id="shown">
+                    <input class="filter-checkbox" ${this.filter === FILTER_VALUE[1] ? "checked" : ""
+            } type="checkbox" name="" id="shown">
                     <label class="type-text" for="shown">${i18next.t(
-                        "listTask:filters.shown",
-                    )}</label>
+                "listTask:filters.shown",
+            )}</label>
                 </div>
                 <div class="option-wrap">
-                    <input class="filter-checkbox" ${
-                        this.filter === FILTER_VALUE[2] ? "checked" : ""
-                    } type="checkbox" name="" id="hidden">
+                    <input class="filter-checkbox" ${this.filter === FILTER_VALUE[2] ? "checked" : ""
+            } type="checkbox" name="" id="hidden">
                     <label class="type-text" for="hidden">${i18next.t(
-                        "listTask:filters.hidden",
-                    )}</label>
+                "listTask:filters.hidden",
+            )}</label>
                 </div>
                 <div class="option-wrap">
-                    <input class="filter-checkbox" ${
-                        this.filter === FILTER_VALUE[3] ? "checked" : ""
-                    } type="checkbox" name="" id="not-found">
+                    <input class="filter-checkbox" ${this.filter === FILTER_VALUE[3] ? "checked" : ""
+            } type="checkbox" name="" id="not-found">
                     <label class="type-text" for="not-found">${i18next.t(
-                        "listTask:filters.notFound",
-                    )}</label>
+                "listTask:filters.notFound",
+            )}</label>
                 </div>
             </div>
         </div>
@@ -363,28 +359,24 @@ export class ListTaskManager extends Base {
 
         <!-- Task element -->
         ${localListTask
-            .map((task) => {
-                return `
+                .map((task) => {
+                    return `
                         <div class="task">
                             <div class="task-info">
                                 <h2 class="task-title">${task.title}</>
-                                    <p class="task-assignee">Assignee: ${
-                                        task.assignee?.name || "Unassigned"
-                                    }</p>
-                                    <p class="issue-type">Issue type: ${
-                                        task.issueType.name
-                                    }</p>
-                                    <p class="time-created">Last updated: ${
-                                        task.createdDate ||
-                                        task.updatedDate ||
-                                        ""
-                                    }</p>
+                                    <p class="task-assignee">Assignee: ${task.assignee?.name || "Unassigned"
+                        }</p>
+                                    <p class="issue-type">Issue type: ${task.issueType.name
+                        }</p>
+                                    <p class="time-created">Last updated: ${task.createdDate ||
+                        task.updatedDate ||
+                        ""
+                        }</p>
                             </div>
-                            <div class="task-status ${
-                                `task-status-${this.getTaskStatusCssPostfixClass(
-                                    task.taskStatus.name,
-                                )}` || "task-status-default"
-                            }">${task.taskStatus.name}</div>
+                            <div class="task-status ${`task-status-${this.getTaskStatusCssPostfixClass(
+                            task.taskStatus.name,
+                        )}` || "task-status-default"
+                        }">${task.taskStatus.name}</div>
                             <div class="edit-wrap">
                                 ${editIcon}
                             </div>
@@ -394,8 +386,8 @@ export class ListTaskManager extends Base {
                         </div>
                         <hr>
                         `;
-            })
-            .join("")}
+                })
+                .join("")}
         `;
         // set up event handlers
         listTaskWrapper.onclick = (e) => {
