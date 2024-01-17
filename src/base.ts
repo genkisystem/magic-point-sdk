@@ -1,6 +1,7 @@
 // import fetch from 'isomorphic-unfetch'
 import { Breakpoints } from "./utils"
 import { Iso639_1LanguageCodesValue } from "./services/i18n"
+// import { env } from "process"
 
 export type ConfigurationOptions = {
     apiKey: string,
@@ -24,7 +25,7 @@ export abstract class Base {
     public baseUrl: string
     constructor(config: ConfigurationOptions) {
         this.apiKey = config.apiKey
-        this.baseUrl = `https://d3qqulsjk5evnr.cloudfront.net/api/`
+        this.baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}/api`
         console.log('baseUrl:', this.baseUrl)
     }
 

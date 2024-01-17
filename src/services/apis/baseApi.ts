@@ -37,7 +37,7 @@ export class BaseApi {
         const headers = new Headers({
             "content-type": "application/json",
             "api-key": licenseManagerInstance.getApiKey()!,
-            "Access-Control-Allow-Origin": "",
+            // "Access-Control-Allow-Origin": "",
         });
         const config: RequestInit = {
             method,
