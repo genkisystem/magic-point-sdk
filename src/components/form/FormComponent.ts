@@ -196,9 +196,7 @@ export class FormComponent {
         closeCallback?: () => void,
         initTask?: Task,
     ): void {
-        if (initTask) {
-            this.setInitialValues(initTask);
-        }
+        this.setInitialValues(initTask);
         this.renderField();
         this.imageEditorWrapper.loadImage(image);
         this.formContainer.style.display = "block";
