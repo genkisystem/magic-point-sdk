@@ -3,7 +3,7 @@ import { Task } from "../list-task/types/Task";
 import { FormComponent } from "./FormComponent";
 
 export class FormManager {
-    private onSubmitCallback: (data: GenericRequest<Task>) => void = () => {};
+    private onSubmitCallback: (data: GenericRequest<Task>) => void = () => { };
     private onCloseCallback?: () => void;
     private currentDomString: string;
     private currentCoordinate: string;
