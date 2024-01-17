@@ -97,8 +97,9 @@ class MagicPoint extends Base {
     }
 
     private initializeBindings(): void {
-        this.createDotEventListenerHandler =
-            this.createDotEventListenerHandler.bind(this);
+        this.createDotEventListenerHandler = this.createDotEventListenerHandler.bind(this);
+        this.disableMagicPoint = this.disableMagicPoint.bind(this);
+        this.enableMagicPoint = this.enableMagicPoint.bind(this);
         this.magicPointListener = this.magicPointListener.bind(this);
     }
 
@@ -178,6 +179,7 @@ class MagicPoint extends Base {
     }
 
     private createDotEventListenerHandler(e: MouseEvent) {
+        this.disableMagicPoint();
         const path = e.composedPath();
         this.formManager.setCurrentDomString(getPointDom(path));
         this.formManager.setCurrentCoordinate(this.calcPointCoordinate(e));
@@ -187,8 +189,6 @@ class MagicPoint extends Base {
             this.setupFormSubmission(e);
             this.formManager.createForm(canvas);
         });
-
-        this.disableMagicPoint();
     }
 
     private calcPointCoordinate(e: MouseEvent): string {
@@ -416,6 +416,8 @@ class MagicPoint extends Base {
         EventBusInstance.on("create-tags", (x, y, title) => {
             this.tagManager.createTag(x, y, title);
         });
+        EventBusInstance.on('disable-magic-point', this.disableMagicPoint)
+        EventBusInstance.on('enable-magic-point', this.enableMagicPoint)
     }
 }
 

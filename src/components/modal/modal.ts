@@ -1,6 +1,8 @@
+import { EventBusInstance } from "@services";
+
 export class ModalManager {
     private modalElement: HTMLDivElement | null = null;
-    private callback: () => void = () => {};
+    private callback: () => void = () => { };
 
     private createModal(): HTMLDivElement {
         const modal = document.createElement("div");
@@ -16,30 +18,34 @@ export class ModalManager {
         // Event listeners
         modal
             .querySelector("#modal-ok")
-            ?.addEventListener("click", () => this.handleOk());
+            ?.addEventListener("click", (e) => this.handleOk(e));
         modal
             .querySelector("#modal-cancel")
-            ?.addEventListener("click", () => this.handleCancel());
+            ?.addEventListener("click", (e) => this.handleCancel(e));
 
         return modal;
     }
 
-    private handleOk(): void {
+    private handleOk(e: Event): void {
+        e.stopPropagation()
         this.closeModal();
         this.callback();
     }
 
-    private handleCancel(): void {
+    private handleCancel(e: Event): void {
+        e.stopPropagation()
         this.closeModal();
     }
 
     private openModal(): void {
+        EventBusInstance.emit('disable-magic-point')
         if (this.modalElement) {
             this.modalElement.style.display = "flex"; // Show the modal
         }
     }
 
     private closeModal(): void {
+        EventBusInstance.emit('enable-magic-point')
         if (this.modalElement) {
             this.modalElement.style.display = "none"; // Hide the modal
         }
