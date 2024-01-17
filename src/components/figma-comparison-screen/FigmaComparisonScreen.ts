@@ -24,7 +24,7 @@ import {
 
 import i18next from "i18next";
 import { GenericRequest } from "../../base";
-import { ButtonComponent } from "../button/ButtonComponent";
+import { ButtonComponent } from "../Button/ButtonComponent";
 import { Component } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";
 import { Task } from "../list-task/types/Task";

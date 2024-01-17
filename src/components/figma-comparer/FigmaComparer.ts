@@ -2,7 +2,7 @@ import { FigmaClient, HtmlImageComparer } from "@services";
 import { createDivElement } from "@utils";
 import i18next from "i18next";
 import { GenericRequest } from "../../base";
-import { IButtonConfig } from "../button/ButtonComponent";
+import { IButtonConfig } from "../Button/ButtonComponent";
 import { Component } from "../common";
 import { FigmaComparerBody } from "../figma-compare-body/FigmaComparerBody";
 import {

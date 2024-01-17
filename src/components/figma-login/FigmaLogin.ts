@@ -5,7 +5,7 @@ import {
     GetUserMeResult,
 } from "figma-api/lib/api-types";
 import i18next from "i18next";
-import { ButtonComponent, IButtonConfig } from "../button/ButtonComponent";
+import { ButtonComponent, IButtonConfig } from "../Button/ButtonComponent";
 import { Component, SelectItem } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";
 
@@ -133,9 +133,8 @@ export class FigmaLoginBody implements Component {
         this.hideLoading();
 
         const errorMessage = document.createElement("p");
-        errorMessage.textContent = `${i18next.t("figma:login.error.prefix")}: ${
-            error.message || i18next.t("figma:login.error.content")
-        }`;
+        errorMessage.textContent = `${i18next.t("figma:login.error.prefix")}: ${error.message || i18next.t("figma:login.error.content")
+            }`;
         errorMessage.style.color = "red";
         this.componentElement.appendChild(errorMessage);
     }
