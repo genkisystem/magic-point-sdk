@@ -179,7 +179,9 @@ export class FormComponent {
     }
 
     public close(): void {
-        EventBusInstance.emit('enable-magic-point')
+        if (!this.initialTask) {
+            EventBusInstance.emit('enable-magic-point')
+        }
         this.resetComponent();
         this.componentElement.style.display = "none";
     }
