@@ -144,23 +144,18 @@ export class HtmlImageComparer {
 
         const diffPoints = await this.processDifferences(diffData, bodyCopy);
 
-        const capturePromises = diffPoints.map(async (point) => {
+        const capturedDiffPoints: ElementBounds[] = [];
+        for (const point of diffPoints) {
             const element = findElementAtPosition(
                 bodyCopy,
                 point.pageX,
                 point.pageY,
             );
-            if (element) {
-                const elementImage =
-                    await this.captureElementAsDataURL(element);
-
-                return { ...point, image: elementImage };
-            }
-
-            return point;
-        });
-
-        const capturedDiffPoints = await Promise.all(capturePromises);
+            const elementImage = element
+                ? await this.captureElementAsDataURL(element)
+                : undefined;
+            capturedDiffPoints.push({ ...point, image: elementImage });
+        }
 
         const imageCanvas: HTMLCanvasElement = drawBugCanvas(
             bodyCanvas,

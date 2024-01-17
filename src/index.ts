@@ -98,7 +98,8 @@ class MagicPoint extends Base {
     }
 
     private initializeBindings(): void {
-        this.createDotEventListenerHandler = this.createDotEventListenerHandler.bind(this);
+        this.createDotEventListenerHandler =
+            this.createDotEventListenerHandler.bind(this);
         this.disableMagicPoint = this.disableMagicPoint.bind(this);
         this.enableMagicPoint = this.enableMagicPoint.bind(this);
         this.magicPointListener = this.magicPointListener.bind(this);
@@ -122,14 +123,12 @@ class MagicPoint extends Base {
     }
 
     private async createTask(task: GenericRequest<Task>): Promise<boolean> {
-        uiManager.showLoading();
         if (task.appData.id) {
             const res: GenericResponse<Task> = await this.invoke(
                 "PUT",
                 `sdk/task/${task.appData.id}`,
                 task,
             );
-            uiManager.hideLoading();
             if (res && !res.hasError && Object.keys(res.appData).length > 0) {
                 EventBusInstance.emit("fetchTask"); // emit event to re-fetch task
                 notification.createNotification(
@@ -145,7 +144,6 @@ class MagicPoint extends Base {
         }
         // Create task
         let res: any = await this.post("sdk/task", task);
-        uiManager.hideLoading();
         if (!res?.hasError) {
             notification.createNotification("CREATE", "SUCCESS", res.appData);
             this.listTaskManager.fetchListTask(
@@ -159,7 +157,14 @@ class MagicPoint extends Base {
     }
 
     private async createTasks(tasks: any[]): Promise<void> {
-        await Promise.all(tasks.map((data) => this.createTask(data)));
+        try {
+            uiManager.showLoading();
+            await Promise.all(tasks.map((data) => this.createTask(data)));
+        } catch (error) {
+            console.error("Error creating tasks: ", error);
+        } finally {
+            uiManager.hideLoading();
+        }
     }
 
     private closeForm() {
@@ -206,12 +211,20 @@ class MagicPoint extends Base {
     private setupFormSubmission(e: MouseEvent): void {
         this.formManager.setCallback(
             (formData: GenericRequest<Task>) => {
-                this.createTask(formData).then((isSuccess) => {
-                    if (isSuccess) {
-                        // this.tagManager.createTag(e.clientX, e.clientY, formData.appData.title);
-                        this.enableMagicPoint();
-                    }
-                });
+                uiManager.showLoading();
+                this.createTask(formData)
+                    .then((isSuccess) => {
+                        if (isSuccess) {
+                            // this.tagManager.createTag(e.clientX, e.clientY, formData.appData.title);
+                            this.enableMagicPoint();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error creating task: ", error);
+                    })
+                    .finally(() => {
+                        uiManager.hideLoading();
+                    });
             },
             () => {
                 this.isFormOpen = false;
@@ -418,8 +431,8 @@ class MagicPoint extends Base {
         EventBusInstance.on("create-tags", (x, y, title) => {
             this.tagManager.createTag(x, y, title);
         });
-        EventBusInstance.on('disable-magic-point', this.disableMagicPoint)
-        EventBusInstance.on('enable-magic-point', this.enableMagicPoint)
+        EventBusInstance.on("disable-magic-point", this.disableMagicPoint);
+        EventBusInstance.on("enable-magic-point", this.enableMagicPoint);
     }
 }
 
