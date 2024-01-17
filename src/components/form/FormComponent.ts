@@ -3,7 +3,7 @@ import {
     convertSelectItemToType,
     convertTypeToSelectItem,
 } from "@components/common";
-import { ImageEditorWrapper2 } from "@components/image-editor/ImageEditor2";
+import { ImageEditorWrapper } from "@components/image-editor/ImageEditor";
 import { Task } from "@components/list-task/types/Task";
 import { Type } from "@components/list-task/types/Type";
 import {
@@ -34,7 +34,7 @@ export class FormComponent {
     private static instance: FormComponent;
     private componentElement: HTMLElement;
 
-    private imageEditorWrapper!: ImageEditorWrapper2;
+    private imageEditorWrapper!: ImageEditorWrapper;
 
     private issueTypes: SelectItem[] = [];
     private assignees: SelectItem[] = [];
@@ -196,7 +196,7 @@ export class FormComponent {
         const imageEditorDiv = createDivElement();
         imageColumn.appendChild(imageEditorDiv);
 
-        this.imageEditorWrapper = new ImageEditorWrapper2(imageEditorDiv);
+        this.imageEditorWrapper = new ImageEditorWrapper(imageEditorDiv);
 
         return imageColumn;
     }
