@@ -25,7 +25,8 @@ export abstract class Base {
     public baseUrl: string
     constructor(config: ConfigurationOptions) {
         this.apiKey = config.apiKey
-        this.baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}/api`
+        // this.baseUrl = 'process.env.BASE_URL || `http://localhost:${process.env.PORT}/api`' 
+        this.baseUrl = "https://d3qqulsjk5evnr.cloudfront.net/api/"
         console.log('baseUrl:', this.baseUrl)
     }
 
