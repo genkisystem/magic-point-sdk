@@ -21,8 +21,6 @@ export class FigmaComparerBody implements Component {
         private onSelectedItemChange: (selectedItem: TreeItem) => void,
         private onTaskChange: (t: GenericRequest<Task>[]) => void,
         private updateFooter: (configs: FooterButtonConfigs) => void,
-        private showLoading: () => void,
-        private hideLoading: () => void,
         private teamIds: string[],
         initialActiveScreenIndex?: number,
     ) {
@@ -59,8 +57,6 @@ export class FigmaComparerBody implements Component {
                     this.loginScreen = new FigmaLoginBody(
                         this.figmaClient,
                         this.updateFooter,
-                        this.showLoading,
-                        this.hideLoading,
                         this.teamIds,
                     ).render();
                 }

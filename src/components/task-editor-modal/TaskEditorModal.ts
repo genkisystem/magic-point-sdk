@@ -2,7 +2,7 @@ import { FormManager } from "@components/form";
 import { Task } from "@components/list-task/types/Task";
 import { Type } from "@components/list-task/types/Type";
 import { ElementBounds } from "@services";
-import { BASE64_IMAGE_PREFIX } from "@utils";
+import { generateBase64Prefix } from "@utils";
 import { GenericRequest } from "src/base";
 
 export interface ITask {
@@ -55,7 +55,7 @@ export class TaskEditorModal {
                     pointCoordinate: `${0}#${0}`,
                     screenSize: window.innerWidth,
                     bugPosition: this.taskData.bugPosition,
-                    });
+                });
             }
             this.formManager.closeForm();
         });
@@ -102,11 +102,8 @@ export class TaskEditorModal {
             img.onerror = () => {
                 console.error("Failed to load image");
             };
-            if (!this.taskData.image.startsWith(BASE64_IMAGE_PREFIX)) {
-                this.taskData.image = BASE64_IMAGE_PREFIX + this.taskData.image;
-            }
 
-            img.src = this.taskData.image;
+            img.src = generateBase64Prefix(this.taskData.image);
         }
     }
 

@@ -4,5 +4,6 @@ export default {
     submit: 'Submit',
     assignee: 'Assignee',
     status: 'Status',
-    cancel: 'Cancel'
+    cancel: 'Cancel',
+    type: 'Type',
 }
