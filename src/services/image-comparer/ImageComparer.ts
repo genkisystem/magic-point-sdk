@@ -24,6 +24,10 @@ export interface CanvasWithDots {
     figmaCanvas: HTMLCanvasElement;
     bugCanvas: HTMLCanvasElement;
     webCanvas: HTMLCanvasElement;
+    screenSizes: {
+        width: number;
+        height: number;
+    };
 }
 
 export class HtmlImageComparer {
@@ -133,6 +137,10 @@ export class HtmlImageComparer {
                 bugCanvas: bodyCanvas,
                 webCanvas: bodyCanvas,
                 figmaCanvas: figmaCanvas,
+                screenSizes: {
+                    width: originalFigmaImage.naturalWidth,
+                    height: originalFigmaImage.naturalHeight,
+                },
             };
         }
 
@@ -168,6 +176,10 @@ export class HtmlImageComparer {
             bugCanvas: imageCanvas,
             webCanvas: bodyCanvas,
             figmaCanvas: figmaCanvas,
+            screenSizes: {
+                width: originalFigmaImage.naturalWidth,
+                height: originalFigmaImage.naturalHeight,
+            },
         };
     }
 
@@ -225,7 +237,6 @@ export class HtmlImageComparer {
         }
 
         const diffImage = diffData.getImageDataUrl();
-        console.log("diffImage", diffImage);
 
         const img = new Image();
         img.src = diffImage;

@@ -5,7 +5,7 @@ import {
     FigmaClient,
     FileImageMap,
 } from "@services";
-import { analyzeScreen, createDivElement } from "@utils";
+import { createDivElement } from "@utils";
 import i18next from "i18next";
 import { Component } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";
@@ -103,10 +103,7 @@ export class FigmaSelectionScreen implements Component {
             flexContainer.appendChild(image);
             this.previewElement.appendChild(flexContainer);
         }
-        if (this.selectedItem?.node) {
-            console.log(this.selectedItem.node);
-            analyzeScreen(this.selectedItem.node);
-        }
+        // TODO: analyze screen
     }
 
     renderComponent(): void {

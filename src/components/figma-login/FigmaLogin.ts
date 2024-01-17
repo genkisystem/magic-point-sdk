@@ -1,4 +1,4 @@
-import { FigmaClient, OAuthClient, OAuthConfig } from "@services";
+import { FigmaClient, OAuthClient, OAuthConfig, uiManager } from "@services";
 import { createDivElement } from "@utils";
 import {
     GetTeamProjectsResult,
@@ -29,8 +29,6 @@ export class FigmaLoginBody implements Component {
     constructor(
         private figmaClient: FigmaClient,
         private updateFooter: (configs: FooterButtonConfigs) => void,
-        private showLoading: () => void,
-        private hideLoading: () => void,
         private teamIds: string[],
     ) {
         this.componentElement = createDivElement({
@@ -101,7 +99,7 @@ export class FigmaLoginBody implements Component {
             const { figma_token } = event.data;
             if (figma_token) {
                 try {
-                    this.showLoading();
+                    uiManager.showLoading();
                     this.figmaClient.setToken(figma_token);
                     this.teams = await this.figmaClient.fetchFigmaTeams(
                         this.teamIds,
@@ -130,17 +128,18 @@ export class FigmaLoginBody implements Component {
     }
 
     private showError(error: any): void {
-        this.hideLoading();
+        uiManager.hideLoading();
 
         const errorMessage = document.createElement("p");
-        errorMessage.textContent = `${i18next.t("figma:login.error.prefix")}: ${error.message || i18next.t("figma:login.error.content")
-            }`;
+        errorMessage.textContent = `${i18next.t("figma:login.error.prefix")}: ${
+            error.message || i18next.t("figma:login.error.content")
+        }`;
         errorMessage.style.color = "red";
         this.componentElement.appendChild(errorMessage);
     }
 
     private updateScreen() {
-        this.hideLoading();
+        uiManager.hideLoading();
         this.renderComponent();
     }
 
@@ -181,7 +180,7 @@ export class FigmaLoginBody implements Component {
     private async preClickFetchTeamInfo(): Promise<boolean | Error> {
         if (this.teamId) {
             try {
-                this.showLoading();
+                uiManager.showLoading();
                 const team = this.teams.get(this.teamId);
                 if (team) {
                     await this.figmaClient.fetchFigmaFiles(team);
@@ -192,7 +191,7 @@ export class FigmaLoginBody implements Component {
                 this.showError(error);
                 return new Error(i18next.t("figma:login.fetchTeamFailedMsg"));
             } finally {
-                this.hideLoading();
+                uiManager.hideLoading();
                 this.updateFooter({
                     nextButtonConfig: {
                         preClick: undefined,

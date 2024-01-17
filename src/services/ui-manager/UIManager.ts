@@ -1,3 +1,5 @@
+import { createDivElement } from "@utils";
+
 export class UIManager {
     private static _instance: UIManager;
     private _container: HTMLElement | null;
@@ -15,29 +17,45 @@ export class UIManager {
     }
 
     public addElement(element: HTMLElement): void {
-        if (!this._container) {
-            console.warn("Container is not set. Unable to add element.");
-            return;
-        }
-        this._container.appendChild(element);
+        this.checkContainer();
+        this._container!.appendChild(element);
+    }
+
+    public findElementByClass(className: string): HTMLElement | null {
+        this.checkContainer();
+        return this._container!.querySelector(`.${className}`);
     }
 
     public findElementById(id: string): HTMLElement | null {
-        if (!this._container) {
-            console.warn("Container is not set. Unable to find element.");
-            return null;
-        }
-
-        return this._container.querySelector(`#${id}`);
+        this.checkContainer();
+        return this._container!.querySelector(`#${id}`);
     }
 
     public removeElement(element: HTMLElement): void {
-        if (!this._container) {
-            console.warn("Container is not set. Unable to remove element.");
-            return;
-        }
+        this.checkContainer();
+        this._container!.removeChild(element);
+    }
 
-        this._container.removeChild(element);
+    public showLoading(): void {
+        const loadingModal = createDivElement({ className: "loading-modal" });
+        const loadingSpinner = createDivElement({
+            className: "loading-spinner",
+        });
+        loadingModal.appendChild(loadingSpinner);
+        this.addElement(loadingModal);
+    }
+
+    public hideLoading(): void {
+        const loadingModal = this.findElementByClass("loading-modal");
+        if (loadingModal) {
+            this.removeElement(loadingModal);
+        }
+    }
+
+    private checkContainer(): void {
+        if (!this._container) {
+            throw new Error("Container is not set.");
+        }
     }
 }
 

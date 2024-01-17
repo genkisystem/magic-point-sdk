@@ -3,6 +3,9 @@ export enum StateKeys {
     Assignee = "assignee",
     Status = "status",
     Issue = "issue",
+    InitAssignee = 'initAssignee',
+    InitStatus = 'initStatus',
+    InitIssue = 'initIssue',
 }
 
 type Listener<T> = (state: T) => void;

@@ -10,22 +10,30 @@ import {
     unCollapsedIcon,
 } from "@icons";
 
-import { CanvasWithDots, ImageComparisonSlider, ImageOverlay } from "@services";
+import {
+    CanvasWithDots,
+    ImageComparisonSlider,
+    ImageOverlay,
+    StateKeys,
+    globalStateManager,
+} from "@services";
 
 import {
+    BLANK_IMAGE,
     createButton,
     createDivElement,
     drawBugCanvas,
     findElementAtPosition,
     getComposedPathForHTMLElement,
     getPointDom,
+    removeBase64Prefix,
     resizeCanvas,
 } from "@utils";
 
 import i18next from "i18next";
 import { GenericRequest } from "../../base";
 import { ButtonComponent } from "../Button/ButtonComponent";
-import { Component } from "../common";
+import { Component, SelectItem, convertSelectItemToType } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";
 import { Task } from "../list-task/types/Task";
 import { ITask, TaskEditorModal } from "../task-editor-modal/TaskEditorModal";
@@ -63,6 +71,9 @@ export class FigmaComparisonScreen implements Component {
 
     private mode: CompareMode;
 
+    private screenWidth!: number;
+    private screenHeight!: number;
+
     constructor(
         private updateFooter: (configs: FooterButtonConfigs) => void,
         private onTasksChange: (t: GenericRequest<Task>[]) => void,
@@ -85,6 +96,8 @@ export class FigmaComparisonScreen implements Component {
         this.componentElement = createDivElement({
             className: "figma-comparison-container",
         });
+        this.componentElement.id = "figma-comparison-container";
+
         this.leftPanel = createDivElement({
             className: "figma-comparison-left",
         });
@@ -100,11 +113,15 @@ export class FigmaComparisonScreen implements Component {
 
     private initializeTasks(): ITask[] {
         if (!this.diffData) return [];
+
+        this.screenWidth = this.diffData.screenSizes.width;
+        this.screenHeight = this.diffData.screenSizes.height;
+
         return this.diffData.diffPositions.map(
             (t, index): ITask => ({
                 title: `Task #${index + 1} Title`,
                 description: `Task #${index + 1} Description`,
-                image: t.image ?? "data:image/png;base64,...",
+                image: t.image ?? BLANK_IMAGE,
                 pageX: t.pageX,
                 pageY: t.pageY,
                 pointCoordinate: `${0}#${0}`,
@@ -259,6 +276,7 @@ export class FigmaComparisonScreen implements Component {
         const selectedTask = this.tasks.filter((_, i) =>
             this.checkedTasks.includes(i),
         );
+        if (selectedTask.length === 0) return [];
 
         const originalStyles = {
             width: document.body.style.width,
@@ -268,10 +286,10 @@ export class FigmaComparisonScreen implements Component {
             overflow: document.body.style.overflow,
         };
 
-        document.body.style.width = `${1920}px`;
-        document.body.style.height = `${1080}px`;
-        document.body.style.maxHeight = `${1080}px`;
-        document.body.style.minHeight = `${1080}px`;
+        document.body.style.width = `${this.screenWidth}px`;
+        document.body.style.height = `${this.screenHeight}px`;
+        document.body.style.maxHeight = `${this.screenHeight}px`;
+        document.body.style.minHeight = `${this.screenHeight}px`;
         document.body.style.overflow = "hidden";
 
         const request = selectedTask.map((t): GenericRequest<Task> => {
@@ -288,22 +306,31 @@ export class FigmaComparisonScreen implements Component {
 
             return {
                 appData: {
-                    assignee: t.assignee ?? {
-                        id: 0,
-                        name: "",
-                    },
+                    assignee:
+                        t.assignee ??
+                        convertSelectItemToType(
+                            globalStateManager.getState<SelectItem>(
+                                StateKeys.InitAssignee,
+                            )!,
+                        ),
                     title: t.title,
                     description: t.description,
-                    base64Images: [t.image],
+                    base64Images: [removeBase64Prefix(t.image)],
                     pointDom: pDom,
-                    issueType: t.issueType ?? {
-                        id: 0,
-                        name: "",
-                    },
-                    taskStatus: t.taskStatus ?? {
-                        id: 0,
-                        name: "",
-                    },
+                    issueType:
+                        t.issueType ??
+                        convertSelectItemToType(
+                            globalStateManager.getState<SelectItem>(
+                                StateKeys.InitIssue,
+                            )!,
+                        ),
+                    taskStatus:
+                        t.taskStatus ??
+                        convertSelectItemToType(
+                            globalStateManager.getState<SelectItem>(
+                                StateKeys.InitStatus,
+                            )!,
+                        ),
                     endPoint: window.location.pathname,
                     screenSize: window.innerWidth,
                     pointCoordinate: `${0}#${0}`,

@@ -16,8 +16,9 @@ export class FigmaComparerHeader implements Component {
         this._activeStepIndex = activeStepIndex;
 
         this.containerElement = createDivElement({
-            className: "modal-components-wizard-he",
+            className: "figma-header",
         });
+        this.containerElement.id = "figma-header-component";
 
         this.renderComponent();
     }
@@ -95,12 +96,8 @@ export class FigmaComparerHeader implements Component {
         baseHead.appendChild(closeDiv);
         baseHeadParent.appendChild(baseHead);
         baseHeadParent.appendChild(stepperLoaded);
-        baseHeadParent.appendChild(
-            createDivElement({ className: "spacer-24px" }),
-        );
         baseHeadParent.appendChild(createDivElement({ className: "spacer" }));
-        baseHeadParent.appendChild(createDivElement({ className: "filler" }));
-
+        
         this.containerElement.appendChild(baseHeadParent);
     }
 

@@ -21,7 +21,7 @@ export class FooterComponent {
         this.nextButtonConfig = configs.nextButtonConfig;
 
         this.componentElement = createDivElement({ className: "footer" });
-
+        this.componentElement.id = "footer-component";
         this._activeStepIndex = initialActiveStepIndex ?? 0;
         this.renderComponent();
     }

@@ -1,4 +1,4 @@
-import { FigmaClient, HtmlImageComparer } from "@services";
+import { FigmaClient, HtmlImageComparer, uiManager } from "@services";
 import { createDivElement } from "@utils";
 import i18next from "i18next";
 import { GenericRequest } from "../../base";
@@ -67,8 +67,6 @@ export class FigmaComparer implements Component {
             this.onSelectedItemChange.bind(this),
             this.onTasksChange.bind(this),
             this.updateFooter.bind(this),
-            this.showLoading.bind(this),
-            this.hideLoading.bind(this),
             this.teamIds,
             this.activeStep,
         );
@@ -163,7 +161,7 @@ export class FigmaComparer implements Component {
             return;
         }
 
-        this.showLoading();
+        uiManager.showLoading();
         this.htmlComparer
             .findDifferencePosition(this.selectedFigmaScreen.imageUrl)
             .then((diffPosition) => {
@@ -171,10 +169,9 @@ export class FigmaComparer implements Component {
             })
             .catch((error) => {
                 console.error("Error during image comparison:", error);
-                console.trace();
             })
             .finally(() => {
-                this.hideLoading();
+                uiManager.hideLoading();
             });
     }
 
@@ -191,9 +188,14 @@ export class FigmaComparer implements Component {
     private processTaskStep() {
         if (!this.tasks) return;
 
-        this.onCreateTasks(this.tasks).then(() => {
-            this.closeModal();
-        });
+        uiManager.showLoading();
+        this.onCreateTasks(this.tasks)
+            .then(() => {
+                this.closeModal();
+            })
+            .finally(() => {
+                uiManager.hideLoading();
+            });
     }
 
     private goToNextStep(): void {
@@ -219,23 +221,6 @@ export class FigmaComparer implements Component {
         this.selectedFigmaScreen = null;
         this.updateComponentsStep();
         this.updateFooterComponent();
-    }
-
-    showLoading() {
-        const loadingModal = createDivElement({ className: "loading-modal" });
-        const loadingSpinner = createDivElement({
-            className: "loading-spinner",
-        });
-        loadingModal.appendChild(loadingSpinner);
-        this.componentElement.appendChild(loadingModal);
-    }
-
-    hideLoading() {
-        const loadingModal =
-            this.componentElement.querySelector(".loading-modal");
-        if (loadingModal) {
-            this.componentElement.removeChild(loadingModal);
-        }
     }
 
     renderComponent(): void {

@@ -10,7 +10,7 @@ import {
     DataApiInterface,
     StateKeys,
     globalStateManager,
-    uiManager
+    uiManager,
 } from "@services";
 import {
     BASE64_IMAGE_PREFIX,
@@ -112,19 +112,30 @@ export class FormComponent {
             case StateKeys.Assignee:
                 this.assignees = convertedData;
                 this.initialSelectedAssignee =
-                    this.assignees[0] ?? ({} as SelectItem);
+                    { ...this.assignees[0] } ?? ({} as SelectItem);
+
+                globalStateManager.setState(StateKeys.InitAssignee, {
+                    ...this.initialSelectedAssignee,
+                });
                 this.selectedAssignee = { ...this.initialSelectedAssignee };
                 break;
             case StateKeys.Issue:
                 this.issueTypes = convertedData;
                 this.initialSelectedIssueType =
-                    this.issueTypes[0] ?? ({} as SelectItem);
+                    { ...this.issueTypes[0] } ?? ({} as SelectItem);
+                globalStateManager.setState(StateKeys.InitIssue, {
+                    ...this.initialSelectedIssueType,
+                });
                 this.selectedIssueType = { ...this.initialSelectedIssueType };
                 break;
             case StateKeys.Status:
                 this.issueStatuses = convertedData;
                 this.initialSelectedIssueStatus =
-                    this.issueStatuses[0] ?? ({} as SelectItem);
+                    { ...this.issueStatuses[0] } ?? ({} as SelectItem);
+                globalStateManager.setState(StateKeys.InitStatus, {
+                    ...this.initialSelectedIssueStatus,
+                });
+
                 this.selectedIssueStatus = {
                     ...this.initialSelectedIssueStatus,
                 };
@@ -207,7 +218,7 @@ export class FormComponent {
         secondCol.appendChild(
             this.createSelectFieldRow(
                 FieldTypes.ISSUE_TYPE,
-                i18next.t("form:issue-type"),
+                i18next.t("form:Type"),
                 this.issueTypes,
                 this.selectedIssueType,
             ),
