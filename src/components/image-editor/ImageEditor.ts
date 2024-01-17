@@ -16,9 +16,7 @@ export class ImageEditorWrapper {
 
     public loadImage(image: string): void {
         this.ensureImageEditorInitialized();
-        setTimeout(() => {
-            this.imageEditor!.loadImageFromURL(image, "Image");
-        }, 0);
+        this.imageEditor!.loadImageFromURL(image, "Image");
     }
 
     public reset(): void {

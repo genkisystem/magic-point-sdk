@@ -92,6 +92,7 @@ class MagicPoint extends Base {
     }
 
     private initializeUI(): void {
+        document.body.appendChild(this.magicPointContainer);
         uiManager.setContainer(this.magicPointContainer);
         styleManager.init();
     }
@@ -120,12 +121,14 @@ class MagicPoint extends Base {
     }
 
     private async createTask(task: GenericRequest<Task>): Promise<boolean> {
+        uiManager.showLoading();
         if (task.appData.id) {
             const res: GenericResponse<Task> = await this.invoke(
                 "PUT",
                 `sdk/task/${task.appData.id}`,
                 task,
             );
+            uiManager.hideLoading();
             if (res && !res.hasError && Object.keys(res.appData).length > 0) {
                 EventBusInstance.emit("fetchTask"); // emit event to re-fetch task
                 notification.createNotification(
@@ -141,6 +144,7 @@ class MagicPoint extends Base {
         }
         // Create task
         let res: any = await this.post("sdk/task", task);
+        uiManager.hideLoading();
         if (!res?.hasError) {
             notification.createNotification("CREATE", "SUCCESS", res.appData);
             this.listTaskManager.fetchListTask(
@@ -378,8 +382,6 @@ class MagicPoint extends Base {
         this.magicPointDiv.append(normalButton, magicButton, figmaBtn);
 
         this.magicPointContainer.appendChild(this.magicPointDiv);
-
-        document.body.appendChild(this.magicPointContainer);
     }
 
     private insertMagicPointToggle(): void {

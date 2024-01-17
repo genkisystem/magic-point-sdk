@@ -209,6 +209,12 @@ export class ListTaskManager extends Base {
             this.listTask[elementIndex].id!,
         );
         const canvas = await this.createCanvasFromBase64(base64Image);
+        this.updateFormElement.setCurrentDomString(
+            this.listTask[elementIndex].pointDom,
+        );
+        this.updateFormElement.setCurrentCoordinate(
+            this.listTask[elementIndex].pointCoordinate,
+        );
         this.updateFormElement.createForm(canvas, this.listTask[elementIndex]);
         EventBusInstance.on("fetchTask", () => {
             this.fetchListTask();
