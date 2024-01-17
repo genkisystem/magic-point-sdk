@@ -1,9 +1,31 @@
-import i18next from 'i18next'
-import resources from './resources'
+import i18next from 'i18next';
+import resources from './resources';
+
+const Iso639_1LanguageCodes = [
+    "en",
+    "ja",
+    // "es",
+    // "fr",
+    // "de",
+    // "zh",
+    // "ru",
+    // "ar",
+    // "pt",
+    // "it",
+    // "hi",
+    // "nl",
+    // "sv",
+    // "el",
+    // "ko"
+    // Add more languages as needed
+] as const
+
+export type Iso639_1LanguageCodesValue = typeof Iso639_1LanguageCodes[number]
 
 //for init purpose only
 export class I18nManager {
-    constructor(lng: string) {
+    public t;
+    constructor(lng: Iso639_1LanguageCodesValue) {
         i18next.init({
             lng,
             fallbackLng: {
@@ -11,5 +33,6 @@ export class I18nManager {
             },
             resources: resources
         })
+        this.t = i18next.t
     }
 }

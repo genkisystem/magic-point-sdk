@@ -13,5 +13,11 @@ export type Task = {
     assignee: Assignee | null
     issueType: IssueType,
     endPoint: string,
-    isRender?: boolean
+    isRender?: boolean,
+    screenSize: number,
+    pointCoordinate: string,
+    hostElementOriginCoordinates?: {
+        width: number,
+        height: number
+    }
 }

@@ -1,7 +1,7 @@
 import { Component } from "../common";
-import css from "./button.scss";
 
 export interface IButtonConfig {
+    id?: string;
     text?: string;
     variant?: "text" | "contained" | "outlined";
     color?: "primary" | "secondary" | "error" | "warning";
@@ -10,10 +10,10 @@ export interface IButtonConfig {
     endIcon?: HTMLElement;
     extendClasses?: string[];
     preClick?: () => Promise<boolean | Error>;
-    onClick?: () => void;
+    onClick?: (e: MouseEvent) => void;
 }
 
-const BUTTON_BASE_CLASS = css["button"];
+const BUTTON_BASE_CLASS = "button";
 
 export class ButtonComponent implements Component {
     private componentElement: HTMLElement;
@@ -27,6 +27,7 @@ export class ButtonComponent implements Component {
 
     renderComponent(): void {
         const {
+            id,
             text,
             variant,
             color,
@@ -38,36 +39,43 @@ export class ButtonComponent implements Component {
             preClick,
         } = this.config;
         this.componentElement.innerHTML = "";
-        this.componentElement.className = `${BUTTON_BASE_CLASS} ${variant ? css[variant] : ""
-            } ${color ? css[color] : ""} ${extendClasses?.join(" ") || ""}`;
+        if (id) {
+            this.componentElement.id = id;
+        }
+        this.componentElement.className = `${BUTTON_BASE_CLASS} ${
+            variant ? variant : ""
+        } ${color ? color : ""} ${extendClasses?.join(" ") || ""}`;
         if (disabled) {
             (this.componentElement as HTMLButtonElement).disabled = true;
-            this.componentElement.classList.add(css["disabled"]);
+            this.componentElement.classList.add("disabled");
         }
 
         if (onClick) {
-            this.componentElement.addEventListener("click", async () => {
-                let shouldProceed = true;
+            this.componentElement.addEventListener(
+                "click",
+                async (e: MouseEvent) => {
+                    let shouldProceed = true;
 
-                if (preClick) {
-                    try {
-                        const result = await preClick();
-                        if (typeof result === "boolean") {
-                            shouldProceed = result;
-                        } else if (result instanceof Error) {
-                            console.error("Pre-click error:", result);
+                    if (preClick) {
+                        try {
+                            const result = await preClick();
+                            if (typeof result === "boolean") {
+                                shouldProceed = result;
+                            } else if (result instanceof Error) {
+                                console.error("Pre-click error:", result);
+                                shouldProceed = false;
+                            }
+                        } catch (error) {
+                            console.error("Error during pre-click:", error);
                             shouldProceed = false;
                         }
-                    } catch (error) {
-                        console.error("Error during pre-click:", error);
-                        shouldProceed = false;
                     }
-                }
 
-                if (shouldProceed) {
-                    onClick();
-                }
-            });
+                    if (shouldProceed) {
+                        onClick(e);
+                    }
+                },
+            );
         }
 
         if (startIcon) {

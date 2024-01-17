@@ -1,5 +1,5 @@
 export const getComposedPathForHTMLElement = (
-    element: HTMLElement | null
+    element: HTMLElement | null,
 ): EventTarget[] => {
     let path: EventTarget[] = [];
     while (element) {
