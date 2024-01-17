@@ -1,5 +1,5 @@
-import i18next from 'i18next'
-import resources from './resources'
+import i18next from 'i18next';
+import resources from './resources';
 
 const Iso639_1LanguageCodes = [
     "en",

@@ -14,7 +14,6 @@ export const getComposedPathForHTMLElement = (
 };
 
 export const getPointDom = (path: EventTarget[]): string => {
-    console.log("path: ", path)
     path.splice(-3);
     let pointDomTreeSelectorString = [];
     for (const nodeInPath of path as HTMLElement[]) {
