@@ -1,6 +1,7 @@
 import { FormManager } from "@components/form";
 import { Task } from "@components/list-task/types/Task";
 import { Type } from "@components/list-task/types/Type";
+import { ElementBounds } from "@services";
 import { BASE64_IMAGE_PREFIX } from "@utils";
 import { GenericRequest } from "src/base";
 
@@ -15,6 +16,7 @@ export interface ITask {
     issueType?: Type;
     pointCoordinate: string;
     screenSize: number;
+    bugPosition: ElementBounds;
 }
 
 export class TaskEditorModal {
@@ -52,7 +54,8 @@ export class TaskEditorModal {
                     issueType: formData.appData.issueType,
                     pointCoordinate: `${0}#${0}`,
                     screenSize: window.innerWidth,
-                });
+                    bugPosition: this.taskData.bugPosition,
+                    });
             }
             this.formManager.closeForm();
         });
