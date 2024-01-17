@@ -1,7 +1,5 @@
 import "img-comparison-slider";
 
-import "./slide.css";
-
 export class ImageComparisonSlider {
     private container: HTMLElement;
     private beforeImage!: HTMLImageElement;
@@ -14,7 +12,7 @@ export class ImageComparisonSlider {
         this.sliderEnabled = false;
 
         this.imgComparisonSlider = document.createElement(
-            "img-comparison-slider"
+            "img-comparison-slider",
         );
     }
 

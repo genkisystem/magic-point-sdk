@@ -1,13 +1,15 @@
+import { inputCloseIcon, searchIconSvg } from "@icons";
+
+import {
+    ExtendedGetProjectFilesResult,
+    FigmaClient,
+    FileImageMap,
+} from "@services";
+import { analyzeScreen, createDivElement } from "@utils";
 import i18next from "i18next";
-import closeIconSvg from "../../asset/input-close.svg";
-import searchIconSvg from "../../asset/look.svg";
-import { FigmaClient } from "../../services/figma/figma";
-import { FigmaProjectFileResponse, FileImageMap } from "../../services/figma/type";
-import { createDivElement } from "../../utils/html";
 import { Component } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";
 import { ScreenComponent, TreeItem } from "../tree/tree";
-import css from "./selection.scss";
 
 export class FigmaSelectionScreen implements Component {
     private componentElement: HTMLElement;
@@ -18,16 +20,17 @@ export class FigmaSelectionScreen implements Component {
     constructor(
         private figmaClient: FigmaClient,
         private updateFooter: (configs: FooterButtonConfigs) => void,
-        private onSelectedItemChange: (selectedItem: TreeItem) => void
+        private onSelectedItemChange: (selectedItem: TreeItem) => void,
     ) {
         this.componentElement = createDivElement({
-            className: css["modal-components-content-b"],
+            className: "figma-selection-screen",
         });
-        this.previewElement = createDivElement({ className: css["right"] });
+
+        this.previewElement = createDivElement({ className: "figma-preview" });
 
         this.screenComponent = new ScreenComponent(
             [],
-            this.onTreeSelectionChange
+            this.onTreeSelectionChange,
         );
 
         this.updateFooter({ nextButtonConfig: { disabled: true } });
@@ -36,19 +39,19 @@ export class FigmaSelectionScreen implements Component {
 
     private createSearchContainer(): HTMLElement {
         const searchContainer = createDivElement({
-            className: css["search-container"],
+            className: "search-container",
         });
         const searchIcon = this.createSpanElement(
-            `${css["icon"]} ${css["search-icon"]}`,
-            searchIconSvg
+            "icon search-icon",
+            searchIconSvg,
         );
         const searchInput = this.createInputElement(
-            css["search-input"],
-            `${i18next.t('figma:selectionScreen.searchInputPlaceholder')}`
+            "search-input",
+            `${i18next.t("figma:selectionScreen.searchInputPlaceholder")}`,
         );
         const closeIcon = this.createSpanElement(
-            `${css["icon"]} ${css["close-icon"]}`,
-            closeIconSvg
+            "icon close-icon",
+            inputCloseIcon,
         );
 
         closeIcon.addEventListener("click", () => (searchInput.value = ""));
@@ -62,7 +65,7 @@ export class FigmaSelectionScreen implements Component {
 
     private createSpanElement(
         className: string,
-        innerHTML: string
+        innerHTML: string,
     ): HTMLSpanElement {
         const span = document.createElement("span");
         span.className = className;
@@ -72,7 +75,7 @@ export class FigmaSelectionScreen implements Component {
 
     private createInputElement(
         className: string,
-        placeholder: string
+        placeholder: string,
     ): HTMLInputElement {
         const input = document.createElement("input");
         input.className = className;
@@ -91,25 +94,29 @@ export class FigmaSelectionScreen implements Component {
         this.previewElement.innerHTML = "";
         if (this.selectedItem?.imageUrl) {
             const flexContainer = createDivElement({
-                className: css["preview-container"],
+                className: "preview-container",
             });
             const image = document.createElement("img");
-            image.className = css["preview-image"];
+            image.className = "preview-image";
             image.src = this.selectedItem.imageUrl;
             image.alt = this.selectedItem.name;
             flexContainer.appendChild(image);
             this.previewElement.appendChild(flexContainer);
         }
+        if (this.selectedItem?.node) {
+            console.log(this.selectedItem.node);
+            analyzeScreen(this.selectedItem.node);
+        }
     }
 
     renderComponent(): void {
         this.componentElement.innerHTML = "";
-        const left = createDivElement({ className: css["left"] });
+        const left = createDivElement({ className: "figma-selection" });
         left.appendChild(this.createSearchContainer());
 
         const files = this.figmaClient.getFiles();
         const tree = files[0].map((file) =>
-            this.mapFileToTreeItem(file, files[1])
+            this.mapFileToTreeItem(file, files[1]),
         );
 
         this.screenComponent.updateData(tree);
@@ -121,22 +128,27 @@ export class FigmaSelectionScreen implements Component {
     }
 
     private mapFileToTreeItem(
-        file: FigmaProjectFileResponse,
-        fileScreensMap: FileImageMap
+        file: ExtendedGetProjectFilesResult,
+        fileScreensMap: FileImageMap,
     ): TreeItem {
         return {
             id: "temp",
             name: file.name,
-            children: file.files.map((f) => ({
-                id: f.key,
-                name: f.name,
-                imageUrl: f.thumbnail_url,
-                children: fileScreensMap[f.key].map((s) => ({
-                    id: s.name,
-                    name: s.name,
-                    imageUrl: s.image,
-                })),
-            })),
+            children: file.files.map(
+                (f): TreeItem => ({
+                    id: f.key,
+                    name: f.name,
+                    imageUrl: f.thumbnail_url,
+                    children: fileScreensMap[f.key].map(
+                        (s): TreeItem => ({
+                            id: s.name,
+                            name: s.name,
+                            imageUrl: s.image,
+                            node: s.node,
+                        }),
+                    ),
+                }),
+            ),
         };
     }
 

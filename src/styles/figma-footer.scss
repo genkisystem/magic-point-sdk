@@ -1,0 +1,28 @@
+@import "./variables";
+
+.footer {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    flex-direction: row;
+    align-self: stretch;
+    border-radius: 0 0 $br-5xs $br-5xs;
+    border: 1px solid $color-gainsboro;
+    height: 72px;
+    overflow: hidden;
+    flex-shrink: 0;
+    justify-content: space-between;
+    padding: 0px $padding-5xl;
+    text-align: center;
+    font-size: $body-500-size;
+    color: $gray-600;
+
+    .right-buttons {
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: $gap-base;
+    }
+}

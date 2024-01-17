@@ -1,0 +1,108 @@
+.form-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+
+    .form-wrapper {
+        min-width: 70vw;
+        max-height: 90vh;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #f2f3f4;
+        gap: 16px;
+        flex-wrap: nowrap;
+        overflow: auto;
+        border: 1px solid #2196f3;
+        border-radius: 8px;
+
+        .first-col {
+            flex: 0 1 65%;
+            align-self: stretch;
+
+            #canvas-holder {
+                border-radius: 8px;
+                overflow: hidden;
+            }
+        }
+
+        .vertical-line {
+            width: 1px;
+            align-self: stretch;
+            background-color: #ccc; /* Change the color to your preference */
+        }
+
+        .second-col {
+            flex: 1 0 32%;
+            display: flex;
+            justify-content: space-between;
+            flex-direction: column;
+            align-self: stretch;
+
+            .row {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                margin-bottom: 24px;
+
+                .field-wrap {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    gap: 8px;
+                }
+
+                input,
+                select {
+                    outline: none;
+                    padding: 0 8px;
+                    border-radius: 8px;
+                    border: 1px solid #ccc;
+                    border-width: 1px;
+                }
+
+                input {
+                    height: 42px;
+                }
+
+                select {
+                    height: 44px;
+                }
+
+                .text-area {
+                    width: 100%;
+                    height: 200px !important;
+                    outline: none;
+                    border-radius: 8px;
+                    color: #000;
+                    max-width: 100%;
+                    word-wrap: break-word;
+                    white-space: normal;
+                    overflow-wrap: break-word;
+                    background-color: #fff;
+                }
+
+                .label {
+                    font-size: 18px;
+                    font-weight: bold;
+                }
+            }
+
+            .row-actions {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+    }
+}

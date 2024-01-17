@@ -1,31 +1,33 @@
-import i18next from "i18next";
-import bugSvg from "../../asset/bug.svg";
-import collapsedIcon from "../../asset/collapsed-icon.svg";
-import editSvg from "../../asset/editSvg.svg";
-import figmaDark from "../../asset/figma-dark.svg";
-import liveWebsite from "../../asset/live-website.svg";
-import overlaySvg from "../../asset/overlay.svg";
-import settingSvg from "../../asset/setting.svg";
-import sliderSvg from "../../asset/slider.svg";
-import unCollapsedIcon from "../../asset/un-collapsed-icon.svg";
-import { GenericRequest } from "../../base";
-import { ImageOverlay } from "../../services/image-comparator/overlay/ImageOverlay";
-import { ImageComparisonSlider } from "../../services/image-comparator/slide/ImageComparatorSlide";
-import { CanvasWithDots } from "../../services/image-comparer/ImageComparer";
-import { resizeCanvas } from "../../utils/canvas";
-import { getComposedPathForHTMLElement, getPointDom } from "../../utils/dom";
+import {
+    bugSvg,
+    collapsedIcon,
+    editSvg,
+    figmaDark,
+    liveWebsite,
+    overlaySvg,
+    settingSvg,
+    sliderSvg,
+    unCollapsedIcon,
+} from "@icons";
+
+import { CanvasWithDots, ImageComparisonSlider, ImageOverlay } from "@services";
+
 import {
     createButton,
     createDivElement,
     findElementAtPosition,
-} from "../../utils/html";
+    getComposedPathForHTMLElement,
+    getPointDom,
+    resizeCanvas,
+} from "@utils";
+
+import i18next from "i18next";
+import { GenericRequest } from "../../base";
 import { ButtonComponent } from "../Button/ButtonComponent";
 import { Component } from "../common";
 import { FooterButtonConfigs } from "../figma-compare-footer/FigmaComparerFooter";
 import { Task } from "../list-task/types/Task";
-import { TaskEditorModal } from "../task-editor-modal/TaskEditorModal";
-import { ITask } from "../task-editor/TaskEditorComponent";
-import css from "./comparison.scss";
+import { ITask, TaskEditorModal } from "../task-editor-modal/TaskEditorModal";
 
 enum CompareMode {
     Bug = "Bug",
@@ -63,10 +65,10 @@ export class FigmaComparisonScreen implements Component {
     constructor(
         private updateFooter: (configs: FooterButtonConfigs) => void,
         private onTasksChange: (t: GenericRequest<Task>[]) => void,
-        private diffData?: CanvasWithDots
+        private diffData?: CanvasWithDots,
     ) {
         this.modeNameDisplay = createDivElement({
-            className: css["mode-name-display"],
+            className: "mode-name-display",
         });
 
         this.progressBar = document.createElement("input");
@@ -76,14 +78,18 @@ export class FigmaComparisonScreen implements Component {
         this.imageOverlay = new ImageOverlay(this.overlayPanel);
 
         this.imagePanel.style.position = "absolute";
-        this.sliderPanel = createDivElement({ className: css["image-panel"] });
+        this.sliderPanel = createDivElement({ className: "image-panel" });
         this.imageSlider = new ImageComparisonSlider(this.sliderPanel);
         this.taskEditorModal = new TaskEditorModal();
         this.componentElement = createDivElement({
-            className: css["modal-components-content-b"],
+            className: "figma-comparison-container",
         });
-        this.leftPanel = createDivElement({ className: css["left"] });
-        this.previewElement = createDivElement({ className: css["right"] });
+        this.leftPanel = createDivElement({
+            className: "figma-comparison-left",
+        });
+        this.previewElement = createDivElement({
+            className: "figma-comparison-right",
+        });
         this.tasks = this.initializeTasks();
         this.checkedTasks = this.tasks.map((_, i) => i);
         this.mode = CompareMode.Bug;
@@ -100,9 +106,9 @@ export class FigmaComparisonScreen implements Component {
                 image: t.image ?? "data:image/png;base64,...",
                 pageX: t.pageX,
                 pageY: t.pageY,
-                pointCoordinate: '',
-                screenSize: 0.1
-            })
+                pointCoordinate: `${0}#${0}`,
+                screenSize: window.innerWidth,
+            }),
         );
     }
     private resizeCanvasAndInitSlider(target: HTMLElement): void {
@@ -118,22 +124,22 @@ export class FigmaComparisonScreen implements Component {
             this.resizedFigmaCanvas = resizeCanvas(
                 figmaCanvas,
                 containerWidth,
-                containerHeight
+                containerHeight,
             );
             this.resizedBugCanvas = resizeCanvas(
                 bugCanvas,
                 containerWidth,
-                containerHeight
+                containerHeight,
             );
             this.resizedWebCanvas = resizeCanvas(
                 webCanvas,
                 containerWidth,
-                containerHeight
+                containerHeight,
             );
 
             this.imageSlider.create(
                 this.resizedFigmaCanvas.toDataURL(),
-                this.resizedBugCanvas.toDataURL()
+                this.resizedWebCanvas.toDataURL(),
             );
             this.imageSlider.disableSlider();
             this.handleDisplayBug();
@@ -144,29 +150,35 @@ export class FigmaComparisonScreen implements Component {
         this.previewElement.innerHTML = "";
         if (!this.tasks) return;
 
-        const taskParent = createDivElement({ className: css["task-parent"] });
+        const taskParent = createDivElement({ className: "task-parent" });
+        if (this.tasks.length === 0) {
+            const notFound = createDivElement({ className: "not-found" });
+            notFound.textContent = "No errors found";
+            taskParent.appendChild(notFound);
+        }
         this.tasks.forEach((t, index) => {
             const task = this.createTask(t, index);
             taskParent.appendChild(task);
         });
+
         this.previewElement.appendChild(taskParent);
     }
 
     private createTask(t: ITask, index: number): HTMLElement {
-        const task = createDivElement({ className: css["task"] });
+        const task = createDivElement({ className: "task" });
         task.appendChild(this.createTaskHeader(index));
         task.appendChild(this.createTaskInner(t, index));
         return task;
     }
 
     private createTaskHeader(index: number): HTMLElement {
-        const taskHeader = createDivElement({ className: css["task-header"] });
+        const taskHeader = createDivElement({ className: "task-header" });
 
         const collapseDiv = createDivElement({
-            className: css["collapse-div"],
+            className: "collapse-div",
         });
         const collapseButton = this.createCollapseButton(taskHeader);
-        const taskTitle = createDivElement({ className: css["task-title"] });
+        const taskTitle = createDivElement({ className: "task-title" });
         taskTitle.textContent = `#${index + 1}`;
 
         collapseDiv.appendChild(collapseButton);
@@ -174,7 +186,7 @@ export class FigmaComparisonScreen implements Component {
 
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
-        checkbox.className = css["task-checkbox"];
+        checkbox.className = "task-checkbox";
         checkbox.checked = this.checkedTasks.includes(index);
 
         checkbox.addEventListener("change", (event) => {
@@ -183,7 +195,7 @@ export class FigmaComparisonScreen implements Component {
         });
 
         const checkboxWrapper = document.createElement("div");
-        checkboxWrapper.className = css["checkbox-wrapper"];
+        checkboxWrapper.className = "checkbox-wrapper";
         checkboxWrapper.appendChild(checkbox);
 
         taskHeader.appendChild(collapseDiv);
@@ -196,7 +208,7 @@ export class FigmaComparisonScreen implements Component {
             this.checkedTasks.push(index);
         } else {
             this.checkedTasks = this.checkedTasks.filter(
-                (item) => item !== index
+                (item) => item !== index,
             );
         }
         this.updateFooterBasedOnCheckedTasks();
@@ -215,18 +227,22 @@ export class FigmaComparisonScreen implements Component {
 
     private createTaskRequest(): GenericRequest<Task>[] {
         const selectedTask = this.tasks.filter((_, i) =>
-            this.checkedTasks.includes(i)
+            this.checkedTasks.includes(i),
         );
 
-        const originalWidth = document.body.style.width;
-        const originalHeight = document.body.style.height;
-        const originalMaxHeight = document.body.style.maxHeight;
-        const originalMinHeight = document.body.style.minHeight;
+        const originalStyles = {
+            width: document.body.style.width,
+            height: document.body.style.height,
+            maxHeight: document.body.style.maxHeight,
+            minHeight: document.body.style.minHeight,
+            overflow: document.body.style.overflow,
+        };
 
         document.body.style.width = `${1920}px`;
         document.body.style.height = `${1080}px`;
         document.body.style.maxHeight = `${1080}px`;
         document.body.style.minHeight = `${1080}px`;
+        document.body.style.overflow = "hidden";
 
         const request = selectedTask.map((t): GenericRequest<Task> => {
             let pDom = "";
@@ -234,7 +250,7 @@ export class FigmaComparisonScreen implements Component {
             const element = findElementAtPosition(
                 document.body,
                 t.pageX,
-                t.pageY
+                t.pageY,
             );
             if (element) {
                 pDom = getPointDom(getComposedPathForHTMLElement(element));
@@ -259,16 +275,16 @@ export class FigmaComparisonScreen implements Component {
                         name: "",
                     },
                     endPoint: window.location.pathname,
-                    screenSize: 0.1,
-                    pointCoordinate: ''
+                    screenSize: window.innerWidth,
+                    pointCoordinate: `${0}#${0}`,
                 },
             };
         });
-
-        document.body.style.width = originalWidth;
-        document.body.style.height = originalHeight;
-        document.body.style.minHeight = originalMinHeight;
-        document.body.style.maxHeight = originalMaxHeight;
+        document.body.style.width = originalStyles.width;
+        document.body.style.height = originalStyles.height;
+        document.body.style.minHeight = originalStyles.minHeight;
+        document.body.style.maxHeight = originalStyles.maxHeight;
+        document.body.style.overflow = originalStyles.overflow;
 
         return request;
     }
@@ -276,15 +292,15 @@ export class FigmaComparisonScreen implements Component {
     private getModeName(mode: CompareMode): string {
         switch (mode) {
             case CompareMode.Bug:
-                return i18next.t('figma:comparisonScreen.modeName.bug');
+                return i18next.t("figma:comparisonScreen.modeName.bug");
             case CompareMode.Slider:
-                return i18next.t('figma:comparisonScreen.modeName.slider');
+                return i18next.t("figma:comparisonScreen.modeName.slider");
             case CompareMode.FigmaDark:
-                return i18next.t('figma:comparisonScreen.modeName.figmaDark');
+                return i18next.t("figma:comparisonScreen.modeName.figmaDark");
             case CompareMode.LiveWebsite:
-                return i18next.t('figma:comparisonScreen.modeName.liveWebsite');
+                return i18next.t("figma:comparisonScreen.modeName.liveWebsite");
             case CompareMode.Overlay:
-                return i18next.t('figma:comparisonScreen.modeName.overlay');
+                return i18next.t("figma:comparisonScreen.modeName.overlay");
             default:
                 return "";
         }
@@ -292,11 +308,11 @@ export class FigmaComparisonScreen implements Component {
 
     private createControlPanel(): HTMLElement {
         const controlPanel = createDivElement({
-            className: css["control-panel"],
+            className: "control-panel",
         });
 
         const panelHeader = createDivElement({
-            className: css["panel-header"],
+            className: "panel-header",
         });
         const controlPanelIcon = document.createElement("span");
         controlPanelIcon.innerHTML = settingSvg;
@@ -306,7 +322,7 @@ export class FigmaComparisonScreen implements Component {
         this.modeNameDisplay.textContent = this.getModeName(this.mode);
         panelHeader.appendChild(this.modeNameDisplay);
 
-        const panelBody = createDivElement({ className: css["panel-body"] });
+        const panelBody = createDivElement({ className: "panel-body" });
         panelBody.style.display = "none";
 
         // Toggle collapsible panel
@@ -320,25 +336,25 @@ export class FigmaComparisonScreen implements Component {
         // Creating and adding event listeners to buttons
         const figmaBtn = this.createButtonWithIcon(
             figmaDark,
-            CompareMode.FigmaDark
+            CompareMode.FigmaDark,
         );
         const liveBtn = this.createButtonWithIcon(
             liveWebsite,
-            CompareMode.LiveWebsite
+            CompareMode.LiveWebsite,
         );
         const sliderBtn = this.createButtonWithIcon(
             sliderSvg,
-            CompareMode.Slider
+            CompareMode.Slider,
         );
         const overlayBtn = this.createButtonWithIcon(
             overlaySvg,
-            CompareMode.Overlay
+            CompareMode.Overlay,
         );
         const bugBtn = this.createButtonWithIcon(bugSvg, CompareMode.Bug);
 
         // Append buttons to the panel body
         [figmaBtn, liveBtn, sliderBtn, overlayBtn, bugBtn].forEach((btn) =>
-            panelBody.appendChild(btn)
+            panelBody.appendChild(btn),
         );
 
         controlPanel.appendChild(panelHeader);
@@ -348,7 +364,7 @@ export class FigmaComparisonScreen implements Component {
         this.progressBar.min = "0";
         this.progressBar.max = "100";
         this.progressBar.value = "50";
-        this.progressBar.className = css["progress-bar"];
+        this.progressBar.className = "progress-bar";
         this.progressBar.style.display = "none";
 
         controlPanel.appendChild(this.progressBar);
@@ -358,10 +374,10 @@ export class FigmaComparisonScreen implements Component {
 
     private createButtonWithIcon(
         iconSvg: string,
-        mode: CompareMode
+        mode: CompareMode,
     ): HTMLElement {
         const button = createButton({
-            extendClasses: [css["button"]],
+            extendClasses: ["mode-button"],
         });
         const icon = document.createElement("span");
         icon.innerHTML = iconSvg;
@@ -370,7 +386,7 @@ export class FigmaComparisonScreen implements Component {
         button.setAttribute("data-mode", mode);
         // Set initial button style based on the default mode
         if (this.mode === mode) {
-            button.classList.add(css["active"]);
+            button.classList.add("mode-button-active");
         }
 
         // Add an event listener to the button
@@ -410,7 +426,6 @@ export class FigmaComparisonScreen implements Component {
                 break;
             case CompareMode.Overlay:
                 this.handleDisplayOverlay();
-
                 break;
         }
     }
@@ -432,11 +447,11 @@ export class FigmaComparisonScreen implements Component {
 
     private handleDisplayOverlay() {
         this.imageOverlay.setBaseImage(
-            this.resizedFigmaCanvas?.toDataURL() ?? ""
+            this.resizedFigmaCanvas?.toDataURL() ?? "",
         );
         this.imageOverlay.setOverlayImage(
-            this.resizedBugCanvas?.toDataURL() ?? "",
-            parseInt(this.progressBar.value) / 100
+            this.resizedWebCanvas?.toDataURL() ?? "",
+            parseInt(this.progressBar.value) / 100,
         );
 
         // Update overlay opacity on progress bar change
@@ -447,15 +462,13 @@ export class FigmaComparisonScreen implements Component {
     }
 
     private updateButtonStyles(): void {
-        const buttons = this.componentElement.querySelectorAll(
-            `.${css["button"]}`
-        );
+        const buttons = this.componentElement.querySelectorAll(".mode-button");
         buttons.forEach((button) => {
             const mode = button.getAttribute("data-mode");
             if (this.mode === mode) {
-                button.classList.add(css["active"]);
+                button.classList.add("mode-button-active");
             } else {
-                button.classList.remove(css["active"]);
+                button.classList.remove("mode-button-active");
             }
         });
     }
@@ -463,15 +476,15 @@ export class FigmaComparisonScreen implements Component {
     // Method to create a collapsible button
     private createCollapseButton(taskHeader: HTMLElement): HTMLElement {
         const collapseButton = createDivElement({
-            className: css["collapse-button"],
+            className: "collapse-button",
         });
         const collapseIcon = document.createElement("span");
-        collapseIcon.classList.add(css["collapse-icon"]);
+        collapseIcon.classList.add("collapse-icon");
         collapseIcon.innerHTML = unCollapsedIcon;
         collapseButton.appendChild(collapseIcon);
 
         collapseButton.addEventListener("click", () =>
-            this.toggleCollapse(taskHeader, collapseIcon)
+            this.toggleCollapse(taskHeader, collapseIcon),
         );
         return collapseButton;
     }
@@ -479,45 +492,58 @@ export class FigmaComparisonScreen implements Component {
     // Toggle collapse functionality
     private toggleCollapse(
         taskHeader: HTMLElement,
-        collapseIcon: HTMLElement
+        collapseIcon: HTMLElement,
     ): void {
         const taskInner = taskHeader.nextElementSibling as HTMLElement;
-        const isCollapsed = taskInner.classList.toggle(css["collapsed"]);
+        const isCollapsed = taskInner.classList.toggle("collapsed");
         collapseIcon.innerHTML = isCollapsed ? collapsedIcon : unCollapsedIcon;
     }
 
     private createTaskInner(t: ITask, index: number): HTMLElement {
-        const taskInner = createDivElement({ className: css["task-inner"] });
+        const taskInner = createDivElement({ className: "task-inner" });
 
-        // Title Label and Read-Only Field
+        const titleWrapper = createDivElement({ className: "title-wrapper" });
+
         const titleLabel = document.createElement("label");
-        titleLabel.className = css["input-label"];
-        titleLabel.textContent = i18next.t('figma:comparisonScreen.taskInnerCreation.title');
-        taskInner.appendChild(titleLabel);
+        titleLabel.className = "input-label";
+        titleLabel.textContent = i18next.t(
+            "figma:comparisonScreen.taskInnerCreation.title",
+        );
+        titleWrapper.appendChild(titleLabel);
 
         const titleField = createDivElement({
-            className: css["read-only-field"],
+            className: "read-only-field",
         });
         titleField.textContent = t.title;
-        taskInner.appendChild(titleField);
+        titleWrapper.appendChild(titleField);
 
-        // Description Label and Read-Only Field
+        taskInner.appendChild(titleWrapper);
+
+        const descriptionWrapper = createDivElement({
+            className: "description-wrapper",
+        });
+
         const descriptionLabel = document.createElement("label");
-        descriptionLabel.className = css["input-label"];
-        descriptionLabel.textContent = i18next.t('figma:comparisonScreen.taskInnerCreation.description');
-        taskInner.appendChild(descriptionLabel);
+        descriptionLabel.className = "input-label";
+        descriptionLabel.textContent = i18next.t(
+            "figma:comparisonScreen.taskInnerCreation.description",
+        );
+        descriptionWrapper.appendChild(descriptionLabel);
 
         const descriptionField = createDivElement({
-            className: css["read-only-field"],
+            className: "read-only-field",
         });
         descriptionField.innerHTML = t.description;
-        taskInner.appendChild(descriptionField);
+        descriptionWrapper.appendChild(descriptionField);
+
+        taskInner.appendChild(descriptionWrapper);
+
         const icon = document.createElement("span");
         icon.innerHTML = editSvg;
 
         const eButton = new ButtonComponent({
             startIcon: icon,
-            extendClasses: [css["edit-button"]],
+            extendClasses: ["edit-button"],
             variant: "outlined",
             onClick: () => this.handleClickEdit(index),
         });
@@ -529,6 +555,7 @@ export class FigmaComparisonScreen implements Component {
 
     private handleClickEdit(index: number) {
         const selectedTask = this.tasks[index];
+
         this.taskEditorModal.initialize(selectedTask, (updatedTask) => {
             this.tasks[index] = updatedTask;
             this.renderComponent();

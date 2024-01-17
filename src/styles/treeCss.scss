@@ -1,0 +1,71 @@
+.tree-view-container {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    align-self: stretch;
+
+    ul {
+        padding-inline-start: 20px;
+        list-style: none;
+    }
+
+    li {
+        padding-inline-start: 40px;
+    }
+
+    .tree-view {
+        flex: 1;
+        padding: 0;
+        list-style-type: none;
+        overflow-y: auto;
+    }
+
+    .item-container {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        height: 32px;
+
+        > input[type="radio"] {
+            margin-right: 10px;
+            display: inline-block;
+            vertical-align: middle;
+            cursor: pointer;
+            height: 18px;
+            width: 18px;
+        }
+    }
+
+    .tree-item {
+        padding: 5px;
+
+        > input[type="radio"],
+        > span,
+        > img {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        img {
+            width: 30px;
+            height: 30px;
+        }
+    }
+
+    .children-container {
+        list-style-type: none;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+
+        &.collapsed {
+            max-height: 0;
+        }
+    }
+
+    .collapse-icon {
+        cursor: pointer;
+        margin-right: 5px;
+        user-select: none;
+    }
+}

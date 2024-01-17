@@ -3,8 +3,16 @@ import {
     IButtonConfig,
 } from "../components/Button/ButtonComponent";
 
+import {
+    ISelectBoxConfig,
+    SelectBoxComponent,
+} from "../components/select-box/SelectBoxComponent";
+
 export class DivElementConfig {
-    constructor(public className?: string, public innerHTML?: string) { }
+    constructor(
+        public className?: string,
+        public innerHTML?: string,
+    ) { }
 }
 
 /**
@@ -13,7 +21,7 @@ export class DivElementConfig {
  * @returns The created div element.
  */
 export const createDivElement = (
-    config: DivElementConfig = new DivElementConfig()
+    config: DivElementConfig = new DivElementConfig(),
 ): HTMLElement => {
     const { className, innerHTML } = Object.freeze(config);
     const element = document.createElement("div");
@@ -31,10 +39,14 @@ export const createButton = (config: IButtonConfig): HTMLElement => {
     return new ButtonComponent({ ...config }).render();
 };
 
+export const createSelectBox = (config: ISelectBoxConfig): HTMLElement => {
+    return new SelectBoxComponent({ ...config }).render();
+};
+
 export const findElementAtPosition = (
     root: HTMLElement,
     x: number,
-    y: number
+    y: number,
 ): HTMLElement | null => {
     let foundElement: HTMLElement | null = null;
 
@@ -68,7 +80,7 @@ export const convertCoordinates = (
     wOriginal: number,
     hOriginal: number,
     wActual: number,
-    hActual: number
+    hActual: number,
 ): { xActual: number; yActual: number } => {
     const xActual = (x / wOriginal) * wActual;
     const yActual = (y / hOriginal) * hActual;
@@ -81,7 +93,7 @@ export const getNewCoordinates = (
     newWidth: number,
     newHeight: number,
     originalX: number,
-    originalY: number
+    originalY: number,
 ): { newX: number; newY: number } => {
     // Calculate scaling factors
     const scaleX = newWidth / originalWidth;

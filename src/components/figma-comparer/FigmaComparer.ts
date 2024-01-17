@@ -1,7 +1,7 @@
+import { FigmaClient, HtmlImageComparer } from "@services";
+import { createDivElement } from "@utils";
 import i18next from "i18next";
 import { GenericRequest } from "../../base";
-import { FigmaClient } from "../../services/figma/figma";
-import { HtmlImageComparer } from "../../services/image-comparer/ImageComparer";
 import { IButtonConfig } from "../Button/ButtonComponent";
 import { Component } from "../common";
 import { FigmaComparerBody } from "../figma-compare-body/FigmaComparerBody";
@@ -12,17 +12,16 @@ import {
 import { FigmaComparerHeader } from "../figma-compare-header/FigmaComparerHeader";
 import { Task } from "../list-task/types/Task";
 import { TreeItem } from "../tree/tree";
-import css from "./figma-comparer.scss";
 
 export class FigmaComparer implements Component {
     private readonly STEPS: string[] = [
-        i18next.t('figma:comparer.steps.login'),
-        i18next.t('figma:comparer.steps.screenSelection'),
-        i18next.t('figma:comparer.steps.tasksEdition'),
+        i18next.t("figma:comparer.steps.login"),
+        i18next.t("figma:comparer.steps.screenSelection"),
+        i18next.t("figma:comparer.steps.tasksEdition"),
     ];
 
     private readonly DEFAULT_CANCEL_BUTTON_CONFIG: IButtonConfig = {
-        text: i18next.t('common:buttonText.cancel'),
+        text: i18next.t("common:buttonText.cancel"),
         variant: "outlined",
         color: "primary",
         onClick: this.closeModal.bind(this),
@@ -44,10 +43,11 @@ export class FigmaComparer implements Component {
         private onClose: () => void,
         private onCreateTasks: (tasks: GenericRequest<Task>[]) => Promise<void>,
         private teamIds: string[],
-        initialActiveStep?: number
+        initialActiveStep?: number,
     ) {
-        this.componentElement = document.createElement("div");
-        this.componentElement.className = css["figma-comparer"];
+        this.componentElement = createDivElement({
+            className: "figma-comparer",
+        });
         this.activeStep = initialActiveStep ?? 0;
 
         this.initializeDataAndComponents();
@@ -59,8 +59,9 @@ export class FigmaComparer implements Component {
         this.headerComponent = new FigmaComparerHeader(
             this.STEPS,
             this.onClose,
-            this.activeStep
+            this.activeStep,
         );
+
         this.bodyComponent = new FigmaComparerBody(
             this.figmaClient,
             this.onSelectedItemChange.bind(this),
@@ -69,8 +70,9 @@ export class FigmaComparer implements Component {
             this.showLoading.bind(this),
             this.hideLoading.bind(this),
             this.teamIds,
-            this.activeStep
+            this.activeStep,
         );
+
         this.footerComponent = new FooterComponent({
             cancelButtonConfig: this.DEFAULT_CANCEL_BUTTON_CONFIG,
             previousButtonConfig: this.createPreviousButtonConfig(),
@@ -98,7 +100,7 @@ export class FigmaComparer implements Component {
 
     private createPreviousButtonConfig(): IButtonConfig {
         return {
-            text: i18next.t('common:buttonText.previous'),
+            text: i18next.t("common:buttonText.previous"),
             variant: "contained",
             color: "primary",
             onClick: this.handlePrevious.bind(this),
@@ -107,7 +109,7 @@ export class FigmaComparer implements Component {
 
     private createNextButtonConfig(): IButtonConfig {
         return {
-            text: i18next.t('common:buttonText.next'),
+            text: i18next.t("common:buttonText.next"),
             variant: "contained",
             color: "primary",
             onClick: this.handleNext.bind(this),
@@ -163,15 +165,13 @@ export class FigmaComparer implements Component {
 
         this.showLoading();
         this.htmlComparer
-            .findDifferencePosition(
-                document.body,
-                this.selectedFigmaScreen.imageUrl
-            )
+            .findDifferencePosition(this.selectedFigmaScreen.imageUrl)
             .then((diffPosition) => {
                 this.handleImageComparisonResult(diffPosition);
             })
             .catch((error) => {
                 console.error("Error during image comparison:", error);
+                console.trace();
             })
             .finally(() => {
                 this.hideLoading();
@@ -217,21 +217,22 @@ export class FigmaComparer implements Component {
     private reset() {
         this.activeStep = 0;
         this.selectedFigmaScreen = null;
+        this.updateComponentsStep();
+        this.updateFooterComponent();
     }
 
     showLoading() {
-        const loadingModal = document.createElement("div");
-        loadingModal.className = css["loading-modal"];
-        const loadingSpinner = document.createElement("div");
-        loadingSpinner.className = css["loading-spinner"];
+        const loadingModal = createDivElement({ className: "loading-modal" });
+        const loadingSpinner = createDivElement({
+            className: "loading-spinner",
+        });
         loadingModal.appendChild(loadingSpinner);
         this.componentElement.appendChild(loadingModal);
     }
 
     hideLoading() {
-        const loadingModal = this.componentElement.querySelector(
-            `.${css["loading-modal"]}`
-        );
+        const loadingModal =
+            this.componentElement.querySelector(".loading-modal");
         if (loadingModal) {
             this.componentElement.removeChild(loadingModal);
         }

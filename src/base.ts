@@ -8,7 +8,7 @@ export type ConfigurationOptions = {
     breakPoints?: Readonly<Breakpoints>
 }
 
-export type Response<T> = {
+export type GenericResponse<T> = {
     appData: T,
     errorCode: string,
     hasError: boolean,

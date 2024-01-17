@@ -1,5 +1,5 @@
+import { createDivElement } from "@utils";
 import { ButtonComponent, IButtonConfig } from "../Button/ButtonComponent";
-import css from "./footer.scss";
 
 export interface FooterButtonConfigs {
     cancelButtonConfig?: IButtonConfig;
@@ -20,8 +20,7 @@ export class FooterComponent {
         this.previousButtonConfig = configs.previousButtonConfig;
         this.nextButtonConfig = configs.nextButtonConfig;
 
-        this.componentElement = document.createElement("div");
-        this.componentElement.className = css["footer"];
+        this.componentElement = createDivElement({ className: "footer" });
 
         this._activeStepIndex = initialActiveStepIndex ?? 0;
         this.renderComponent();
@@ -65,19 +64,17 @@ export class FooterComponent {
     renderComponent() {
         this.componentElement.innerHTML = "";
 
-        const leftButtons = document.createElement("div");
-        leftButtons.className = css["left-buttons"];
+        const leftButtons = createDivElement();
         if (this.cancelButtonConfig) {
             const cancelButton = new ButtonComponent(this.cancelButtonConfig);
             leftButtons.appendChild(cancelButton.render());
         }
 
-        const rightButtons = document.createElement("div");
-        rightButtons.className = css["right-buttons"];
+        const rightButtons = createDivElement({ className: "right-buttons" });
         if (this.previousButtonConfig) {
             this.previousButtonConfig.disabled = this._activeStepIndex === 0;
             const previousButton = new ButtonComponent(
-                this.previousButtonConfig
+                this.previousButtonConfig,
             );
             rightButtons.appendChild(previousButton.render());
         }
