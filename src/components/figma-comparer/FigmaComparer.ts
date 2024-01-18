@@ -188,14 +188,9 @@ export class FigmaComparer implements Component {
     private processTaskStep() {
         if (!this.tasks) return;
 
-        uiManager.showLoading();
-        this.onCreateTasks(this.tasks)
-            .then(() => {
-                this.closeModal();
-            })
-            .finally(() => {
-                uiManager.hideLoading();
-            });
+        this.onCreateTasks(this.tasks).then(() => {
+            this.closeModal();
+        });
     }
 
     private goToNextStep(): void {

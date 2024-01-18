@@ -35,6 +35,7 @@ export class FigmaLoginBody implements Component {
         this.componentElement = createDivElement({
             className: "login-container",
         });
+        this.componentElement.id = "figma-login-container";
 
         this.teams = new Map();
         this.teamOptions = [];

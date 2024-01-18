@@ -1,8 +1,8 @@
-import html2canvas from "html2canvas";
 import resemble from "resemblejs";
 
 import {
     APP_ID,
+    captureElementAsCanvas,
     drawBugCanvas,
     findElementAtPosition,
     resizeCanvas,
@@ -34,8 +34,8 @@ export class HtmlImageComparer {
     private async captureElementAsDataURL(
         element: HTMLElement,
     ): Promise<string> {
-        const canvas = await html2canvas(element);
-        return canvas.toDataURL("image/png");
+        const canvas = await captureElementAsCanvas(element);
+        return canvas.toDataURL();
     }
 
     private async captureAndResizeElement(
@@ -43,11 +43,8 @@ export class HtmlImageComparer {
         newWidth: number,
         newHeight: number,
     ): Promise<HTMLCanvasElement> {
-        const capturedCanvas: HTMLCanvasElement = await html2canvas(element, {
-            scale: 1,
-            width: newWidth,
-            height: newHeight,
-        });
+        const capturedCanvas: HTMLCanvasElement =
+            await captureElementAsCanvas(element);
         return resizeCanvas(capturedCanvas, newWidth, newHeight);
     }
 
@@ -241,11 +238,7 @@ export class HtmlImageComparer {
         const img = new Image();
         img.src = diffImage;
 
-        const elementBoundsArray = await this.loadAndProcessImage(
-            img,
-            bodyCopy,
-        );
-        return elementBoundsArray;
+        return await this.loadAndProcessImage(img, bodyCopy);
     }
 
     private async loadAndProcessImage(
@@ -335,7 +328,12 @@ export class HtmlImageComparer {
         pageY: number,
     ): ElementBounds | null {
         const elementAtPosition = findElementAtPosition(bodyCopy, pageX, pageY);
-        if (!elementAtPosition) {
+
+        if (
+            !elementAtPosition ||
+            elementAtPosition.offsetWidth === 0 ||
+            elementAtPosition.offsetHeight === 0
+        ) {
             return null;
         }
 
