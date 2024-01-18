@@ -35,7 +35,7 @@ export class HtmlImageComparer {
         element: HTMLElement,
     ): Promise<string> {
         const canvas = await captureElementAsCanvas(element);
-        return canvas.toDataURL("image/png");
+        return canvas.toDataURL();
     }
 
     private async captureAndResizeElement(
@@ -143,18 +143,23 @@ export class HtmlImageComparer {
 
         const diffPoints = await this.processDifferences(diffData, bodyCopy);
 
-        const capturedDiffPoints: ElementBounds[] = [];
-        for (const point of diffPoints) {
+        const capturePromises = diffPoints.map(async (point) => {
             const element = findElementAtPosition(
                 bodyCopy,
                 point.pageX,
                 point.pageY,
             );
-            const elementImage = element
-                ? await this.captureElementAsDataURL(element)
-                : undefined;
-            capturedDiffPoints.push({ ...point, image: elementImage });
-        }
+            if (element) {
+                const elementImage =
+                    await this.captureElementAsDataURL(element);
+
+                return { ...point, image: elementImage };
+            }
+
+            return point;
+        });
+
+        const capturedDiffPoints = await Promise.all(capturePromises);
 
         const imageCanvas: HTMLCanvasElement = drawBugCanvas(
             bodyCanvas,
@@ -233,11 +238,7 @@ export class HtmlImageComparer {
         const img = new Image();
         img.src = diffImage;
 
-        const elementBoundsArray = await this.loadAndProcessImage(
-            img,
-            bodyCopy,
-        );
-        return elementBoundsArray;
+        return await this.loadAndProcessImage(img, bodyCopy);
     }
 
     private async loadAndProcessImage(
@@ -327,7 +328,12 @@ export class HtmlImageComparer {
         pageY: number,
     ): ElementBounds | null {
         const elementAtPosition = findElementAtPosition(bodyCopy, pageX, pageY);
-        if (!elementAtPosition) {
+
+        if (
+            !elementAtPosition ||
+            elementAtPosition.offsetWidth === 0 ||
+            elementAtPosition.offsetHeight === 0
+        ) {
             return null;
         }
 
