@@ -431,7 +431,6 @@ export class FormComponent {
     private onSubmit(event: MouseEvent): void {
         event.preventDefault();
         event.stopPropagation();
-        console.log("onSubmit", this.initialTask);
         const formData: GenericRequest<Task> = {
             appData: {
                 ...this.initialTask,
@@ -447,7 +446,6 @@ export class FormComponent {
                 screenSize: window.innerWidth,
             },
         };
-        console.log("onSubmit", formData);
 
         if (this._onClickSubmit) {
             this._onClickSubmit(formData);
