@@ -1,6 +1,6 @@
 {
   "name": "magic-point-sdk",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Software Developer Kit of Magic Point project build on Javascript/NodeJS",
   "main": "dist/index.cjs",
   "module": "dist/index.m.js",
@@ -14,7 +14,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": " rm -rf dist && rollup -c --watch"
+    "build": " rm -rf dist && rollup -c --watch",
+    "publish": "rm -rf dist && rollup -c && git add . && git commit -m 'upgrade package version' && git push && npm publish"
   },
   "repository": {
     "type": "git",
