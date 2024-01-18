@@ -33,7 +33,11 @@ enum FieldTypes {
 
 export class FormComponent {
     private static instance: FormComponent;
-    private componentElement: HTMLElement;
+    private formContainer: HTMLElement;
+
+    private formWrapperElement!: HTMLElement;
+    private imageEditorElement!: HTMLElement;
+    private fieldElement!: HTMLElement;
 
     private imageEditorWrapper!: ImageEditorWrapper;
 
@@ -59,11 +63,37 @@ export class FormComponent {
     private _onCloseCallback?: () => void;
 
     constructor() {
-        this.componentElement = createDivElement({
+        this.formContainer = createDivElement({
             className: "form-container",
         });
-        this.componentElement.style.display = "none";
-        uiManager.addElement(this.componentElement);
+        this.formContainer.style.display = "none";
+
+        this.formWrapperElement = createDivElement({
+            className: "form-wrapper",
+        });
+
+        this.imageEditorElement = createDivElement({
+            className: "first-col",
+        });
+        const imageDiv = createDivElement();
+        this.imageEditorElement.appendChild(imageDiv);
+        this.formWrapperElement.appendChild(this.imageEditorElement);
+
+        this.formContainer.appendChild(
+            createDivElement({ className: "vertical-line" }),
+        );
+
+        this.fieldElement = createDivElement({
+            className: "second-col",
+        });
+        this.formWrapperElement.appendChild(this.fieldElement);
+
+        this.formContainer.appendChild(this.formWrapperElement);
+
+        uiManager.addElement(this.formContainer);
+
+        this.imageEditorWrapper = new ImageEditorWrapper(imageDiv);
+
         this.init();
     }
 
@@ -73,7 +103,7 @@ export class FormComponent {
 
     private async init(): Promise<void> {
         await this.fetchData();
-        this.renderComponent();
+        this.renderField();
     }
 
     private async fetchData(): Promise<void> {
@@ -167,60 +197,27 @@ export class FormComponent {
         closeCallback?: () => void,
         initTask?: Task,
     ): void {
-        EventBusInstance.emit('disable-magic-point')
-        if (initTask) {
-            this.setInitialValues(initTask);
-        }
-        this.renderComponent();
+        EventBusInstance.emit("disable-magic-point");
+        this.setInitialValues(initTask);
+        this.renderField();
         this.imageEditorWrapper.loadImage(image);
-        this.componentElement.style.display = "block";
+        this.formContainer.style.display = "block";
         this._onClickSubmit = submitCallback;
         this._onCloseCallback = closeCallback;
     }
 
     public close(): void {
         if (!this.initialTask) {
-            EventBusInstance.emit('enable-magic-point')
+            EventBusInstance.emit("enable-magic-point");
         }
         this.resetComponent();
-        this.componentElement.style.display = "none";
+        this.formContainer.style.display = "none";
     }
 
-    private renderComponent(): void {
-        this.componentElement.innerHTML = "";
-        this.componentElement.appendChild(this.createForm());
-    }
+    private renderField(): void {
+        this.fieldElement.innerHTML = "";
 
-    private createForm(): HTMLFormElement {
-        const formElement = document.createElement("form");
-        formElement.className = "form-wrapper";
-
-        formElement.appendChild(this.createImageColumn());
-        formElement.appendChild(this.createVerticalLine());
-        formElement.appendChild(this.createSecondColumn());
-
-        return formElement;
-    }
-
-    private createVerticalLine(): HTMLElement {
-        const verticalLine = createDivElement({ className: "vertical-line" });
-        return verticalLine;
-    }
-
-    private createImageColumn(): HTMLElement {
-        const imageColumn = createDivElement({ className: "first-col" });
-        const imageEditorDiv = createDivElement();
-        imageColumn.appendChild(imageEditorDiv);
-
-        this.imageEditorWrapper = new ImageEditorWrapper(imageEditorDiv);
-
-        return imageColumn;
-    }
-
-    private createSecondColumn(): HTMLElement {
-        const secondCol = createDivElement({ className: "second-col" });
-
-        secondCol.appendChild(
+        this.fieldElement.appendChild(
             this.createSelectFieldRow(
                 FieldTypes.ISSUE_TYPE,
                 i18next.t("form:Type"),
@@ -228,14 +225,14 @@ export class FormComponent {
                 this.selectedIssueType,
             ),
         );
-        secondCol.appendChild(
+        this.fieldElement.appendChild(
             this.createInputFieldRow(
                 FieldTypes.SUBJECT,
                 i18next.t("form:Subject"),
                 this.subject,
             ),
         );
-        secondCol.appendChild(
+        this.fieldElement.appendChild(
             this.createSelectFieldRow(
                 FieldTypes.ASSIGNEE,
                 i18next.t("form:Assignee"),
@@ -243,7 +240,7 @@ export class FormComponent {
                 this.selectedAssignee,
             ),
         );
-        secondCol.appendChild(
+        this.fieldElement.appendChild(
             this.createSelectFieldRow(
                 FieldTypes.ISSUE_STATUS,
                 i18next.t("form:Status"),
@@ -252,10 +249,8 @@ export class FormComponent {
             ),
         );
 
-        secondCol.appendChild(this.createDescriptionRow());
-        secondCol.appendChild(this.createActionsRow());
-
-        return secondCol;
+        this.fieldElement.appendChild(this.createDescriptionRow());
+        this.fieldElement.appendChild(this.createActionsRow());
     }
 
     private createInputFieldRow(
@@ -421,7 +416,7 @@ export class FormComponent {
         this.selectedIssueStatus = { ...this.initialSelectedIssueStatus };
         this.description = "";
         this.imageEditorWrapper.reset();
-        this.renderComponent();
+        this.renderField();
     }
 
     private onClose(event: MouseEvent): void {
@@ -435,7 +430,7 @@ export class FormComponent {
 
     private onSubmit(event: MouseEvent): void {
         event.preventDefault();
-        event.stopPropagation()
+        event.stopPropagation();
         const formData: GenericRequest<Task> = {
             appData: {
                 ...this.initialTask,

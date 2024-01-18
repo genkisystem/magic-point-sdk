@@ -1,12 +1,12 @@
-import html2canvas from "html2canvas";
 import resemble from "resemblejs";
 
 import {
     APP_ID,
     drawBugCanvas,
     findElementAtPosition,
-    resizeCanvas,
+    resizeCanvas
 } from "@utils";
+import html2canvas from "html2canvas";
 
 export interface ElementBounds {
     pageX: number;
@@ -241,11 +241,7 @@ export class HtmlImageComparer {
         const img = new Image();
         img.src = diffImage;
 
-        const elementBoundsArray = await this.loadAndProcessImage(
-            img,
-            bodyCopy,
-        );
-        return elementBoundsArray;
+        return await this.loadAndProcessImage(img, bodyCopy);
     }
 
     private async loadAndProcessImage(
@@ -335,7 +331,12 @@ export class HtmlImageComparer {
         pageY: number,
     ): ElementBounds | null {
         const elementAtPosition = findElementAtPosition(bodyCopy, pageX, pageY);
-        if (!elementAtPosition) {
+
+        if (
+            !elementAtPosition ||
+            elementAtPosition.offsetWidth === 0 ||
+            elementAtPosition.offsetHeight === 0
+        ) {
             return null;
         }
 
