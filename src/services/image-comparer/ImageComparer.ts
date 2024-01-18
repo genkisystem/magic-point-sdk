@@ -33,9 +33,8 @@ export interface CanvasWithDots {
 export class HtmlImageComparer {
     private async captureElementAsDataURL(
         element: HTMLElement,
-        delayTime: number = 100,
     ): Promise<string> {
-        const canvas = await captureElementAsCanvas(element, delayTime);
+        const canvas = await captureElementAsCanvas(element);
         return canvas.toDataURL("image/png");
     }
 

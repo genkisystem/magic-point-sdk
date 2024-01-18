@@ -69,15 +69,8 @@ export const drawBugCanvas = (
     return bugCanvas;
 };
 
-export const delay = (ms: number): Promise<void> => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-};
-
 export const captureElementAsCanvas = async (
     element: HTMLElement,
-    delayTime: number = 100,
 ): Promise<HTMLCanvasElement> => {
-    await delay(delayTime);
-
     return await html2canvas(element);
 };
