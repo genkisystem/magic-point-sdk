@@ -1,5 +1,4 @@
 import { ElementBounds } from "@services";
-import html2canvas from "html2canvas";
 
 export const resizeCanvas = (
     sourceCanvas: HTMLCanvasElement,
@@ -67,10 +66,4 @@ export const drawBugCanvas = (
     bugPositions.forEach((point, index) => drawRect(ctx, point, index));
 
     return bugCanvas;
-};
-
-export const captureElementAsCanvas = async (
-    element: HTMLElement,
-): Promise<HTMLCanvasElement> => {
-    return await html2canvas(element);
 };
