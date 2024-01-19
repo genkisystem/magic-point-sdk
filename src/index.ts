@@ -234,18 +234,23 @@ class MagicPoint extends Base {
     }
 
     private toggleSDKElementsInOneSec() {
-        const taskList: HTMLDivElement | null =
-            document.querySelector("#list-task-wrapper") ?? null;
-        if (taskList) taskList.style.display = "none";
+        // const taskList: HTMLDivElement | null =
+        //     document.querySelector("#list-task-wrapper") ?? null;
+        // if (taskList) taskList.style.display = "none";
 
-        const magicPointToggleWrap: HTMLDivElement = document.querySelector(
-            `.${"active"}`,
-        )?.parentElement as HTMLDivElement;
-        magicPointToggleWrap.style.display = "none";
+        // const magicPointToggleWrap: HTMLDivElement = document.querySelector(
+        //     `.${"active"}`,
+        // )?.parentElement as HTMLDivElement;
+        // magicPointToggleWrap.style.display = "none";
 
+        // setTimeout(() => {
+        //     if (taskList) taskList.style.display = "flex";
+        //     magicPointToggleWrap.style.display = "block";
+        // }, 1);
+
+        this.magicPointContainer.hidden = true
         setTimeout(() => {
-            if (taskList) taskList.style.display = "flex";
-            magicPointToggleWrap.style.display = "block";
+            this.magicPointContainer.hidden = false;
         }, 1);
     }
 
@@ -254,6 +259,7 @@ class MagicPoint extends Base {
     ): Promise<HTMLCanvasElement> {
         const outermostTag = this.findOutermostTag(e.target as HTMLElement);
         this.toggleSDKElementsInOneSec();
+        this.removeNoScriptTag() // for reactjs project created by CRA
         const base64png = await html2canvas(outermostTag);
 
         return new Promise<HTMLCanvasElement>((resolve) => {
@@ -279,6 +285,14 @@ class MagicPoint extends Base {
                 resolve(canvas);
             };
         });
+    }
+
+    private removeNoScriptTag() {
+        const HTMLCollection = document.getElementsByTagName('noscript')
+        console.log("NoScript Collection: ", HTMLCollection);
+        if (HTMLCollection.length > 0) {
+            HTMLCollection.item(0)!.remove();
+        }
     }
 
     private getDevicePixelRatio(): number {

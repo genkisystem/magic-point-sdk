@@ -2,7 +2,7 @@ $success-color: green;
 $failure-color: red;
 $common-font-size: 1.5rem;
 $toast-animation-duration: 0.5s;
-$toast-height: 8vh;
+$toast-height: 3vh;
 
 .toast {
     position: fixed;
@@ -13,7 +13,7 @@ $toast-height: 8vh;
     transform: translate(-50%, -100%);
     font-size: $common-font-size;
     padding: .5rem 1.5rem;
-    border-radius: 4px;
+    border-radius: 8px;
     z-index: 11;
     height: $toast-height;
     width: max-content;
@@ -24,7 +24,7 @@ $toast-height: 8vh;
     background-color: #fff;
     transition: opacity $toast-animation-duration, transform $toast-animation-duration;
     overflow: hidden;
-
+    font-size: 1rem;
 
     @keyframes progress {
         100% {
@@ -41,7 +41,6 @@ $toast-height: 8vh;
         width: 100%;
         animation: progress 5s linear forwards;
     }
-
 
     &.slide-in {
         transform: translate(-50%, 0);
