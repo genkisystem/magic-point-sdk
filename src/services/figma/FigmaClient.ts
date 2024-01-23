@@ -22,7 +22,7 @@ export class FigmaClient {
     constructor() {}
 
     private async fetchFigmaProjectFilesByTeams(
-        teams: ExtendedGetTeamProjectsResult[]
+        teams: ExtendedGetTeamProjectsResult[],
     ): Promise<[ExtendedGetProjectFilesResult[], FileImageMap]> {
         let allProjectFiles: ExtendedGetProjectFilesResult[] = [];
         let allFileImageMap: FileImageMap = {};
@@ -31,9 +31,8 @@ export class FigmaClient {
             const projectFiles = await this.fetchProjectFilesForTeam(team);
             allProjectFiles = [...allProjectFiles, ...projectFiles];
 
-            const fileImageMap = await this.fetchFileImageMapForTeam(
-                projectFiles
-            );
+            const fileImageMap =
+                await this.fetchFileImageMapForTeam(projectFiles);
             allFileImageMap = { ...allFileImageMap, ...fileImageMap };
         }
 
@@ -41,47 +40,46 @@ export class FigmaClient {
     }
 
     private async fetchProjectFilesForTeam(
-        team: ExtendedGetTeamProjectsResult
+        team: ExtendedGetTeamProjectsResult,
     ): Promise<ExtendedGetProjectFilesResult[]> {
         return await Promise.all(
             team.projects.map((p) =>
-                this.figmaApiService.getProjectFiles(p.id.toString())
-            )
+                this.figmaApiService.getProjectFiles(p.id.toString()),
+            ),
         );
     }
 
     private async fetchFileImageMapForTeam(
-        projectFiles: ExtendedGetProjectFilesResult[]
+        projectFiles: ExtendedGetProjectFilesResult[],
     ): Promise<FileImageMap> {
         const fileIds = this.getFileIdsFromProjects(projectFiles);
         const files = await this.fetchFiles(fileIds);
         const fileIdToImageIdsMap = this.createFileIdToImageIdsMap(
             fileIds,
-            files
+            files,
         );
-        const imagesResponses = await this.fetchImagesForFiles(
-            fileIdToImageIdsMap
-        );
+        const imagesResponses =
+            await this.fetchImagesForFiles(fileIdToImageIdsMap);
         return this.createAllFileImageMap(fileIds, files, imagesResponses);
     }
 
     private getFileIdsFromProjects(
-        projectFiles: ExtendedGetProjectFilesResult[]
+        projectFiles: ExtendedGetProjectFilesResult[],
     ): string[] {
         return projectFiles.flatMap((project) =>
-            project.files.map((file) => file.key)
+            project.files.map((file) => file.key),
         );
     }
 
     private async fetchFiles(fileIds: string[]): Promise<GetFileResult[]> {
         return await Promise.all(
-            fileIds.map((fileId) => this.figmaApiService.getFile(fileId))
+            fileIds.map((fileId) => this.figmaApiService.getFile(fileId)),
         );
     }
 
     private createFileIdToImageIdsMap(
         fileIds: string[],
-        files: GetFileResult[]
+        files: GetFileResult[],
     ): { [fileId: string]: string[] } {
         const fileIdToImageIdsMap: { [fileId: string]: string[] } = {};
         for (let i = 0; i < fileIds.length; i++) {
@@ -102,14 +100,14 @@ export class FigmaClient {
                     return Promise.resolve({ images: {} });
                 }
                 return this.figmaApiService.getImage(fileId, imageIds);
-            })
+            }),
         );
     }
 
     private createAllFileImageMap(
         fileIds: string[],
         files: GetFileResult[],
-        imagesResponses: GetImageResult[]
+        imagesResponses: GetImageResult[],
     ): FileImageMap {
         let allFileImageMap: FileImageMap = {};
         for (let i = 0; i < files.length; i++) {
@@ -120,7 +118,7 @@ export class FigmaClient {
             const imageInfoList: ImageInfo[] = this.createImageInfoList(
                 imagesResponse,
                 idNameMap,
-                idToNodeMap
+                idToNodeMap,
             );
             allFileImageMap[fileIds[i]] = imageInfoList;
         }
@@ -130,7 +128,7 @@ export class FigmaClient {
     private createImageInfoList(
         imagesResponse: GetImageResult,
         idNameMap: { [id: string]: string },
-        idToNodeMap: { [id: string]: any }
+        idToNodeMap: { [id: string]: any },
     ): ImageInfo[] {
         const imageInfoList: ImageInfo[] = [];
         for (const imageId in imagesResponse.images) {
@@ -194,18 +192,45 @@ export class FigmaClient {
     }
 
     public async fetchFigmaTeams(
-        teamIds: string[]
+        teamIds: string[],
     ): Promise<Map<string, ExtendedGetTeamProjectsResult>> {
-        const responses = await Promise.all(
-            teamIds.map((id) => this.figmaApiService.getTeamProjects(id))
-        );
+        try {
+            const responses = await Promise.all(
+                teamIds.map((id) => this.figmaApiService.getTeamProjects(id)),
+            );
 
-        const resultMap = teamIds.reduce((map, teamId, index) => {
-            map.set(teamId, responses[index]);
-            return map;
-        }, new Map<string, ExtendedGetTeamProjectsResult>());
+            const resultMap = teamIds.reduce((map, teamId, index) => {
+                map.set(teamId, responses[index]);
+                return map;
+            }, new Map<string, ExtendedGetTeamProjectsResult>());
 
-        return resultMap;
+            return resultMap;
+        } catch (error) {
+            console.error("Error in fetchFigmaTeams:", error);
+            return new Map<string, ExtendedGetTeamProjectsResult>();
+        }
+    }
+
+    public async fetchFigmaProjects(
+        projectIds: string[],
+    ): Promise<Map<string, ExtendedGetProjectFilesResult>> {
+        try {
+            const responses = await Promise.all(
+                projectIds.map((id) =>
+                    this.figmaApiService.getProjectFiles(id),
+                ),
+            );
+
+            const resultMap = projectIds.reduce((map, projectId, index) => {
+                map.set(projectId, responses[index]);
+                return map;
+            }, new Map<string, ExtendedGetProjectFilesResult>());
+
+            return resultMap;
+        } catch (error) {
+            console.error("Error in fetchFigmaProjects:", error);
+            return new Map<string, ExtendedGetProjectFilesResult>();
+        }
     }
 
     public getUserInfo() {

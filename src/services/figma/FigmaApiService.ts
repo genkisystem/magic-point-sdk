@@ -4,7 +4,10 @@ import {
     GetImageResult,
     GetUserMeResult,
 } from "figma-api/lib/api-types";
-import { ExtendedGetProjectFilesResult, ExtendedGetTeamProjectsResult } from "./type";
+import {
+    ExtendedGetProjectFilesResult,
+    ExtendedGetTeamProjectsResult,
+} from "./type";
 
 export class FigmaApiService {
     private figmaApi: Figma.Api | null = null;
@@ -21,14 +24,14 @@ export class FigmaApiService {
 
     public async getImage(
         fileId: string,
-        nodeIds: string[]
+        nodeIds: string[],
     ): Promise<GetImageResult> {
         return this.callFigmaApi(async () =>
             this.figmaApi!.getImage(fileId, {
                 ids: nodeIds.join(","),
                 scale: 1,
                 format: "png",
-            })
+            }),
         );
     }
 
@@ -37,22 +40,22 @@ export class FigmaApiService {
     }
 
     public async getTeamProjects(
-        teamId: string
+        teamId: string,
     ): Promise<ExtendedGetTeamProjectsResult> {
         return this.callFigmaApi(async () =>
             this.figmaApi!.request<ExtendedGetTeamProjectsResult>(
-                `${Figma.API_DOMAIN}/${Figma.API_VER}/teams/${teamId}/projects`
-            )
+                `${Figma.API_DOMAIN}/${Figma.API_VER}/teams/${teamId}/projects`,
+            ),
         );
     }
 
     public async getProjectFiles(
-        projectId: string
+        projectId: string,
     ): Promise<ExtendedGetProjectFilesResult> {
         return this.callFigmaApi(async () =>
             this.figmaApi!.request<ExtendedGetProjectFilesResult>(
-                `${Figma.API_DOMAIN}/${Figma.API_VER}/projects/${projectId}/files`
-            )
+                `${Figma.API_DOMAIN}/${Figma.API_VER}/projects/${projectId}/files`,
+            ),
         );
     }
 
