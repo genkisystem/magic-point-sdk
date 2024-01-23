@@ -1,6 +1,6 @@
 {
   "name": "magic-point-sdk",
-  "version": "0.0.11",
+  "version": "0.1.0",
   "description": "Software Developer Kit of Magic Point project build on Javascript/NodeJS",
   "main": "dist/index.cjs",
   "module": "dist/index.m.js",
