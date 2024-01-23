@@ -1,4 +1,10 @@
-import { FigmaClient, OAuthClient, OAuthConfig, uiManager } from "@services";
+import {
+    ExtendedGetProjectFilesResult,
+    FigmaClient,
+    OAuthClient,
+    OAuthConfig,
+    uiManager,
+} from "@services";
 import { createDivElement } from "@utils";
 import {
     GetTeamProjectsResult,
@@ -24,8 +30,10 @@ export class FigmaLoginBody implements Component {
     };
 
     private teamId: string = "";
+    private projects: Map<string, ExtendedGetProjectFilesResult>;
     private teams: Map<string, ExtendedGetTeamProjectsResult>;
     private teamOptions: SelectItem[];
+    private projectOptions: SelectItem[];
 
     constructor(
         private figmaClient: FigmaClient,
@@ -38,7 +46,9 @@ export class FigmaLoginBody implements Component {
         this.componentElement.id = "figma-login-container";
 
         this.teams = new Map();
+        this.projects = new Map();
         this.teamOptions = [];
+        this.projectOptions = [];
 
         this.oAuthClient = new OAuthClient(this.oAuthConfig);
 
@@ -103,6 +113,18 @@ export class FigmaLoginBody implements Component {
                 try {
                     uiManager.showLoading();
                     this.figmaClient.setToken(figma_token);
+
+                    this.projects = await this.figmaClient.fetchFigmaProjects(
+                        this.teamIds,
+                    );
+
+                    this.projectOptions = Array.from(
+                        this.projects.entries(),
+                    ).map(([id, response]) => ({
+                        display: response.name,
+                        value: id,
+                    }));
+
                     this.teams = await this.figmaClient.fetchFigmaTeams(
                         this.teamIds,
                     );
@@ -119,24 +141,14 @@ export class FigmaLoginBody implements Component {
                     );
                 } catch (error) {
                     console.error("Error fetching Figma information:", error);
-                    this.showError(error);
                 } finally {
+                    uiManager.hideLoading();
                     window.removeEventListener("message", tokenListener);
                 }
             }
         };
 
         window.addEventListener("message", tokenListener);
-    }
-
-    private showError(error: any): void {
-        uiManager.hideLoading();
-
-        const errorMessage = document.createElement("p");
-        errorMessage.textContent = `${i18next.t("figma:login.error.prefix")}: ${error.message || i18next.t("figma:login.error.content")
-            }`;
-        errorMessage.style.color = "red";
-        this.componentElement.appendChild(errorMessage);
     }
 
     private updateScreen() {
@@ -163,6 +175,13 @@ export class FigmaLoginBody implements Component {
             teamSelectBox.appendChild(option);
         });
 
+        this.projectOptions.forEach((item) => {
+            const option = document.createElement("option");
+            option.value = item.value;
+            option.textContent = item.display;
+            teamSelectBox.appendChild(option);
+        });
+
         teamSelectBox.addEventListener("change", (event: Event) => {
             const target = event.target as HTMLSelectElement;
             this.teamId = target.value;
@@ -179,28 +198,47 @@ export class FigmaLoginBody implements Component {
     }
 
     private async preClickFetchTeamInfo(): Promise<boolean | Error> {
-        if (this.teamId) {
-            try {
-                uiManager.showLoading();
-                const team = this.teams.get(this.teamId);
-                if (team) {
-                    await this.figmaClient.fetchFigmaFiles(team);
-                }
-                return true;
-            } catch (error) {
-                console.error("Error fetching Figma team information:", error);
-                this.showError(error);
-                return new Error(i18next.t("figma:login.fetchTeamFailedMsg"));
-            } finally {
-                uiManager.hideLoading();
-                this.updateFooter({
-                    nextButtonConfig: {
-                        preClick: undefined,
-                    },
-                });
-            }
+        if (!this.teamId) {
+            return false;
         }
-        return false;
+
+        try {
+            uiManager.showLoading();
+            const target = this.getTargetInfo();
+            if (!target) {
+                console.error("Invalid team or project");
+                return false;
+            }
+
+            await this.figmaClient.fetchFigmaFiles(target);
+            this.updateFooter({
+                nextButtonConfig: {
+                    preClick: undefined,
+                },
+            });
+            return true;
+        } catch (error) {
+            console.error("Error fetching Figma team information:", error);
+            return new Error(i18next.t("figma:login.fetchTeamFailedMsg"));
+        } finally {
+            uiManager.hideLoading();
+        }
+    }
+
+    private getTargetInfo(): ExtendedGetTeamProjectsResult | undefined {
+        const project = this.projects.get(this.teamId);
+
+        return project
+            ? {
+                  name: project.name,
+                  projects: [
+                      {
+                          id: parseInt(this.teamId),
+                          name: project.name,
+                      },
+                  ],
+              }
+            : this.teams.get(this.teamId);
     }
 
     renderComponent() {

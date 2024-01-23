@@ -131,16 +131,19 @@ export class FigmaSelectionScreen implements Component {
         return {
             id: "temp",
             name: file.name,
+            level: 0,
             children: file.files.map(
                 (f): TreeItem => ({
                     id: f.key,
                     name: f.name,
                     imageUrl: f.thumbnail_url,
+                    level: 1,
                     children: fileScreensMap[f.key].map(
                         (s): TreeItem => ({
                             id: s.name,
                             name: s.name,
                             imageUrl: s.image,
+                            level: 2,
                             node: s.node,
                         }),
                     ),

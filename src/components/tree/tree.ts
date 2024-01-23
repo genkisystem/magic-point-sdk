@@ -6,6 +6,7 @@ import { Component } from "../common";
 export type TreeItem = {
     id: string;
     name: string;
+    level: number; // Add this line
     imageUrl?: string;
     children?: TreeItem[];
     node?: Node;
@@ -57,10 +58,10 @@ export class ScreenComponent implements Component {
     private createItemContainer(item: TreeItem): HTMLElement {
         const divContainer = createDivElement({ className: "item-container" });
 
-        if (item.children && item.children.length > 0) {
-            divContainer.appendChild(this.createCollapseIcon());
-        } else {
+        if (item.level === 2) {
             divContainer.appendChild(this.createRadio(item));
+        } else {
+            divContainer.appendChild(this.createCollapseIcon());
         }
 
         const name = document.createElement("span");
